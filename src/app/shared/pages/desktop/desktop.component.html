@@ -1,0 +1,80 @@
+
+
+<div class="search-layout">
+  <div class="dashboard-card">
+    <mat-card class="example-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title style="cursor: pointer;" (click)="selectedQueue = ''">SEARCH WORKITEMS</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content class="reference-form-container">
+        <form [formGroup]="searchVipReference" class="reference-form">
+    
+          <div class="form-field">
+            <div class="label-field">
+              <label>Queue</label>
+            </div>
+              <select matNativeControl formControlName="selecteQueue">
+                <option value="" disabled selected>Select Queue</option>
+                <option value="so">Section Officer</option>
+                <option value="us">Under Secretary</option>
+                <option value="dd">Deputy Director</option>
+              </select>
+          </div>
+      
+          <div class="form-field">
+            <div class="label-field">
+              <label>Process</label>
+            </div>
+            <select matNativeControl formControlName="processName">
+              <option value="" disabled selected>Select Process</option>
+              <option value="so">Section Officer</option>
+              <option value="us">Under Secretary</option>
+              <option value="dd">Deputy Director</option>
+            </select>
+          </div>
+      
+          <div class="form-field">
+            <div class="label-field">
+              <label>Workshop</label>
+            </div>
+            
+            <select matNativeControl formControlName="workshopName">
+              <option value="" disabled selected>Select Designation</option>
+              <option value="so">Section Officer</option>
+              <option value="us">Under Secretary</option>
+              <option value="dd">Deputy Director</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <div class="label-field">
+              <label>Variant Name</label>
+            </div>
+            
+            <select matNativeControl formControlName="variantName">
+              <option value="" disabled selected>Select State</option>
+              <option value="so">Maharashtra</option>
+              <option value="us">Uttar Pradesh</option>
+              <option value="dd">Bihar</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <div class="label-field">
+              <label>Registration No</label>
+            </div>
+            
+            <input matInput formControlName="registrationNo" class="mat-input" placeholder="Constituency">
+          </div>
+      
+     
+        </form>
+      </mat-card-content>
+      <div class="search-btn-group">
+        <button mat-raised-button class="search-btn">Search</button>
+        <span class="separator"><hr></span>
+        <button mat-raised-button class="reset-btn">Reset</button>
+      </div>
+    </mat-card>
+
+  </div>
+</div>

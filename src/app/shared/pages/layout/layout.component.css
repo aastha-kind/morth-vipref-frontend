@@ -1,0 +1,191 @@
+.mat-expansion-panel {
+    box-shadow: none !important;
+    background: transparent;
+  }
+  
+  .mat-expansion-panel-header {
+    padding: 0 16px;
+  }
+  
+  .mat-expansion-panel-header-title,
+  .mat-expansion-panel-header-description {
+    align-items: center;
+  }
+  
+  .mat-list-icon {
+    padding: 4px;
+  }
+  
+  ::ng-deep .mat-list-item {
+    cursor: pointer !important;
+    border-left: 4px solid transparent;
+    transition: 0.2s all;
+    box-sizing: border-box;
+  }
+  
+  ::ng-deep .mat-list-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+  
+  .mat-list-base {
+    padding-top: 0;
+  }
+  
+  .mat-list-base .mat-list-item {
+    height: 50px;
+  }
+  
+  .list-item {
+    font-size: 16px;
+    padding-left: 16px;
+  }
+  
+  .mat-line {
+    white-space: normal !important;
+  }
+  
+  .active {
+    background: #94a5ff33 !important;
+    border-left: 4px solid #3f51b5;
+  }
+  
+  
+  :host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  ::ng-deep .mat-mdc-list-item-unscoped-content{
+    display: flex;
+  }
+  
+  mat-drawer {
+    min-width: 200px;
+    max-width: 400px;
+  }
+  
+  .margin-left {
+    margin-left: 300px;
+  }
+  
+  mat-drawer-container {
+    min-height: calc(100vh - 64px);
+  }
+  
+  ::ng-deep .mat-drawer-inner-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #ecececc2;
+  }
+  
+  
+  .center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+  }
+  
+  
+  .date-hour-content {
+    background: #3f51b538;
+    text-align: center;
+    padding: 10px 0;
+  }
+
+  .mat-card-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.menu-button-content {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    /* space between text and icon */
+}
+
+::ng-deep .mat-mdc-card-content:first-child {
+  padding-top: 0px !important;
+}
+
+::ng-deep .mat-mdc-card-content:last-child {
+  padding-bottom: 0px !important;
+}
+.button-content {
+  font-size: 14px;
+  font-weight: 500;
+  font-family: Roboto, sans-serif;
+}
+
+
+
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background-color: #e91e63;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1200;
+}
+
+/* ===== LAYOUT ===== */
+.layout-container {
+  display: flex;
+  height: calc(100vh - 64px);
+  margin-top: 64px;
+  overflow: hidden;
+  /* Prevent page scroll */
+}
+
+.sidenav-container {
+  flex: 1;
+  display: flex;
+  height: 100%;
+}
+
+/* ===== FIXED SIDENAV ===== */
+.sidenav {
+  width: 230px;
+  color: #fff;
+  padding-top: 10px;
+  position: fixed;
+  /* Make it fixed */
+  top: 55px;
+  /* Below the header */
+  left: 0;
+  bottom: 0;
+  z-index: 1100;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  overflow-y: auto;
+  /* Scroll if sidebar content grows */
+}
+
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  transition: margin-left 0.3s ease;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background-color: #edf1f7;
+  width: 100%;
+}
+
+ffffff
+.main-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* When sidenav is closed */
+.main-content.sidenav-closed {
+  margin-left: 0;
+}

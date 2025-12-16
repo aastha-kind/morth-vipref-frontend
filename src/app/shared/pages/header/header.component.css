@@ -1,0 +1,120 @@
+/* ===== HEADER ===== */
+.main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 74px;
+      background: linear-gradient(to right, #4CAF50, #2196F3) !important;
+    /* pink like ngx-admin */
+    color: #000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    z-index: 1000;
+    gap: 20px;
+}
+
+/* ===== LAYOUT ===== */
+.layout-container {
+    display: flex;
+    height: calc(100vh - 64px);
+    margin-top: 64px;
+    /* offset below header */
+}
+
+/* Angular Material sidenav setup */
+.sidenav-container {
+    flex: 1;
+    display: flex;
+    height: 100%;
+}
+
+.header-content {
+    border-left: 1px solid #fff;
+    padding-left: 20px;
+    color: #fff;
+}
+::ng-deep .mat-mdc-icon-button{
+    color: #fff !important;
+}
+::ng-deep .mat-elevation-z4{
+    box-shadow: none;
+}
+
+/* ===== user-menu ===== */
+.user-menu {
+  display: flex;
+  align-items: center;
+}
+
+.user-menu button[mat-button] {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  text-transform: none;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.user-menu button[mat-button]:hover {
+  background-color: #fff(255, 255, 255, 0.1);
+}
+
+.user-menu .user-icon {
+  font-size: 1.7rem;
+  margin-right: 6px;
+}
+
+.user-menu .username {
+  margin-right: 4px;
+  font-size: 1rem;
+}
+
+::ng-deep .mat-mdc-button>.mat-icon{
+    height: auto;
+    width: auto;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.header-divider {
+  width: 1px;
+  height: 20px;
+  background-color: #fff;
+  margin: 0 10px;
+}
+
+::ng-deep .mat-mdc-menu-content .mat-mdc-menu-item .mat-mdc-menu-item-text{
+    font-size: 0.8125rem;
+}
+
+::ng-deep .mat-mdc-menu-item .mat-icon{
+    margin-right: 7px;
+}
+
+.govt-title {
+  padding: 10px;
+  font-family: "Segoe UI", Arial, sans-serif;
+
+}
+
+.title-main {
+  font-size: 24px;
+  font-weight: 800;
+  color: #00398A; /* Navy Blue */
+  font-style: italic;
+  
+}
+
+.title-sub {
+  font-size: 12px;
+  font-weight: 500;
+  color: #FFF;
+  margin-top: 5px;
+}

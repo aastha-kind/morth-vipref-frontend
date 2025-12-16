@@ -1,0 +1,47 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><b>Manage Organization</b></h2>
+    <div>
+      <button mat-raised-button color="accent" (click)="openAddDialog()">
+        <mat-icon>person_add</mat-icon> Add New Organization
+      </button>
+    </div>
+  </div>
+
+  <table mat-table [dataSource]="organizations" class="mat-elevation-z2 table organization-table">
+
+    <!-- Serial No -->
+    <ng-container matColumnDef="srNo">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Sr. No.</th>
+      <td mat-cell *matCellDef="let org; let i = index" class="text-center">{{ i + 1 }}</td>
+    </ng-container>
+
+    <!-- Name -->
+    <ng-container matColumnDef="organizationName">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Organization Name</th>
+      <td mat-cell *matCellDef="let org" class="text-center">{{ org.organizationName }}</td>
+    </ng-container>
+
+    <!-- Code -->
+    <ng-container matColumnDef="organizationCode">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Organization Code</th>
+      <td mat-cell *matCellDef="let org" class="text-center">{{ org.organizationCode }}</td>
+    </ng-container>
+
+    <!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Actions</th>
+      <td mat-cell *matCellDef="let org" class="text-center">
+        <button mat-icon-button (click)="openEditDialog(org)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="openDeleteDialog(org)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>

@@ -1,0 +1,36 @@
+<!-- Titles -->
+<h2 mat-dialog-title *ngIf="data.mode === 'add'">Add Office Type</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'edit'">Edit Office Type</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'delete'">Delete Office Type</h2>
+
+<!-- Add/Edit Form -->
+<mat-dialog-content *ngIf="data.mode !== 'delete'">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Office Type Name</mat-label>
+    <input matInput [(ngModel)]="data.officeType.typeName"
+           oninput="this.value=this.value.replace(/[^a-zA-Z ]/g,'').replace(/^\s+/,'').replace(/\s{2,}/g,' ')"
+           placeholder="Enter office type name" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Office Type Code</mat-label>
+    <input matInput [(ngModel)]="data.officeType.officeTypeCode"
+           oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').trim();"
+           placeholder="Enter office type code" />
+  </mat-form-field>
+</mat-dialog-content>
+
+<!-- Delete Confirmation -->
+<mat-dialog-content *ngIf="data.mode === 'delete'">
+  <p>Are you sure you want to delete <strong>{{ data.officeType?.officeTypeName }}</strong>?</p>
+  <small>This action cannot be undone.</small>
+</mat-dialog-content>
+
+<!-- Actions -->
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+
+  <button mat-raised-button color="primary" *ngIf="data.mode === 'add'" (click)="saveOfficeType()">Add</button>
+  <button mat-raised-button color="accent" *ngIf="data.mode === 'edit'" (click)="updateOfficeType()">Save</button>
+  <button mat-raised-button color="warn" *ngIf="data.mode === 'delete'" (click)="deleteOfficeType()">Delete</button>
+</mat-dialog-actions>

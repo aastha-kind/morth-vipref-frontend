@@ -1,0 +1,19 @@
+<div class="editor-card">
+    <mat-card-header>
+        <mat-card-title style="cursor: pointer;font-style: italic;background-color: #3f51b5;color: #fff;">VIEW DRAFT REPLY</mat-card-title>
+    </mat-card-header>
+
+    <div class="editor-content">
+        <mat-card-content>
+            <editor apiKey="b5g34ckshepltf9x1akei96rr2zcm1wsd94gxppwmugvurkn" [init]="previewInit"
+                [initialValue]="draftContent" class="custom-editor" [disabled]="true">
+            </editor>
+        </mat-card-content>
+
+        <mat-card-footer>
+            <div class="btn-group">
+                <button mat-raised-button color="warn" mat-dialog-close>Close</button>
+            </div>
+        </mat-card-footer>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+<!-- ===== TOP NAVBAR ===== -->
+<app-admin-panel-header (toggleSidenav)="drawer.toggle()"></app-admin-panel-header>
+
+<!-- ===== SIDEBAR + MAIN CONTENT ===== -->
+<div class="layout-container">
+  <mat-sidenav-container class="sidenav-container">
+    <!-- Sidebar -->
+    <mat-sidenav #drawer class="sidenav" mode="side" opened>
+      <app-admin-panel-sidebar></app-admin-panel-sidebar>
+    </mat-sidenav>
+
+    <!-- Main Content -->
+    <mat-sidenav-content class="main-content">
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

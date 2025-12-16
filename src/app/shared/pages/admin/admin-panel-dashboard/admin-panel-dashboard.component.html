@@ -1,0 +1,107 @@
+<div class="container-fluid dashboard-template">
+        <div class="row mb-3">
+          <!-- Daily Income -->
+          <div class="col-12 col-lg-3 mb-3">
+            <mat-card class="h-100">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <small>Daily Income</small>
+                  <h4>45,895</h4>
+                  <small class="text-success">▲ 4%</small>
+                </div>
+                <div style="width:120px">
+                  <canvas baseChart [data]="sparklineData" [options]="sparklineOptions" chartType="line"></canvas>
+                </div>
+              </div>
+            </mat-card>
+          </div>
+
+          <!-- Orders -->
+          <div class="col-12 col-lg-6 mb-3">
+            <mat-card class="h-100">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">Orders</h5>
+                <mat-select>
+                  <mat-option>Week</mat-option>
+                  <mat-option>Month</mat-option>
+                </mat-select>
+              </div>
+              <div style="height:320px">
+                <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" chartType="line"></canvas>
+              </div>
+            </mat-card>
+          </div>
+
+          <!-- Traffic -->
+          <div class="col-12 col-lg-3 mb-3">
+            <mat-card class="h-100">
+              <h6>Traffic</h6>
+              <table class="table table-borderless mb-0">
+                <tbody>
+                  <tr *ngFor="let t of traffic">
+                    <td>{{t.day}}</td>
+                    <td>{{t.visits}}</td>
+                    <td class="text-end">{{t.trend}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </mat-card>
+          </div>
+
+          <div class="col-12 col-lg-3 mb-3">
+            <mat-card class="h-100">
+              <h6>Traffic</h6>
+              <table class="table table-borderless mb-0">
+                <tbody>
+                  <tr *ngFor="let t of traffic">
+                    <td>{{t.day}}</td>
+                    <td>{{t.visits}}</td>
+                    <td class="text-end">{{t.trend}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </mat-card>
+          </div>
+          <div class="col-12 col-lg-3 mb-3">
+            <mat-card class="h-100">
+              <h6>Traffic</h6>
+              <table class="table table-borderless mb-0">
+                <tbody>
+                  <tr *ngFor="let t of traffic">
+                    <td>{{t.day}}</td>
+                    <td>{{t.visits}}</td>
+                    <td class="text-end">{{t.trend}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </mat-card>
+          </div>
+          
+        </div>
+
+        <!-- ===== Lower Row ===== -->
+        <div class="row">
+          <div class="col-12 col-lg-8 mb-3">
+            <mat-card style="height:240px">
+              <h6>Country Orders Statistics</h6>
+              <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                Map placeholder
+              </div>
+            </mat-card>
+          </div>
+
+          <div class="col-12 col-lg-4 mb-3">
+            <mat-card class="mb-3">
+              <h6>Today's Profit</h6>
+              <h3>572,900</h3>
+            </mat-card>
+            <mat-card>
+              <h6>Quick Actions</h6>
+              <div class="d-flex gap-2">
+                <button mat-stroked-button color="primary">New</button>
+                <button mat-stroked-button color="accent">Upload</button>
+              </div>
+            </mat-card>
+          </div>
+        </div>
+      </div>

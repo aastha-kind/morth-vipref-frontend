@@ -1,0 +1,58 @@
+
+::ng-deep .mat-mdc-header-row {
+    /* background: #3f51b5 !important; */
+    background: #3e9393 !important;
+    color: #ffff !important;
+}
+
+::ng-deep .mat-sort-header-arrow svg {
+    fill: #ffff !important;
+}
+
+::ng-deep .mat-mdc-menu-panel {
+    min-width: 140px !important;
+}
+.px-4 {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.pb-4{
+  padding-bottom: 20px;
+}
+.example-card {
+    width: 100% !important;
+    height: 100% !important;
+}
+.Login-btn {
+    height: 3em;
+    float: right;
+    width: 13em;
+    background-color: #3e9393;
+    color: #ffff;
+}
+::ng-deep .mat-mdc-row{
+    cursor: pointer !important;
+}
+::ng-deep .mat-mdc-row:hover{
+    background-color: #ededed !important;
+}
+::ng-deep .mat-mdc-no-data-row {
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.govt-title {
+  padding: 10px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  margin: 10px;
+}
+
+.title-main {
+  font-size: 22px;
+  font-weight: 800;
+  color: #00398A; /* Navy Blue */
+}

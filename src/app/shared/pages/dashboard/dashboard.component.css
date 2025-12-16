@@ -1,0 +1,56 @@
+
+.example-card {
+    width: 100% !important;
+    height: 100% !important;
+}
+.grid-layout {
+    display: grid;
+    grid-template-columns: 2fr 5fr;
+}
+.canvas-chart-container {
+    width: 350px !important;
+    height: 350px !important;
+    margin: 30px 0px;
+}
+
+.mat-mdc-card-header {
+    padding-top: 40px;
+    justify-content: center;
+}
+
+.canvas-chart {
+    display: flex;
+    justify-content: center;
+}
+
+.p-4 {
+    padding: 20px;
+}
+
+.mat-card-footer {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mat-card-footer p span {
+    color: red;
+    font-weight: 600;
+}
+
+::ng-deep .mat-mdc-header-row {
+    /* background: #3f51b5 !important; */
+    background: #3e9393 !important;
+    color: #ffff !important;
+}
+
+::ng-deep .mat-sort-header-arrow svg {
+    fill: #ffff !important;
+}
+
+::ng-deep .mat-mdc-menu-panel {
+    min-width: 140px !important;
+}
+
+

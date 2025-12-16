@@ -1,0 +1,46 @@
+<!-- Titles -->
+<h2 mat-dialog-title *ngIf="data.mode === 'add'">Add Designation</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'edit'">Edit Designation</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'delete'">Delete Designation</h2>
+
+<!-- Add/Edit Form -->
+<mat-dialog-content *ngIf="data.mode !== 'delete'">
+  <!-- Code -->
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Designation Code</mat-label>
+    <input matInput [(ngModel)]="data.designation.designationCode" placeholder="Enter code" />
+  </mat-form-field>
+
+  <!-- Description -->
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Description</mat-label>
+    <input matInput [(ngModel)]="data.designation.designationDescription" placeholder="Enter description" />
+  </mat-form-field>
+
+  <!-- Organization Dropdown -->
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Organization</mat-label>
+    <mat-select [(ngModel)]="data.designation.organization.organizationId">
+      <mat-option *ngFor="let org of organizations" [value]="org.organizationId">
+        {{ org.organizationName }} ({{ org.organizationCode }})
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+
+<!-- Delete Confirmation -->
+<mat-dialog-content *ngIf="data.mode === 'delete'">
+  <p>
+    Are you sure you want to delete
+    <strong>{{ data.designation?.designationDescription }}</strong>?
+  </p>
+  <small>This action cannot be undone.</small>
+</mat-dialog-content>
+
+<!-- Actions -->
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" *ngIf="data.mode === 'add'" (click)="saveDesignation()">Add</button>
+  <button mat-raised-button color="accent" *ngIf="data.mode === 'edit'" (click)="updateDesignation()">Save</button>
+  <button mat-raised-button color="warn" *ngIf="data.mode === 'delete'" (click)="deleteDesignation()">Delete</button>
+</mat-dialog-actions>

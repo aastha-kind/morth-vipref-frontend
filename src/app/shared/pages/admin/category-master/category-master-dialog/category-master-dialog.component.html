@@ -1,0 +1,57 @@
+<!-- Dialog Titles -->
+<h2 mat-dialog-title *ngIf="data.mode === 'add'">Add Category</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'edit'">Edit Category</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'delete'">Delete Category</h2>
+
+<!-- Add/Edit Form -->
+<mat-dialog-content *ngIf="data.mode !== 'delete'">
+
+  <!-- Category Code -->
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Category Code</mat-label>
+    <input
+      matInput
+      [(ngModel)]="data.category.categoryCode"
+      placeholder="Enter category code"
+      oninput="this.value=this.value.replace(/[^a-zA-Z0-9_]/g,'').toLowerCase()"
+    />
+  </mat-form-field>
+
+  <!-- Category Description -->
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Category Description</mat-label>
+    <input
+      matInput
+      [(ngModel)]="data.category.categoryDescription"
+      placeholder="Enter category description"
+      oninput="this.value=this.value.replace(/[^a-zA-Z ]/g,'').replace(/^\s+/,'').replace(/\s{2,}/g,' ')"
+    />
+  </mat-form-field>
+
+</mat-dialog-content>
+
+<!-- Delete Confirmation -->
+<mat-dialog-content *ngIf="data.mode === 'delete'">
+  <p>
+    Are you sure you want to delete
+    <strong>{{ data.category?.categoryDescription }}</strong>?
+  </p>
+  <small>This action cannot be undone.</small>
+</mat-dialog-content>
+
+<!-- Dialog Actions -->
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+
+  <button mat-raised-button color="primary" *ngIf="data.mode === 'add'" (click)="saveCategory()">
+    Add
+  </button>
+
+  <button mat-raised-button color="accent" *ngIf="data.mode === 'edit'" (click)="updateCategory()">
+    Save
+  </button>
+
+  <button mat-raised-button color="warn" *ngIf="data.mode === 'delete'" (click)="deleteCategory()">
+    Delete
+  </button>
+</mat-dialog-actions>

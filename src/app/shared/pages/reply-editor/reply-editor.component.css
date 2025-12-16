@@ -1,0 +1,71 @@
+.btn-group {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 20px;
+    margin-top: 30px;
+}
+::ng-deep .tox .tox-statusbar{
+    display: none !important;
+}
+::ng-deep .tox .tox-promotion{
+    display: none !important;
+}
+.form-field {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.editor-card {
+  border-radius: 12px;
+  width: 100%;
+  /* max-width: 900px; */
+}
+.editor-content {
+  padding: 30px;
+  width: 100%;
+  /* max-width: 900px; */
+}
+
+.custom-editor {
+  width: 100%;
+  display: block;
+}
+
+.mat-mdc-card-content{
+
+}
+
+::ng-deep .tox-tinymce {
+ border: 2px solid grey !important;
+  border-radius:0px !important;
+}
+
+.tox-editor-container {
+  border-radius:0px !important;
+}
+
+.tox .tox-menu {
+  border-radius: 0px !important;
+}
+
+.tox .tox-toolbar__primary {
+  border-radius:0px !important;
+}
+
+.tox-statusbar {
+  border-radius:0px !important;
+}
+
+
+::ng-deep .mat-mdc-card-header{
+    padding:15px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3f51b5 !important;
+}
+
+

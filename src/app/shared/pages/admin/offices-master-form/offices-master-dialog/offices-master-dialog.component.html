@@ -1,0 +1,63 @@
+<!-- Dialog Titles -->
+<h2 mat-dialog-title *ngIf="data.mode === 'add'">Add Office</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'edit'">Edit Office</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'delete'">Delete Office</h2>
+
+<!-- Add/Edit Form -->
+<mat-dialog-content *ngIf="data.mode !== 'delete'">
+    <!-- Office Name -->
+    <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Office Name</mat-label>
+        <input matInput [(ngModel)]="data.office.officeName"
+            oninput="this.value=this.value.replace(/[^a-zA-Z ]/g,'').replace(/^\s+/,'').replace(/\s{2,}/g,' ')"
+            placeholder="Enter office name" />
+    </mat-form-field>
+
+    <!--Office Type -->
+    <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Select Organization</mat-label>
+        <mat-select [(ngModel)]="data.office.officeTypeId.officeTypeId">
+            <mat-option *ngFor="let org of officeType" [value]="org.officeTypeId">
+                {{ org.typeName }} ({{ org.officeTypeCode }})
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    
+
+    <!-- Organization Dropdown -->
+    <mat-form-field appearance="outline" class="w-100">
+        <mat-label>Select Organization</mat-label>
+        <mat-select [(ngModel)]="data.office.organization.organizationId">
+            <mat-option *ngFor="let org of organizations" [value]="org.organizationId">
+                {{ org.organizationName }} ({{ org.organizationCode }})
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</mat-dialog-content>
+
+<!-- Delete Confirmation -->
+<mat-dialog-content *ngIf="data.mode === 'delete'">
+    <p>
+        Are you sure you want to delete
+        <strong>{{ data.office?.officeName }}</strong>?
+    </p>
+    <small>This action cannot be undone.</small>
+</mat-dialog-content>
+
+<!-- Dialog Actions -->
+<mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancel</button>
+
+    <button mat-raised-button color="primary" *ngIf="data.mode === 'add'" (click)="saveOffice()">
+        Add
+    </button>
+
+    <button mat-raised-button color="accent" *ngIf="data.mode === 'edit'" (click)="updateOffice()">
+        Save
+    </button>
+
+    <button mat-raised-button color="warn" *ngIf="data.mode === 'delete'" (click)="deleteOffice()">
+        Delete
+    </button>
+</mat-dialog-actions>

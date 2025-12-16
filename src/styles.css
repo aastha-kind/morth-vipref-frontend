@@ -1,0 +1,75 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Prevent global scrollbar */
+}
+
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.text-sm{
+    font-size: 0.875rem;
+}
+.text-lg{
+    font-size: 1.125rem;
+}
+.text-2xl{
+    font-size: 1.5rem;
+}
+.font-normal{
+    font-weight: 400;
+}
+.font-smallbold{
+    font-weight: 550;
+}
+.font-semibold{
+    font-weight: 600;
+}
+.font-bold{
+    font-weight: 700;
+}
+.text-gray-800{
+color:oklch(27.8% .033 256.848);
+}
+.text-gray-900{
+    color: oklch(21% .034 264.665);
+}
+.text-blue-900{
+    color:oklch(37.9% .146 265.522);
+}
+.text-red-500{
+    color:oklch(63.7% .237 25.331)
+}
+
+.mat-mdc-raised-button{
+    box-shadow: none !important;
+    font-size: 0.75rem !important;
+    padding-block:0.4rem !important;
+}
+.mat-mdc-raised-button.mat-warn{
+    background: #f97316 !important;
+    border: 1px solid #f97316 !important;
+    color: #fff !important;
+}
+.mat-mdc-raised-button.mat-primary{
+    background: #10b981 !important;
+    border: 1px solid #10b981 !important;
+    color: #fff !important;
+}
+.mat-mdc-raised-button.mat-accent{
+    background: #0284c7 !important;
+    border: 1px solid #0284c7 !important;
+    color: #fff !important;
+}
+.mat-mdc-table tbody, .mat-mdc-table tfoot, .mat-mdc-table thead, .mat-mdc-cell, .mat-mdc-footer-cell, .mat-mdc-header-row, .mat-mdc-row, .mat-mdc-footer-row, .mat-mdc-table .mat-mdc-header-cell.mat-mdc-table{
+    font-size: 12px !important;
+}
+.success-snackbar {
+  background-color: #4caf50;
+  color: white;
+}
+.success-snackbar {
+  --mdc-snackbar-container-color: #4caf50;
+  --mdc-snackbar-supporting-text-color: white;
+}

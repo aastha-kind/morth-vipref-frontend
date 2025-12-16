@@ -1,0 +1,58 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><b>Manage Office Types</b></h2>
+
+    <div class="d-flex align-items-center gap-3">
+      <!-- 🔍 Search Input -->
+      <mat-form-field appearance="outline" class="me-3" style="width: 250px; margin-top: 18px;">
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search Office Type" />
+      </mat-form-field>
+
+      <button mat-raised-button color="accent" (click)="openAddDialog()">
+        <mat-icon>add</mat-icon> Add New Office Type
+      </button>
+    </div>
+  </div>
+
+  <!-- 🧾 Table -->
+  <table mat-table [dataSource]="officeTypes" class="mat-elevation-z2 w-100">
+
+    <!-- Sr. No -->
+    <ng-container matColumnDef="srNo">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Sr. No.</th>
+      <td mat-cell *matCellDef="let type; let i = index" class="text-center">{{ i + 1 }}</td>
+    </ng-container>
+
+    <!-- Office Type Name -->
+    <ng-container matColumnDef="officeTypeName">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Office Type Name</th>
+      <td mat-cell *matCellDef="let type" class="text-center">{{ type.typeName }}</td>
+    </ng-container>
+
+    <!-- Office Type Code -->
+    <ng-container matColumnDef="officeTypeCode">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Office Type Code</th>
+      <td mat-cell *matCellDef="let type" class="text-center">{{ type.officeTypeCode }}</td>
+    </ng-container>
+
+    <!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Actions</th>
+      <td mat-cell *matCellDef="let type" class="text-center">
+        <button mat-icon-button color="primary" (click)="openEditDialog(type)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="openDeleteDialog(type)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <!-- ✅ Paginator -->
+  <mat-paginator [length]="officeTypes.data.length" [pageSize]="5" [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons>
+  </mat-paginator>
+</div>

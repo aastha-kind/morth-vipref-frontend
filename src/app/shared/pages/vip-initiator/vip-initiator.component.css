@@ -1,0 +1,70 @@
+::ng-deep .mat-mdc-icon-button {
+    color: black !important;
+}
+
+.mat-mdc-header-row {
+    background: linear-gradient(to right, #4CAF50, #2196F3) !important;
+    color: white !important;
+}
+
+.mat-mdc-header-cell {
+    background: transparent !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.material-icons {
+    font-size: 20px !important;
+}
+
+::ng-deep .mdc-text-field--outlined {
+    height: 40px !important;
+}
+
+::ng-deep .mat-mdc-select {
+    font-size: 21px;
+}
+
+::ng-deep .mdc-text-field--outlined .mat-mdc-form-field-infix,
+.mdc-text-field--no-label .mat-mdc-form-field-infix {
+    padding-top: 10px !important;
+}
+
+::ng-deep .mat-sort-header-arrow svg {
+    fill: #ffff !important;
+}
+
+::ng-deep .mat-mdc-menu-panel {
+    min-width: 140px !important;
+}
+
+.px-4 {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.pb-4 {
+    padding-bottom: 20px;
+}
+
+.example-card {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.Login-btn {
+    height: 3em;
+    float: right;
+    width: 13em;
+    background-color: #3e9393;
+    color: #ffff;
+}
+
+::ng-deep .mat-mdc-no-data-row {
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    font-size: 16px;
+}

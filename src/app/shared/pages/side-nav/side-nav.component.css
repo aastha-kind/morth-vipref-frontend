@@ -1,0 +1,30 @@
+a span{
+    font-size: .8125rem;
+    line-height: 1.5rem;
+    font-weight: 550;
+}
+::ng-deep .mat-mdc-list-item-unscoped-content{
+    display: flex;
+    align-items: center;
+}
+::ng-deep .mat-drawer-side{
+    border-right-color:#fff;
+}
+::ng-deep .custom-sidenav a.mat-mdc-list-item:hover .mdc-list-item__primary-text,
+::ng-deep .custom-sidenav a.mat-mdc-list-item:hover mat-icon {
+  color: #007bff !important;
+}
+
+.submenu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.submenu-items {
+  padding-left: 2rem;
+}
+
+.submenu-items a {
+  font-size: 0.9rem;
+}

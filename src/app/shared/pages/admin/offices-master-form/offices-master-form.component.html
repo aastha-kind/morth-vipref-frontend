@@ -1,0 +1,71 @@
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><b>Manage Offices</b></h2>
+
+        <div class="d-flex align-items-center gap-3">
+            <!-- 🔍 Search Input -->
+            <mat-form-field appearance="outline" class="me-3" style="width: 250px;margin-top:18px;">
+                <input matInput (keyup)="applyFilter($event)" placeholder="Search Office Name" />
+            </mat-form-field>
+
+            <button mat-raised-button color="accent" (click)="openAddDialog()">
+                <mat-icon>person_add</mat-icon> Add New Office
+            </button>
+        </div>
+    </div>
+
+    <table mat-table [dataSource]="offices" class="mat-elevation-z2 w-100">
+
+        <!-- Sr. No -->
+        <ng-container matColumnDef="srNo">
+            <th mat-header-cell *matHeaderCellDef class="text-center">Sr. No.</th>
+            <td mat-cell *matCellDef="let office; let i = index" class="text-center">{{ i + 1 }}</td>
+        </ng-container>
+
+        <!-- Office Name -->
+        <ng-container matColumnDef="officeName">
+            <th mat-header-cell *matHeaderCellDef class="text-center">Office Name</th>
+            <td mat-cell *matCellDef="let office" class="text-center">{{ office.officeName }}</td>
+        </ng-container>
+
+        <!-- Organization Code -->
+        <ng-container matColumnDef="officeType">
+            <th mat-header-cell *matHeaderCellDef class="text-center">Office Type</th>
+            <td mat-cell *matCellDef="let office" class="text-center">
+                <ng-container *ngIf="office.officeTypeId?.typeName; else noType">
+                    {{ office.officeTypeId?.typeName }} ({{ office.officeTypeId?.officeTypeCode }})
+                </ng-container>
+                <ng-template #noType>NA</ng-template>
+            </td>
+        </ng-container>
+
+        <!-- Organization Name -->
+        <ng-container matColumnDef="organizationName">
+            <th mat-header-cell *matHeaderCellDef class="text-center">Organization Name</th>
+            <td mat-cell *matCellDef="let office" class="text-center">
+                {{ office.organization?.organizationName }}
+            </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="text-center">Actions</th>
+            <td mat-cell *matCellDef="let office" class="text-center">
+                <button mat-icon-button color="primary" (click)="openEditDialog(office)">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="openDeleteDialog(office)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <!-- ✅ Paginator -->
+    <mat-paginator [length]="offices.data.length" class="table-paginator" [pageSize]="5" [pageSizeOptions]="[5, 10, 25]"
+        showFirstLastButtons>
+    </mat-paginator>
+</div>

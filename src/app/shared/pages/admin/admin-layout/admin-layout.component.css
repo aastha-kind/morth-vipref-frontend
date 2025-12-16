@@ -1,0 +1,68 @@
+
+
+.main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background-color: #e91e63;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1200;
+}
+
+/* ===== LAYOUT ===== */
+.layout-container {
+  display: flex;
+  height: calc(100vh - 64px);
+  margin-top: 64px;
+  overflow: hidden;
+  /* Prevent page scroll */
+}
+
+.sidenav-container {
+  flex: 1;
+  display: flex;
+  height: 100%;
+}
+
+/* ===== FIXED SIDENAV ===== */
+.sidenav {
+  width: 230px;
+  color: #fff;
+  padding-top: 10px;
+  position: fixed;
+  /* Make it fixed */
+  top: 64px;
+  /* Below the header */
+  left: 0;
+  bottom: 0;
+  z-index: 1100;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  overflow-y: auto;
+  /* Scroll if sidebar content grows */
+}
+
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  transition: margin-left 0.3s ease;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  background-color: #edf1f7;
+  width: 100%;
+}
+
+.main-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* When sidenav is closed */
+.main-content.sidenav-closed {
+  margin-left: 0;
+}

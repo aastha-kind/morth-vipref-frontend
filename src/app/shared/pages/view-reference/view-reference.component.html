@@ -1,0 +1,52 @@
+<div class="dashboard-card">
+    <mat-card class="example-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title style="cursor: pointer;">REFERENCE DETAILS</mat-card-title>
+      </mat-card-header>
+    </mat-card>
+    <mat-card-content class="reference-form-container">
+        <form [formGroup]="viewReference" class="reference-form">
+    
+            <div class="form-field">
+              <div class="label-field">
+                <label>Reference No</label>
+              </div>
+              <input matInput formControlName="referenceNo" class="mat-input" >
+            </div>
+        
+            <div class="form-field">
+              <div class="label-field">
+                <label>Subject</label>
+              </div>
+              <input matInput formControlName="subject" class="mat-input" >
+            </div>
+
+            <div class="form-field">
+                <div class="label-field">
+                  <label>Received Date</label>
+                </div>
+                <input matInput formControlName="assignedAt" class="mat-input" >
+            </div>
+
+            <div class="form-field">
+                <div class="label-field">
+                  <label>Priority</label>
+                </div>
+                <input matInput formControlName="priority" class="mat-input" >
+            </div>
+
+            <div class="form-field">
+                <div class="label-field">
+                  <label>Current Queue</label>
+                </div>
+                <input matInput formControlName="currentQueue" class="mat-input" >
+            </div>
+            <div class="form-field">
+                <div class="upload-btn-group">
+                    <button mat-raised-button mat-dialog-close class="disabled-look">Close</button>
+                </div>
+            </div>
+        </form>
+    </mat-card-content>
+</div>
+

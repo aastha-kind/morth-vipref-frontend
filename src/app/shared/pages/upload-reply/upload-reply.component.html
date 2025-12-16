@@ -1,0 +1,33 @@
+<div class="dashboard-card">
+    <mat-card class="example-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title style="cursor: pointer;">UPLOAD DOCUMENTS</mat-card-title>
+      </mat-card-header>
+    </mat-card>
+    <mat-card-content class="reference-form-container">
+        <form [formGroup]="uploadReplyDocs" >
+            <div class="form-field">
+              <div class="label-field">
+                <label>File Name</label>
+              </div>
+              <div class="input-container">
+                  <input type="file" (change)="onFileSelect($event)"  class="mat-input" accept="application/pdf">
+                  <mat-error class="mat-error" *ngIf="uploadReplyDocs.get('file')?.hasError('invalidType')">
+                    Only PDF files are allowed.
+                  </mat-error>
+                  <mat-error class="mat-error" *ngIf="uploadReplyDocs.get('file')?.hasError('maxSizeExceeded')">
+                    File size must not exceed 2 MB.
+                  </mat-error>
+              </div>
+            </div>
+        
+            <div class="form-field">
+                <div class="upload-btn-group">
+                    <button mat-raised-button (click)="confirmUpload()" color="primary" [disabled]="!uploadReplyDocs.valid">Ok</button>
+                    <button mat-raised-button mat-dialog-close class="disabled-look">Close</button>
+                </div>
+            </div>
+        </form>
+    </mat-card-content>
+</div>
+

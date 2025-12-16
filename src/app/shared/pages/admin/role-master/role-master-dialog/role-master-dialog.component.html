@@ -1,0 +1,49 @@
+<!-- Dialog Titles -->
+<h2 mat-dialog-title *ngIf="data.mode === 'add'">Add Role</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'edit'">Edit Role</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'delete'">Delete Role</h2>
+
+<!-- Add/Edit Form -->
+<mat-dialog-content *ngIf="data.mode !== 'delete'">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Role Name</mat-label>
+    <input
+      matInput
+      [(ngModel)]="data.role.roleName"
+      placeholder="Enter role name"
+      oninput="this.value=this.value.replace(/[^a-zA-Z ]/g,'').replace(/^\s+/,'').replace(/\s{2,}/g,' ')" disabled="true"/>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Role Description</mat-label>
+    <textarea
+      matInput
+      rows="3"
+      [(ngModel)]="data.role.roleDescription"
+      placeholder="Enter role description" >
+    </textarea>
+  </mat-form-field>
+</mat-dialog-content>
+
+<!-- Delete Confirmation -->
+<mat-dialog-content *ngIf="data.mode === 'delete'">
+  <p>Are you sure you want to delete <strong>{{ data.role?.roleName }}</strong>?</p>
+  <small>This action cannot be undone.</small>
+</mat-dialog-content>
+
+<!-- Dialog Actions -->
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+
+  <button mat-raised-button color="primary" *ngIf="data.mode === 'add'" (click)="saveRole()">
+    Add
+  </button>
+
+  <button mat-raised-button color="accent" *ngIf="data.mode === 'edit'" (click)="updateRole()">
+    Save
+  </button>
+
+  <button mat-raised-button color="warn" *ngIf="data.mode === 'delete'" (click)="deleteRole()">
+    Delete
+  </button>
+</mat-dialog-actions>

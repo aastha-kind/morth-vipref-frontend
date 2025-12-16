@@ -1,0 +1,15 @@
+::ng-deep .mat-mdc-icon-button{
+    color: black !important;
+}
+.mat-mdc-header-row {
+  background: linear-gradient(to right, #4CAF50, #2196F3) !important;
+  color: white !important;
+}
+.mat-mdc-header-cell {
+  background: transparent !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+.material-icons{
+    font-size: 20px !important;
+}

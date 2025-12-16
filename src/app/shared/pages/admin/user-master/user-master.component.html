@@ -1,0 +1,136 @@
+<div class="container mt-4">
+  <!-- Header Section -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><b>User Master</b></h2>
+
+    <div class="d-flex align-items-center gap-3">
+      <!-- 🔍 Search Input -->
+      <mat-form-field appearance="outline" class="me-3" style="width: 250px; margin-top: 18px;">
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search by Name, Designation, or Organization" />
+      </mat-form-field>
+
+      <!-- ➕ Add Button -->
+      <button mat-raised-button color="accent" (click)="openAddDialog()">
+        <mat-icon>add</mat-icon> Add New User
+      </button>
+    </div>
+  </div>
+
+  <!-- 📋 Table -->
+  <table mat-table [dataSource]="users" class="mat-elevation-z2 w-100">
+
+    <!-- Sr. No -->
+    <ng-container matColumnDef="srNo">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Sr. No.</th>
+      <td mat-cell *matCellDef="let element; let i = index" class="text-center">
+        {{ i + 1 }}
+      </td>
+    </ng-container>
+
+    <!-- Organization -->
+    <ng-container matColumnDef="organization">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Organization</th>
+      <td mat-cell *matCellDef="let element" class="text-center">
+        {{ element.organizationName || 'NA' }}
+      </td>
+    </ng-container>
+
+    <!-- Office -->
+    <ng-container matColumnDef="office">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Office</th>
+      <td mat-cell *matCellDef="let element" class="text-center">
+        {{ element.officeName || 'NA' }}
+      </td>
+    </ng-container>
+
+    <!-- Designation -->
+    <ng-container matColumnDef="designation">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Designation</th>
+      <td mat-cell *matCellDef="let element" class="text-center">
+        {{ element.designationName || 'NA' }}
+      </td>
+    </ng-container>
+
+    <!-- Role -->
+    <ng-container matColumnDef="role">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Assigned Role</th>
+      <td mat-cell *matCellDef="let element" class="text-center">
+        {{ element.roles[0]?.roleName || 'NA' }}
+      </td>
+    </ng-container>
+
+    <!-- Name -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Name</th>
+      <td mat-cell *matCellDef="let element" class="text-center">
+        {{ element.name || 'NA' }}
+      </td>
+    </ng-container>
+
+    <!-- Contact -->
+    <ng-container matColumnDef="contactNumber">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Contact</th>
+      <td mat-cell *matCellDef="let element" class="text-center">
+        {{ element.contactNumber || 'NA' }}
+      </td>
+    </ng-container>
+
+    <!-- Email -->
+    <ng-container matColumnDef="emailId">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Email</th>
+      <td mat-cell *matCellDef="let element" class="text-center">
+        {{ element.emailId || 'NA' }}
+      </td>
+    </ng-container>
+
+        <ng-container matColumnDef="loginId">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Login ID</th>
+      <td mat-cell *matCellDef="let element" class="text-center">
+        {{ element.loginId || 'NA' }}
+      </td>
+    </ng-container>
+
+    <!-- Account Status -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Status</th>
+      <td mat-cell *matCellDef="let element" class="text-center">
+        <span *ngIf="element.userLocked" class="badge bg-danger text-white px-2 py-1" style="border-radius: 4px;">
+          <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">lock</mat-icon>
+          Locked
+        </span>
+        <span *ngIf="!element.userLocked" class="badge bg-success text-white px-2 py-1" style="border-radius: 4px;">
+          <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">check_circle</mat-icon>
+          Active
+        </span>
+      </td>
+    </ng-container>
+
+    <!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="text-center w-20">Actions</th>
+      <td mat-cell *matCellDef="let element" class="text-center w-20">
+        <button mat-icon-button color="primary" (click)="openEditDialog(element)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="accent" (click)="openChangePasswordDialog(element)" matTooltip="Change Password">
+          <mat-icon>lock_reset</mat-icon>
+        </button>
+        <button mat-icon-button [color]="element.userLocked ? 'warn' : 'primary'" (click)="toggleUserLock(element)" [matTooltip]="element.userLocked ? 'Unlock User' : 'Lock User'">
+          <mat-icon>{{ element.userLocked ? 'lock' : 'lock_open' }}</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="openDeleteDialog(element)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <!-- Table Header & Rows -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <!-- ✅ Paginator -->
+  <mat-paginator [length]="totalUsers" class="table-paginator" [pageSize]="pageSize" [pageIndex]="pageIndex"
+    [pageSizeOptions]="[5, 10, 25, 50]" showFirstLastButtons>
+  </mat-paginator>
+</div>

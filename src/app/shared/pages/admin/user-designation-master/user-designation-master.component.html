@@ -1,0 +1,73 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><b>Manage User Designations</b></h2>
+
+    <div class="d-flex align-items-center gap-3">
+      <!-- 🔍 Search Input -->
+      <mat-form-field appearance="outline" class="me-3" style="width: 250px; margin-top: 18px;">
+        <input matInput (keyup)="applyFilter($event)" placeholder="Search Designation" />
+      </mat-form-field>
+
+      <!-- ➕ Add Button -->
+      <button mat-raised-button color="accent" (click)="openAddDialog()">
+        <mat-icon>add</mat-icon> Add New Designation
+      </button>
+    </div>
+  </div>
+
+  <!-- 📋 Table -->
+  <table mat-table [dataSource]="designations" class="mat-elevation-z2 w-100">
+
+    <!-- Sr. No -->
+    <ng-container matColumnDef="srNo">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Sr. No.</th>
+      <td mat-cell *matCellDef="let designation; let i = index" class="text-center">{{ i + 1 }}</td>
+    </ng-container>
+
+    <!-- Designation Code -->
+    <ng-container matColumnDef="designationCode">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Code</th>
+      <td mat-cell *matCellDef="let designation" class="text-center">
+        {{ designation.designationCode }}
+      </td>
+    </ng-container>
+
+    <!-- Designation Description -->
+    <ng-container matColumnDef="designationDescription">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Description</th>
+      <td mat-cell *matCellDef="let designation" class="text-center">
+        {{ designation.designationDescription }}
+      </td>
+    </ng-container>
+
+    <!-- Organization Name -->
+    <ng-container matColumnDef="organizationName">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Organization</th>
+      <td mat-cell *matCellDef="let designation" class="text-center">
+        {{ designation.organization?.organizationName || 'NA' }}
+      </td>
+    </ng-container>
+
+    <!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="text-center">Actions</th>
+      <td mat-cell *matCellDef="let designation" class="text-center">
+        <button mat-icon-button color="primary" (click)="openEditDialog(designation)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="openDeleteDialog(designation)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+
+  <!-- ✅ Paginator -->
+  
+  <mat-paginator [length]="designations.data.length" class="table-paginator" [pageSize]="5" [pageSizeOptions]="[5, 10, 25]"
+        showFirstLastButtons>
+    </mat-paginator>
+</div>

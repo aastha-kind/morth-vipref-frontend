@@ -1,0 +1,56 @@
+<app-header (toggleSidenav)="drawer.toggle()"></app-header>
+
+
+<div class="layout-container">
+  <mat-sidenav-container class="sidenav-container">
+    <!-- Sidebar -->
+    <mat-sidenav #drawer class="sidenav" mode="side" opened>
+      <app-side-nav></app-side-nav>
+    </mat-sidenav>
+
+    <!-- Main Content -->
+    <mat-sidenav-content class="main-content">
+      <mat-drawer-container>
+        <mat-drawer mode="side" [opened]="opened">
+          <mat-list>
+            <ng-container *ngFor="let item of menu">
+              <ng-container *ngIf="item.subMenu === undefined">
+                <mat-list-item *ngIf="item.title" [routerLink]="item.link" routerLinkActive="active"
+                  [routerLinkActiveOptions]="{ exact: true }">
+                  <mat-icon [style.color]="item.color" mat-list-icon>
+                    {{ item.icon }}
+                  </mat-icon>
+                  <span mat-line class="list-item">{{ item.title }}</span>
+                </mat-list-item>
+              </ng-container>
+
+              <ng-container *ngIf="item.subMenu?.length > 0">
+                <mat-expansion-panel [expanded]="item.expanded">
+                  <mat-expansion-panel-header>
+                    <mat-panel-title class="d-flex align-items-center">
+                      <mat-icon [style.color]="item.color" mat-list-icon>
+                        {{ item.icon }}
+                      </mat-icon>
+                      <span mat-line class="list-item">{{ item.title }}</span>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <mat-nav-list>
+                    <mat-list-item *ngFor="let sub of item.subMenu" [routerLink]="sub.link" routerLinkActive="active"
+                      [routerLinkActiveOptions]="{ exact: true }">
+                      <mat-icon [style.color]="sub.color" mat-list-icon>{{ sub.icon }}</mat-icon>
+                      <span mat-line class="list-item">{{ sub.title }}</span>
+                    </mat-list-item>
+                  </mat-nav-list>
+                </mat-expansion-panel>
+              </ng-container>
+            </ng-container>
+          </mat-list>
+        </mat-drawer>
+
+        <mat-drawer-content class="mt-4" [class.margin-left]="opened">
+          <router-outlet></router-outlet>
+        </mat-drawer-content>
+      </mat-drawer-container>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

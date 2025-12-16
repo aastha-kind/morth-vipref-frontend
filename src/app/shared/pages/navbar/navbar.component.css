@@ -1,0 +1,73 @@
+.navbar-top {
+  background: linear-gradient(to right, #4CAF50, #2196F3) !important;
+  font-size: 0.875rem;
+  position: sticky;
+  z-index: 1000;
+  top: 0;
+  color: white;
+  height: auto !important;
+}
+
+.navbar-menu {
+  padding: 10px 1.2rem;
+  background-color: #fff;
+  position: sticky;
+  z-index: 999;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.language-select {
+  width: 120px;
+
+  ::ng-deep .mat-select-trigger {
+    padding: 0.1rem !important;
+  }
+
+  ::ng-deep .mat-select {
+    border-radius: 60px !important;
+  }
+}
+
+.greviance-button,
+.login-button {
+  border-radius: 60px !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  white-space: nowrap;
+}
+
+.access-type .changer {
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.2s ease-in-out;
+}
+
+.access-type .changer:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.vertical-divider {
+  width: 1px;
+  height: 20px;
+  background-color: #fff;
+
+  &.black {
+    width: 3px;
+    height: 25px;
+    background-color: #000;
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+.h-6 {
+  height: 1.5rem; 
+}
+.mat-toolbar-row, .mat-toolbar-single-row{
+  height: auto !important;
+}

@@ -1,0 +1,1304 @@
+<div class="grid-layout">
+  <!-- Left Side: Dashboard -->
+  <mat-tab-group  [(selectedIndex)]="selectedTabIndex">
+    <mat-tab label="Reference">
+      <div class="dashboard-card">
+        <mat-card class="example-card" appearance="outlined">
+          <mat-card-content class="reference-form-container">
+            <form [formGroup]="addVipReferenceDetails">
+
+              <div class="form-field" *ngIf="showReferencNo">
+                <div class="label-field">
+                  <label>Reference No. </label>
+                </div>
+                <input matInput formControlName="referenceNo" class="mat-input" placeholder="Reference No.">
+              </div>
+
+<!--              <div class="form-field">-->
+<!--                <div class="label-field">-->
+<!--                  <label>Select Assigner<span class="text-red-500">*</span></label>-->
+<!--                </div>-->
+
+<!--                  <div class="input-container">-->
+<!--                    <select matNativeControl formControlName="toLoginId">-->
+<!--                      <option value="{{selectedAssigner}}" disabled selected>Select Assigner</option>-->
+<!--                      <option *ngFor="let assigner of activeAssignersList" [value]="assigner">-->
+<!--                        {{assigner.name}} ({{assigner.loginId}})</option>-->
+<!--                    </select>-->
+<!--                    <mat-error class="mat-error"-->
+<!--                               *ngIf="addVipReferenceDetails.controls['toLoginId'].hasError('required') && addVipReferenceDetails.controls['toLoginId'].touched">-->
+<!--                      Please select assigner-->
+<!--                    </mat-error>-->
+<!--                  </div>-->
+
+<!--              </div>-->
+              <div class="form-field"  *ngIf="!showReferencNo">
+                <div class="label-field">
+                  <label>Select Assigner<span class="text-red-500">*</span></label>
+                </div>
+
+                <div class="input-container">
+                  <select matNativeControl [(ngModel)]="selectedAssigner" [ngModelOptions]="{standalone: true}">
+                    <option [ngValue]="null" disabled selected>Select Assigner</option>
+                    <option *ngFor="let assigner of activeAssignersList" [ngValue]="assigner">
+                      {{assigner.name}} ({{assigner.loginId}})
+                    </option>
+                  </select>
+                  <mat-error class="mat-error" *ngIf="!selectedAssigner">
+                    Please select assigner
+                  </mat-error>
+                </div>
+              </div>
+<!--              <div class="form-field">-->
+<!--                <div class="label-field">-->
+<!--                  <label>Select Assigner<span class="text-red-500">*</span></label>-->
+<!--                </div>-->
+
+<!--                <div class="input-container">-->
+<!--                  <mat-form-field appearance="outline" class="full-width">-->
+<!--                    <mat-label>Select Assigner</mat-label>-->
+<!--                    <mat-select [(ngModel)]="selectedAssigner" [ngModelOptions]="{standalone: true}" required>-->
+<!--                      <mat-option *ngFor="let assigner of activeAssignersList" [value]="assigner">-->
+<!--                        {{assigner.name}} ({{assigner.loginId}})-->
+<!--                        <span *ngIf="assigner.designation"> - {{assigner.designation}}</span>-->
+<!--                      </mat-option>-->
+<!--                    </mat-select>-->
+<!--                    <mat-error *ngIf="!selectedAssigner">Please select an assigner</mat-error>-->
+<!--                  </mat-form-field>-->
+<!--                </div>-->
+<!--              </div>-->
+
+<!--                <mat-form-field appearance="outline" class="full-width">-->
+<!--&lt;!&ndash;                  <mat-label>Select Assigner *</mat-label>&ndash;&gt;-->
+<!--                  <mat-select [(ngModel)]="selectedAssigner" required>-->
+<!--                    <mat-option *ngFor="let assigner of activeAssignersList" [value]="assigner">-->
+<!--                      {{assigner.name}} ({{assigner.loginId}})-->
+<!--                      <span *ngIf="assigner.designation"> - {{assigner.designation}}</span>-->
+<!--                    </mat-option>-->
+<!--                  </mat-select>-->
+<!--                  <mat-error *ngIf="!selectedAssigner">Please select an assigner</mat-error>-->
+<!--                </mat-form-field>-->
+
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Date Of Letter <span class="text-red-500">*</span></label>
+                </div>
+
+                <div class="input-container">
+                  <div>
+                    <input matInput [matDatepicker]="picker1" [max]="maxDate" formControlName="dateOfLetter" class="mat-input"
+                      placeholder="Date Of Letter">
+                    <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                    <mat-datepicker #picker1></mat-datepicker>
+                  </div>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['dateOfLetter'].hasError('required') && addVipReferenceDetails.controls['dateOfLetter'].touched">
+                    Please select date of letter
+                  </mat-error>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['dateOfLetter'].hasError('futureDate') && addVipReferenceDetails.controls['dateOfLetter'].touched">
+                    Date of letter cannot be a future date
+                  </mat-error>
+                </div>
+              </div>
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Date Of Receiving <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <div>
+                    <input matInput [matDatepicker]="picker2" [max]="maxDate" formControlName="dateOfReceiving" class="mat-input"
+                      placeholder="Date Of Receiving">
+                    <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2></mat-datepicker>
+                  </div>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['dateOfReceiving'].hasError('required') && addVipReferenceDetails.controls['dateOfReceiving'].touched">
+                    Please select date of receiving
+                  </mat-error>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['dateOfReceiving'].hasError('futureDate') && addVipReferenceDetails.controls['dateOfReceiving'].touched">
+                    Date of receiving cannot be a future date
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Date Of Entry <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <div>
+                    <input matInput [matDatepicker]="picker3" formControlName="dateOfEntry" class="mat-input"
+                      placeholder="Date Of Entry">
+                    <mat-datepicker-toggle matSuffix [for]="picker3"></mat-datepicker-toggle>
+                    <mat-datepicker #picker3></mat-datepicker>
+                  </div>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['dateOfEntry'].hasError('required') && addVipReferenceDetails.controls['dateOfEntry'].touched">
+                    Please select date of entry
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Name Of Diginitary <span class="text-red-500">*</span></label>
+                </div>
+
+                <div class="input-container">
+                  <input matInput formControlName="nameOfDiginitary" class="mat-input" placeholder="Name Of Diginitary">
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['nameOfDiginitary'].hasError('required') && addVipReferenceDetails.controls['nameOfDiginitary'].touched">
+                    Please enter name of diginitary
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>E-Mail Id </label>
+                </div>
+
+                <div class="input-container">
+                  <input matInput formControlName="emailId" class="mat-input" placeholder="E-Mail ID">
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['emailId'].hasError('required') && addVipReferenceDetails.controls['emailId'].touched">
+                    Please enter email id
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Designation <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="designation">
+                    <option value="" disabled selected>Select Designation</option>
+                    <option *ngFor="let designation of vipDesignationList" [value]="designation.designationCode">
+                      {{designation.designationName}}</option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['designation'].hasError('required') && addVipReferenceDetails.controls['designation'].touched">
+                    Please select designation
+                  </mat-error>
+                </div>
+              </div>
+              <div class="form-field">
+                <div class="label-field">
+                  <label>State <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="state">
+                    <option value="" disabled selected>Select State</option>
+                    <option *ngFor="let state of stateList" [value]="state.code">
+                      {{state.name}}
+                    </option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['state'].hasError('required') && addVipReferenceDetails.controls['state'].touched">
+                    Please select state
+                  </mat-error>
+                </div>
+              </div>
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Constituency <span class="text-red-500">*</span></label>
+                </div>
+
+                <div class="input-container">
+                  <input matInput formControlName="constituency" class="mat-input" placeholder="Enter Constituency">
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['constituency'].hasError('required') && addVipReferenceDetails.controls['constituency'].touched">
+                    Please select constituency
+                  </mat-error>
+                </div>
+              </div>
+              <div class="form-field" *ngIf="showReferencNo">
+                <div class="label-field">
+                  <label>Priority <span class="text-red-500">*</span></label>
+                </div>
+
+                <div class="input-container">
+                  <select matNativeControl formControlName="priority">
+                    <option value="" disabled selected>Select Priority</option>
+                    <option value="Priority">Priority</option>
+                    <option value="Normal">Normal</option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['priority'].hasError('required') && addVipReferenceDetails.controls['priority'].touched">
+                    Please select priority
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Category Of Subject <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="catgOfSubject" (change)="onCategoryChange($event)">
+                    <option value="" disabled selected>Select Category Of Subject</option>
+                    <option *ngFor="let category of categoryList" [value]="category.categoryId">
+                      {{category.categoryDescription}}
+                    </option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['catgOfSubject'].hasError('required') && addVipReferenceDetails.controls['catgOfSubject'].touched">
+                    Please select category of subject
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Sub-Category Of Subject <span class="text-red-500">*</span></label>
+                </div>
+
+                <div class="input-container">
+                  <select matNativeControl formControlName="subCatgOfSubject">
+                    <option value="" disabled selected>Select Sub-Category Of Subject</option>
+                    <option *ngFor="let subCategory of subCategoryList" [value]="subCategory.subCatId">
+                      {{subCategory.subCatName}}
+                    </option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['subCatgOfSubject'].hasError('required') && addVipReferenceDetails.controls['subCatgOfSubject'].touched">
+                    Please select sub-category of subject
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Subject/Issue <span class="text-red-500">*</span></label>
+                </div>
+
+
+                <div class="input-container">
+                  <textarea matInput formControlName="subjectOrIssue" rows="4"
+                    placeholder="Please Specify Subject or Issue"></textarea>
+                  <mat-error class="mat-error"
+                    *ngIf="addVipReferenceDetails.controls['subjectOrIssue'].hasError('required') && addVipReferenceDetails.controls['subjectOrIssue'].touched">
+                    Please enter subject/issues
+                  </mat-error>
+                </div>
+              </div>
+
+              <!-- Update Reference Button - Before Documents Section -->
+              <div class="form-field" *ngIf="showReferencNo">
+                <div class="btn-group">
+                  <button mat-raised-button color="primary" (click)="updateVipReferenceDetails()">
+                    Update Reference
+                  </button>
+                </div>
+              </div>
+
+              <!-- Pending Documents Info for New References -->
+              <div class="pending-documents-section" *ngIf="!showReferencNo && pendingDocuments.length > 0">
+                <mat-card class="pending-documents-card" appearance="outlined">
+                  <mat-card-header class="pending-documents-card-header">
+                    <mat-card-title class="pending-documents-card-title">
+                      <mat-icon class="section-icon">schedule</mat-icon>
+                      <span>Documents to Upload ({{pendingDocuments.length}})</span>
+                    </mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content class="pending-documents-card-content">
+                    <div class="pending-docs-info">
+                      <mat-icon style="color: #FF9800; vertical-align: middle;">info</mat-icon>
+                      <span style="font-weight: 500; color: #333;">
+                        These documents will be uploaded when you submit the reference
+                      </span>
+                    </div>
+                    <ul class="pending-docs-list">
+                      <li *ngFor="let doc of pendingDocuments; let i = index">
+                        <strong>{{i + 1}}.</strong> {{doc.file.name}}
+                        <span class="badge" [ngClass]="{
+                          'badge-letter': doc.documentType === 'letter',
+                          'badge-memo': doc.documentType === 'memo',
+                          'badge-draft': doc.documentType === 'draft'
+                        }">{{doc.documentType | titlecase}}</span>
+                        <span *ngIf="doc.comments" style="font-style: italic; color: #666;"> - {{doc.comments}}</span>
+                      </li>
+                    </ul>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+
+              <!-- Uploaded Documents Section -->
+              <div class="uploaded-documents-section" *ngIf="showReferencNo && documentList && documentList.length > 0">
+                <mat-card class="documents-card" appearance="outlined">
+                  <mat-card-header class="documents-card-header">
+                    <mat-card-title class="documents-card-title">
+                      <mat-icon class="section-icon">cloud_done</mat-icon>
+                      <span>Uploaded Documents ({{documentList.length}})</span>
+                    </mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content class="documents-card-content">
+                    <div class="overflow-x-auto">
+                      <table mat-table [dataSource]="documentList" class="mat-elevation-z2 w-100" style="width: 100%;">
+                        <!-- Sr. No Column -->
+                        <ng-container matColumnDef="srNo">
+                          <th mat-header-cell *matHeaderCellDef style="width: 60px;">Sr. No</th>
+                          <td mat-cell *matCellDef="let element; let i = index">{{i + 1}}</td>
+                        </ng-container>
+
+                        <!-- File Name Column -->
+                        <ng-container matColumnDef="fileName">
+                          <th mat-header-cell *matHeaderCellDef>File Name</th>
+                          <td mat-cell *matCellDef="let element">{{element.fileOriginalName || element.fileName}}</td>
+                        </ng-container>
+
+                        <!-- Document Type Column -->
+                        <ng-container matColumnDef="documentType">
+                          <th mat-header-cell *matHeaderCellDef style="width: 120px;">Document Type</th>
+                          <td mat-cell *matCellDef="let element">
+                            <span class="badge" [ngClass]="{
+                              'badge-letter': element.documentType === 'letter',
+                              'badge-memo': element.documentType === 'memo',
+                              'badge-draft': element.documentType === 'draft'
+                            }">
+                              {{element.documentType | titlecase}}
+                            </span>
+                          </td>
+                        </ng-container>
+
+                        <!-- Remarks/Comments Column -->
+                        <ng-container matColumnDef="comments">
+                          <th mat-header-cell *matHeaderCellDef>Remarks</th>
+                          <td mat-cell *matCellDef="let element">{{element.comments || 'No comments'}}</td>
+                        </ng-container>
+
+                        <!-- Uploaded By Column -->
+                        <ng-container matColumnDef="uploadedBy">
+                          <th mat-header-cell *matHeaderCellDef style="width: 150px;">Uploaded By</th>
+                          <td mat-cell *matCellDef="let element">{{element.createdBy}}</td>
+                        </ng-container>
+
+                        <!-- Upload Date Column -->
+                        <ng-container matColumnDef="uploadDate">
+                          <th mat-header-cell *matHeaderCellDef style="width: 180px;">Upload Date</th>
+                          <td mat-cell *matCellDef="let element">{{element.createdAt | date:'dd MMM yyyy, HH:mm'}}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="['srNo', 'fileName', 'documentType', 'comments', 'uploadedBy', 'uploadDate']"></tr>
+                        <tr mat-row *matRowDef="let row; columns: ['srNo', 'fileName', 'documentType', 'comments', 'uploadedBy', 'uploadDate'];"></tr>
+                      </table>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+
+              <!-- Submit/Save Buttons for New References -->
+              <div class="form-field" *ngIf="!showReferencNo">
+                <div class="btn-group">
+                  <button mat-raised-button color="primary" (click)="saveVipReferenceDetails()">
+                    Save As Draft
+                  </button>
+                  <button mat-raised-button color="primary" (click)="addVipReferencDetails()">
+                    Submit Reference
+                  </button>
+                </div>
+              </div>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+    <mat-tab label="Action" *ngIf="showReferencNo">
+      <div class="dashboard-card">
+        <mat-card class="example-card" appearance="outlined">
+          <mat-card-content class="reference-form-container">
+            <form [formGroup]="forwardReferenceForm">
+
+              <div class="form-field" *ngIf="this.userDetails.roles[0].roleName == 'Assigner'">
+                <div class="label-field">
+                  <label>Routing Type <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="routingType">
+                    <option value="" disabled selected>Select Routing</option>
+                    <option value="single">Single</option>
+                    <!-- <option value="multiple">Multiple</option> -->
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="forwardReferenceForm.controls['routingType'].hasError('required') && forwardReferenceForm.controls['routingType'].touched">
+                    Please select routing
+                  </mat-error>
+                </div>
+              </div>
+
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Action Type <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="actionType" (change)="onActionTypeChange()">
+                    <option value="" disabled selected>Select Action Type</option>
+                    <option *ngFor="let actionType of actionTypeOptions" [value]="actionType.actionType">
+                      {{ actionType.actionType }}
+                    </option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="forwardReferenceForm.controls['actionType'].hasError('required') && forwardReferenceForm.controls['actionType'].touched">
+                    Please select action type
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Action <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="action" (change)="onActionChange()">
+                    <option value="" disabled selected>Select Action</option>
+                    <option *ngFor="let action of actionOptions" [value]="action.actionName">
+                      {{ action.actionName }}
+                    </option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="forwardReferenceForm.controls['action'].hasError('required') && forwardReferenceForm.controls['action'].touched">
+                    Please select action
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field"
+                *ngIf="forwardReferenceForm.get('actionType')?.value === 'Final Draft Reply' || forwardReferenceForm.get('actionType')?.value === 'Draft Reply'">
+                <div class="label-field">
+                  <label>Reply Type <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="replyType">
+                    <option value="" disabled selected>Select Reply Type</option>
+                    <option value="positive">Positive</option>
+                    <option value="negative">Negative</option>
+                    <option value="interim">Interim</option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="forwardReferenceForm.controls['replyType'].hasError('required') && forwardReferenceForm.controls['replyType'].touched">
+                    Please select reply type
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Organization <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="assigneeOrganization"
+                    (change)="selectedOrganization($event)">
+                    <option value="" disabled selected>Select Organization</option>
+                    <option *ngFor="let org of organizationsList" [value]="org.organizationCode">
+                      {{ org.organizationCode }}
+                    </option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="forwardReferenceForm.controls['assigneeOrganization'].hasError('required') && forwardReferenceForm.controls['assigneeOrganization'].touched">
+                    Please select organization
+                  </mat-error>
+                </div>
+              </div>
+
+              <!-- <div class="form-field">
+                <div class="label-field">
+                  <label>Office Type</label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="officeType">
+                    <option value="" disabled selected>Select Office Type</option>
+                    <option value="MoRTH">MoRTH</option>
+                    <option value="NHAI">NHAI</option>
+                    <option value="NHIDCL">NHIDCL</option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="forwardReferenceForm.controls['officeType'].hasError('required') && forwardReferenceForm.controls['officeType'].touched">
+                    Please select office type
+                  </mat-error>
+                </div>
+              </div> -->
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Office <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="assigneeOffice" (change)="selectedOffice($event)">
+                    <option value="" disabled selected>Select Office</option>
+                    <option *ngFor="let office of officeTypeList" [value]="office.officeName">
+                      {{office.officeName}}
+                    </option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="forwardReferenceForm.controls['assigneeOffice'].hasError('required') && forwardReferenceForm.controls['assigneeOffice'].touched">
+                    Please select office
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Designation <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="assigneeDesignation" (change)="selectedDesignation($event)">
+                    <option value="" disabled selected>Select Designation</option>
+                    <option *ngFor="let designation of designationList" [value]="designation.designationCode">
+                      {{ designation.designationCode }}
+                    </option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="forwardReferenceForm.controls['assigneeDesignation'].hasError('required') && forwardReferenceForm.controls['assigneeDesignation'].touched">
+                    Please select designation
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>User <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl formControlName="assigneeName" (change)="selectedUserDetails($event)">
+                    <option value="" disabled selected>Select User</option>
+                    <option *ngFor="let user of userLists" [value]="user.id">{{user.name}}</option>
+                  </select>
+                  <mat-error class="mat-error"
+                    *ngIf="forwardReferenceForm.controls['assigneeName'].hasError('required') && forwardReferenceForm.controls['assigneeName'].touched">
+                    Please select user
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="label-field">
+                  <label>Comment For Action <span class="text-red-500">*</span></label>
+                </div>
+
+
+                <div class="input-container">
+                  <textarea matInput formControlName="assignerComment" rows="4"
+                    placeholder="Please Enter Comment"></textarea>
+                  <mat-error class="mat-error"
+                    *ngIf="forwardReferenceForm.controls['assignerComment'].hasError('required') && forwardReferenceForm.controls['assignerComment'].touched">
+                    Please enter comment
+                  </mat-error>
+                </div>
+              </div>
+
+              <div class="form-field"
+                *ngIf="forwardReferenceForm.get('actionType')?.value === 'Final Draft Reply' || forwardReferenceForm.get('actionType')?.value === 'Draft Reply'">
+                <div class="overflow-x-auto" style="width: 100%;">
+                  <table mat-table [dataSource]="savedDraftReply" matSort class="mat-elevation-z8 border">
+                    <ng-container matColumnDef="select">
+                      <th mat-header-cell *matHeaderCellDef>Select</th>
+                      <td mat-cell *matCellDef="let row">
+                        <mat-radio-button (click)="$event.stopPropagation()" (change)="selectedRecord(row)"
+                          [checked]="selection.isSelected(row)">
+                        </mat-radio-button>
+                      </td>
+                    </ng-container>
+
+
+                    <!-- Reference Number Column -->
+                    <ng-container matColumnDef="id">
+                      <th mat-header-cell *matHeaderCellDef>Sr No</th>
+                      <td mat-cell *matCellDef="let element;let i=index;">{{i+1}}</td>
+                    </ng-container>
+
+                    <!-- Status Column -->
+                    <ng-container matColumnDef="editedBy">
+                      <th mat-header-cell *matHeaderCellDef>Created By</th>
+                      <td mat-cell *matCellDef="let element">{{element.editedBy}}</td>
+                    </ng-container>
+
+                    <!-- Subject Column -->
+                    <ng-container matColumnDef="editedAt">
+                      <th mat-header-cell *matHeaderCellDef>Created At</th>
+                      <td mat-cell *matCellDef="let element">{{element.editedAt | date:'dd MMM yyyy HH:mm:ss'}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="fileName">
+                      <th mat-header-cell *matHeaderCellDef>File Name</th>
+                      <td mat-cell *matCellDef="let element">{{element.fileName}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="versionNumber">
+                      <th mat-header-cell *matHeaderCellDef>Draft Version</th>
+                      <td mat-cell *matCellDef="let element">{{element.versionNumber}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="viewDraft">
+                      <th mat-header-cell *matHeaderCellDef>View Draft</th>
+                      <td mat-cell *matCellDef="let element">
+                        <button (click)="previewDraft(element)" mat-icon-button><mat-icon style="color: #3f51b5;">visibility</mat-icon></button>
+                      </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="savedDraftReplyCol"></tr>
+                    <tr mat-row *matRowDef="let row; columns: savedDraftReplyCol;"></tr>
+                    <tr class="mat-row" *matNoDataRow>
+                      <td class="mat-cell" [colSpan]="savedDraftReplyCol.length">
+                        No Draft Reply Added.
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+              <div class="warning-box" *ngIf="showDraftReply">
+                <span class="text-red-500"> Note :</span> Please create a new Draft Reply from the “Create Draft Reply” tab or select an existing draft before sending it to the concerned authority.
+              </div>
+
+              <div class="form-field">
+
+                <div class="btn-group">
+                  <button mat-raised-button color="primary" (click)="forwardVipReference()"
+                    *ngIf="showForwardBtn">Forward Reference</button>
+                  <button mat-raised-button color="primary" (click)="finalReplyQueue()" *ngIf="showFinalReplyBtn" [disabled]="!selectedDraftRecord || forwardReferenceForm.invalid">
+                    Move To Final Reply</button>
+                  <button mat-raised-button color="primary" (click)="discardVipReference()"
+                    *ngIf="showDiscardBtn">Discard Reference</button>
+                  <button mat-raised-button color="primary" (click)="assignBack()" *ngIf="showAssignBack" >Assign
+                    Back</button>
+                  <button mat-raised-button color="primary" (click)="senDraftReply()" *ngIf="showDraftReply" [disabled]="!selectedDraftRecord || forwardReferenceForm.invalid">
+                    Send Draft Reply
+                  </button>
+                  <button mat-raised-button color="primary" (click)="closeReference()" *ngIf="showCloseReference" >
+                    Close Reference
+                  </button>
+                </div>
+              </div>
+            </form>
+          </mat-card-content>
+
+          <div class="overflow-x-auto px-4 pb-4">
+            <table mat-table [dataSource]="actionHistoryData" matSort class="mat-elevation-z8 border">
+
+              <!-- Reference Number Column -->
+              <ng-container matColumnDef="performedByName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>User Name</th>
+                <td mat-cell *matCellDef="let element">{{element.performedByName}}</td>
+              </ng-container>
+
+              <!-- Status Column -->
+              <ng-container matColumnDef="actionType">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Action Type</th>
+                <td mat-cell *matCellDef="let element">{{element.actionType}}</td>
+              </ng-container>
+
+              <!-- Subject Column -->
+              <ng-container matColumnDef="actionName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Action</th>
+                <td mat-cell *matCellDef="let element">{{element.actionName}}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="comments">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Comments</th>
+                <td mat-cell *matCellDef="let element">{{element.comments ? element.comments : 'NA'}}</td>
+              </ng-container>
+
+              <!-- Priority Column -->
+              <ng-container matColumnDef="targetUser">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Reply Type</th>
+                <td mat-cell *matCellDef="let element">
+                  NA
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="targetUserName">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Target User Name</th>
+                <td mat-cell *matCellDef="let element">{{element.targetUserName}}</td>
+              </ng-container>
+
+              <!-- Received Date Column -->
+              <ng-container matColumnDef="timestamp">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Received Date</th>
+                <td mat-cell *matCellDef="let element">{{element.timestamp | date:'dd MMM yyyy HH:mm:ss'}}</td>
+              </ng-container>
+
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell" [colSpan]="displayedColumns.length">
+                  No Assignment Left.
+                </td>
+              </tr>
+            </table>
+          </div>
+        </mat-card>
+      </div>
+
+
+    </mat-tab>
+    <mat-tab label="Create Draft Reply"
+      *ngIf="showReferencNo && (forwardReferenceForm.get('actionType')?.value === 'Final Draft Reply' || forwardReferenceForm.get('actionType')?.value === 'Draft Reply')"
+      style="min-height: 80vh !important;">
+
+      <div class="dashboard-card">
+        <mat-card class="example-card" appearance="outlined">
+          <mat-card-content class="reference-form-container">
+
+            <div>
+              <div class="form-field">
+                <div class="label-field" style="width: 350px;">
+                  <label>Is reply created through template?</label>
+                </div>
+                <div class="input-container">
+                  <select matNativeControl>
+                    <option value="" disabled selected>Select</option>
+                    <option value="Y">Yes</option>
+                    <option value="N">No</option>
+                  </select>
+                  <!-- <mat-error class="mat-error">
+                    Please select routing
+                  </mat-error> -->
+                </div>
+              </div>
+
+              <div class="form-field">
+                <div class="btn-group">
+                  <button mat-raised-button color="primary" (click)="openEditor()">Open Editor</button>
+
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+    <mat-tab label="Linked References" *ngIf="showReferencNo">
+      <div class="tab-content p-4">
+        <!-- Search Criteria Section -->
+        <h4 class="mb-3">Search References to Link</h4>
+        <form [formGroup]="linkedReferencesSearchForm">
+          <div class="row">
+            <div class="col-md-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Date of Letter (From)</mat-label>
+                <input matInput [matDatepicker]="dateOfLetterFromPicker"
+                       formControlName="dateOfLetterFrom" [max]="maxDate">
+                <mat-datepicker-toggle matSuffix [for]="dateOfLetterFromPicker"></mat-datepicker-toggle>
+                <mat-datepicker #dateOfLetterFromPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Date of Letter (To)</mat-label>
+                <input matInput [matDatepicker]="dateOfLetterToPicker"
+                       formControlName="dateOfLetterTo" [max]="maxDate">
+                <mat-datepicker-toggle matSuffix [for]="dateOfLetterToPicker"></mat-datepicker-toggle>
+                <mat-datepicker #dateOfLetterToPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Date of Receiving (From)</mat-label>
+                <input matInput [matDatepicker]="dateOfReceivingFromPicker"
+                       formControlName="dateOfReceivingFrom" [max]="maxDate">
+                <mat-datepicker-toggle matSuffix [for]="dateOfReceivingFromPicker"></mat-datepicker-toggle>
+                <mat-datepicker #dateOfReceivingFromPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Date of Receiving (To)</mat-label>
+                <input matInput [matDatepicker]="dateOfReceivingToPicker"
+                       formControlName="dateOfReceivingTo" [max]="maxDate">
+                <mat-datepicker-toggle matSuffix [for]="dateOfReceivingToPicker"></mat-datepicker-toggle>
+                <mat-datepicker #dateOfReceivingToPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Name of Dignitary <span class="text-red-500">*</span></mat-label>
+                <input matInput formControlName="nameOfDignitary"
+                       placeholder="Enter name">
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Designation <span class="text-red-500">*</span></mat-label>
+                <select matNativeControl formControlName="designation">
+                  <option value="">--Select--</option>
+                  <option *ngFor="let designation of vipDesignationList" [value]="designation.designationCode">
+                    {{designation.designationName}}
+                  </option>
+                </select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>State <span class="text-red-500">*</span></mat-label>
+                <select matNativeControl formControlName="state">
+                  <option value="">--Select--</option>
+                  <option *ngFor="let state of stateList" [value]="state.code">
+                    {{state.name}}
+                  </option>
+                </select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Constituency</mat-label>
+                <input matInput formControlName="constituency"
+                       placeholder="Enter constituency">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Category of Subject <span class="text-red-500">*</span></mat-label>
+                <select matNativeControl formControlName="categoryOfSubject">
+                  <option value="">--Select--</option>
+                  <option *ngFor="let category of categoryList" [value]="category.categoryId">
+                    {{category.categoryDescription}}
+                  </option>
+                </select>
+              </mat-form-field>
+            </div>
+
+            <div class="col-md-6">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Subject/Issue</mat-label>
+                <input matInput formControlName="subject"
+                       placeholder="Enter subject">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <p class="text-danger mb-3">
+            <small>(*) Denotes primary references searching criteria</small>
+          </p>
+
+          <div class="row mb-4">
+            <div class="col-md-12 text-center">
+              <button mat-raised-button color="primary"
+                      (click)="searchReferencesToLink()"
+                      class="me-2">
+                <mat-icon>search</mat-icon> Search References
+              </button>
+              <button mat-raised-button color="accent"
+                      (click)="openSelectedReferences()"
+                      class="me-2"
+                      [disabled]="searchResultsSelection.selected.length === 0">
+                <mat-icon>open_in_new</mat-icon> Open References
+              </button>
+              <button mat-raised-button
+                      (click)="clearSearchResults()"
+                      class="me-2">
+                <mat-icon>clear</mat-icon> Clear
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Results Section -->
+        <div class="row">
+          <!-- Search Results Table -->
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5>Search Results ({{searchResultsData.data.length}})</h5>
+              <button mat-raised-button color="primary"
+                      (click)="linkSelectedReferences()"
+                      [disabled]="searchResultsSelection.selected.length === 0">
+                <mat-icon>link</mat-icon> Link Selected ({{searchResultsSelection.selected.length}})
+              </button>
+            </div>
+
+            <div class="table-container">
+              <table mat-table [dataSource]="searchResultsData" class="mat-elevation-z2 w-100">
+                <ng-container matColumnDef="select">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox
+                      (change)="toggleAllSearchResults()"
+                      [checked]="isAllSearchResultsSelected()"
+                      [indeterminate]="searchResultsSelection.hasValue() && !isAllSearchResultsSelected()">
+                    </mat-checkbox>
+                  </th>
+                  <td mat-cell *matCellDef="let element">
+                    <mat-checkbox
+                      (click)="$event.stopPropagation()"
+                      (change)="$event ? searchResultsSelection.toggle(element) : null"
+                      [checked]="searchResultsSelection.isSelected(element)">
+                    </mat-checkbox>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="referenceNo">
+                  <th mat-header-cell *matHeaderCellDef>Reference No</th>
+                  <td mat-cell *matCellDef="let element">{{element.referenceNo || 'N/A'}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="subject">
+                  <th mat-header-cell *matHeaderCellDef>Subject</th>
+                  <td mat-cell *matCellDef="let element" class="subject-column">
+                    {{element.subject || 'N/A'}}
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Status</th>
+                  <td mat-cell *matCellDef="let element">{{element.status || 'N/A'}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="searchResultsColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: searchResultsColumns;"></tr>
+
+                <!-- No data row -->
+                <tr class="mat-row" *matNoDataRow>
+                  <td class="mat-cell text-center" [attr.colspan]="searchResultsColumns.length">
+                    <p class="py-3">No search results. Please use search criteria above.</p>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+
+          <!-- Linked References Table -->
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5>Linked References ({{linkedReferencesData.data.length}})</h5>
+              <button mat-raised-button color="warn"
+                      (click)="delinkSelectedReferences()"
+                      [disabled]="linkedReferencesSelection.selected.length === 0">
+                <mat-icon>link_off</mat-icon> Delink Selected ({{linkedReferencesSelection.selected.length}})
+              </button>
+            </div>
+
+            <div class="table-container">
+              <table mat-table [dataSource]="linkedReferencesData" class="mat-elevation-z2 w-100">
+                <ng-container matColumnDef="select">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <mat-checkbox
+                      (change)="toggleAllLinkedReferences()"
+                      [checked]="isAllLinkedReferencesSelected()"
+                      [indeterminate]="linkedReferencesSelection.hasValue() && !isAllLinkedReferencesSelected()">
+                    </mat-checkbox>
+                  </th>
+                  <td mat-cell *matCellDef="let element">
+                    <mat-checkbox
+                      (click)="$event.stopPropagation()"
+                      (change)="$event ? linkedReferencesSelection.toggle(element) : null"
+                      [checked]="linkedReferencesSelection.isSelected(element)">
+                    </mat-checkbox>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="referenceNo">
+                  <th mat-header-cell *matHeaderCellDef>Reference No</th>
+                  <td mat-cell *matCellDef="let element">{{element.referenceNo || 'N/A'}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="subject">
+                  <th mat-header-cell *matHeaderCellDef>Subject</th>
+                  <td mat-cell *matCellDef="let element" class="subject-column">
+                    {{element.subject || 'N/A'}}
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Status</th>
+                  <td mat-cell *matCellDef="let element">{{element.status || 'N/A'}}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="linkedReferencesColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: linkedReferencesColumns;"></tr>
+
+                <!-- No data row -->
+                <tr class="mat-row" *matNoDataRow>
+                  <td class="mat-cell text-center" [attr.colspan]="linkedReferencesColumns.length">
+                    <p class="py-3">No linked references yet.</p>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="Knowledge Base" *ngIf="showReferencNo">
+      <div class="knowledge-base-container">
+        <mat-card class="knowledge-base-card">
+          <mat-card-header class="knowledge-base-header">
+            <mat-card-title>Search VIP References</mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content class="knowledge-base-content">
+            <!-- Search Form -->
+            <form [formGroup]="knowledgeBaseForm" class="kb-search-form">
+              <div class="kb-form-row">
+                <div class="kb-form-field">
+                  <label>Name of Dignitary <span class="required-asterisk">*</span></label>
+                  <input type="text" formControlName="nameOfDignitary" placeholder="Enter name">
+                </div>
+
+                <div class="kb-form-field">
+                  <label>Designation <span class="required-asterisk">*</span></label>
+                  <select formControlName="designation">
+                    <option value="">Select Designation</option>
+                    <option *ngFor="let designation of vipDesignationList" [value]="designation.designationCode">
+                      {{designation.designationName}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="kb-form-row">
+                <div class="kb-form-field">
+                  <label>State <span class="required-asterisk">*</span></label>
+                  <select formControlName="state">
+                    <option value="">Select State</option>
+                    <option *ngFor="let state of stateList" [value]="state.code">
+                      {{state.name}}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="kb-form-field">
+                  <label>Constituency</label>
+                  <input type="text" formControlName="constituency" placeholder="Enter constituency">
+                </div>
+              </div>
+
+              <div class="kb-form-row">
+                <div class="kb-form-field">
+                  <label>Category of Subject <span class="required-asterisk">*</span></label>
+                  <select formControlName="categoryOfSubject">
+                    <option value="">Select Category</option>
+                    <option *ngFor="let category of categoryList" [value]="category.categoryId">
+                      {{category.categoryDescription}}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="kb-form-row full-width">
+                <div class="kb-form-field">
+                  <label>Subject/Issue</label>
+                  <textarea formControlName="subjectIssue" rows="3" placeholder="Enter subject or issue details"></textarea>
+                </div>
+              </div>
+
+              <!-- Search Note -->
+              <div class="kb-search-note">
+                <small><span class="required-asterisk">*</span> Searching will be available on the basis of Name of Dignitary, Designation, State and Subject</small>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="kb-button-group">
+                <button type="button" mat-raised-button color="primary" (click)="searchKnowledgeBase()"
+                  [disabled]="!knowledgeBaseForm.valid">
+                  <mat-icon>search</mat-icon> Search References
+                </button>
+                <button type="button" mat-raised-button color="accent" (click)="openSelectedKBReferences()"
+                  [disabled]="selectedKBReferences.length === 0">
+                  <mat-icon>open_in_new</mat-icon> Open References ({{selectedKBReferences.length}})
+                </button>
+              </div>
+            </form>
+
+            <!-- Results Table -->
+            <div class="kb-results-section" *ngIf="knowledgeBaseResults.length > 0">
+              <h5>Search Results ({{knowledgeBaseResults.length}})</h5>
+              <div class="kb-table-container">
+                <table mat-table [dataSource]="knowledgeBaseDataSource" class="kb-results-table">
+
+                  <!-- Checkbox Column -->
+                  <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <mat-checkbox (change)="toggleAllKBReferences($event)"
+                        [checked]="isAllKBSelected()"
+                        [indeterminate]="isSomeKBSelected()">
+                      </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                      <mat-checkbox (change)="toggleKBReference(row)"
+                        [checked]="isKBReferenceSelected(row)">
+                      </mat-checkbox>
+                    </td>
+                  </ng-container>
+
+                  <!-- Request Number Column -->
+                  <ng-container matColumnDef="requestNumber">
+                    <th mat-header-cell *matHeaderCellDef>REQUEST NUMBER</th>
+                    <td mat-cell *matCellDef="let element">{{element.referenceNo}}</td>
+                  </ng-container>
+
+                  <!-- Name of Dignitary Column -->
+                  <ng-container matColumnDef="nameOfDignitary">
+                    <th mat-header-cell *matHeaderCellDef>NAME OF DIGNITARY</th>
+                    <td mat-cell *matCellDef="let element">{{element.nameOfDignitary}}</td>
+                  </ng-container>
+
+                  <!-- Designation Column -->
+                  <ng-container matColumnDef="designation">
+                    <th mat-header-cell *matHeaderCellDef>DESIGNATION</th>
+                    <td mat-cell *matCellDef="let element">{{element.designation}}</td>
+                  </ng-container>
+
+                  <!-- State Column -->
+                  <ng-container matColumnDef="state">
+                    <th mat-header-cell *matHeaderCellDef>STATE</th>
+                    <td mat-cell *matCellDef="let element">{{element.state}}</td>
+                  </ng-container>
+
+                  <!-- Subject Category Column -->
+                  <ng-container matColumnDef="subjectCategory">
+                    <th mat-header-cell *matHeaderCellDef>SUBJECT CATEGORY</th>
+                    <td mat-cell *matCellDef="let element">{{element.categoryOfSubject}}</td>
+                  </ng-container>
+
+                  <!-- Pending Status Column -->
+                  <ng-container matColumnDef="pending">
+                    <th mat-header-cell *matHeaderCellDef>PENDING</th>
+                    <td mat-cell *matCellDef="let element">{{element.currentQueue}}</td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="knowledgeBaseColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: knowledgeBaseColumns;" (click)="toggleKBReference(row)" class="kb-row"></tr>
+
+                  <tr class="mat-row" *matNoDataRow>
+                    <td class="mat-cell text-center" [attr.colspan]="knowledgeBaseColumns.length">
+                      <p class="py-3">No results found. Try different search criteria.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="kb-empty-state" *ngIf="knowledgeBaseSearched && knowledgeBaseResults.length === 0">
+              <mat-icon>search_off</mat-icon>
+              <p>No references found matching your search criteria.</p>
+              <small>Try adjusting your filters and search again.</small>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+
+  <!-- Right Side: Table -->
+  <div class="table-card">
+    <mat-card class="example-card bg-white">
+
+
+
+
+      <!-- CUSTOM BUTTON injected into toolbar -->
+      <mat-toolbar color="primary" style="padding:0px; border-radius: 0;height: 50px;">
+        <!-- Start Section -->
+        <div class="start-section" style="display: flex; align-items: center; gap: 0.5rem;margin-left: 10px;">
+          <ng-container *ngIf="pdfSrc">
+            <select matNativeControl mat-raised-button [(ngModel)]="selectedDocument"
+              (change)="onDocumentSelect($event)">
+              <option value="" disabled selected>Select</option>
+              <!-- Pending documents for new references -->
+              <optgroup label="Pending Documents" *ngIf="pendingDocuments.length > 0">
+                <option *ngFor="let doc of pendingDocuments; let i = index" [value]="'pending_' + i">
+                  {{doc.file.name}} ({{doc.documentType | titlecase}})
+                </option>
+              </optgroup>
+              <!-- Existing documents for saved references -->
+              <optgroup label="Uploaded Documents" *ngIf="documentList.length > 0">
+                <option *ngFor="let document of documentList" [value]="document.fileName">
+                  {{document.fileOriginalName}}
+                </option>
+              </optgroup>
+            </select>
+            <button mat-raised-button color="primary" (click)="toggleDocumentInfo()" title="View Document Details">
+              <mat-icon>info</mat-icon> Info
+            </button>
+            <button mat-raised-button color="primary" (click)="openDialog()"> <mat-icon>upload</mat-icon> Upload
+              Document</button>
+          </ng-container>
+          <ng-container *ngIf="!pdfSrc">
+            <span style="font-size: medium;">Document Review</span>
+          </ng-container>
+        </div>
+      </mat-toolbar>
+
+      <div class="no-file" *ngIf="!pdfSrc">
+        <div class="dropbox" id="dropbox">
+          <div class="dropbox-icon">📁</div>
+          <div class="dropbox-text">Select files here</div>
+          <div class="dropbox-subtext">Supported formats: JPEG, PNG, PDF (Max 5MB)</div>
+          <button mat-raised-button color="primary" (click)="openDialog()"> <mat-icon>upload</mat-icon> Upload
+            Document</button>
+          <input type="file" id="fileInput" multiple hidden>
+        </div>
+      </div>
+
+
+      <!-- Document Info Panel -->
+      <div *ngIf="showDocumentInfo && selectedDocumentDetails"
+           style="background: #f5f5f5; border-bottom: 1px solid #ddd; padding: 12px 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <h3 style="margin: 0 0 12px 0; color: #3f51b5; font-size: 16px; font-weight: 500;">
+              <mat-icon style="vertical-align: middle; margin-right: 8px; font-size: 20px;">description</mat-icon>
+              Document Information
+            </h3>
+            <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 14px;">
+              <strong style="color: #666;">File Name:</strong>
+              <span>{{selectedDocumentDetails.fileOriginalName || selectedDocumentDetails.fileName}}</span>
+
+              <strong style="color: #666;">Document Type:</strong>
+              <span>{{selectedDocumentDetails.documentType || 'Not specified'}}</span>
+
+              <strong style="color: #666;">Comments:</strong>
+              <span style="white-space: pre-wrap;">{{selectedDocumentDetails.comments || 'No comments'}}</span>
+
+              <ng-container *ngIf="selectedDocumentDetails.createdBy">
+                <strong style="color: #666;">Uploaded By:</strong>
+                <span>{{selectedDocumentDetails.createdBy}}</span>
+              </ng-container>
+
+              <ng-container *ngIf="selectedDocumentDetails.createdAt">
+                <strong style="color: #666;">Uploaded On:</strong>
+                <span>{{selectedDocumentDetails.createdAt | date:'dd MMM yyyy, HH:mm'}}</span>
+              </ng-container>
+            </div>
+          </div>
+          <button mat-icon-button (click)="toggleDocumentInfo()" title="Close">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="pdfSrc; else noDocument">
+        <ngx-extended-pdf-viewer [src]="pdfSrc" backgroundColor="#ffffff" useBrowserLocale="true"
+          [height]="'93vh'" [handTool]="true" [showHandToolButton]="true" [pageViewMode]="'single'"
+          [scrollMode]="scrollMode">
+        </ngx-extended-pdf-viewer>
+      </div>
+
+      <ng-template #noDocument>
+        <div class="no-document-message" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 93vh; color: #666;">
+          <mat-icon style="font-size: 64px; width: 64px; height: 64px; color: #ccc;">description</mat-icon>
+          <p style="margin-top: 16px; font-size: 16px;">No document selected</p>
+          <p style="margin-top: 8px; font-size: 14px; color: #999;">Please select a document from the dropdown above or upload a new one</p>
+        </div>
+      </ng-template>
+
+    </mat-card>
+  </div>
+</div>

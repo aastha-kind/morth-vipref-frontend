@@ -1,0 +1,55 @@
+<!-- Dialog Titles -->
+<h2 mat-dialog-title *ngIf="data.mode === 'add'">Add Organization</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'edit'">Edit Organization</h2>
+<h2 mat-dialog-title *ngIf="data.mode === 'delete'">Delete Organization</h2>
+
+<!-- Add/Edit Form -->
+<mat-dialog-content *ngIf="data.mode !== 'delete'">
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Organization Name</mat-label>
+    <input matInput [(ngModel)]="data.organization.organizationName" oninput="this.value=this.value.replace(/[^a-zA-Z ]/g,'').replace(/^\s+/,'').replace(/\s{2,}/g,' ')" placeholder="Enter organization name">
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="w-100">
+    <mat-label>Organization Code</mat-label>
+    <input matInput [(ngModel)]="data.organization.organizationCode" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();" placeholder="Enter organization code">
+  </mat-form-field>
+</mat-dialog-content>
+
+<!-- Delete Confirmation -->
+<mat-dialog-content *ngIf="data.mode === 'delete'">
+  <p>
+    Are you sure you want to delete
+    <strong>{{ data.organization?.organizationName }}</strong>?
+  </p>
+  <small>This action cannot be undone.</small>
+</mat-dialog-content>
+
+<!-- Dialog Actions -->
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+
+  <button
+    mat-raised-button
+    color="primary"
+    *ngIf="data.mode === 'add'"
+    (click)="saveOrganization()">
+    Add
+  </button>
+
+  <button
+    mat-raised-button
+    color="accent"
+    *ngIf="data.mode === 'edit'"
+    (click)="updateOrganization()">
+    Save
+  </button>
+
+  <button
+    mat-raised-button
+    color="warn"
+    *ngIf="data.mode === 'delete'"
+    (click)="deleteOrganization()">
+    Delete
+  </button>
+</mat-dialog-actions>
