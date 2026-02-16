@@ -1,25 +1,26 @@
-import { AfterViewInit, Component, inject, Input, ViewChild } from '@angular/core';
-import { User } from '../../interface/user.model';
-import { Router } from '@angular/router';
-import { NgxUiLoaderService } from 'ngx-ui-loader';
-import { UsermgmtService } from '../../service/usermgmt.service';
-import { ToastrService } from 'ngx-toastr';
-import { MatDialog } from '@angular/material/dialog';
+import { AfterViewInit, Component, inject, ViewChild } from '@angular/core';
 import { VipReference } from '../dashboard/dashboard.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 
+import { MatDialog } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { UsermgmtService } from '../../service/usermgmt.service';
+import { User } from '../../interface/user.model';
+import { Router } from '@angular/router';
+import { ViewReferenceComponent } from '../view-reference/view-reference.component';
+
 @Component({
-  selector: 'app-vip-assignee',
+  selector: 'app-discard-references',
   standalone: false,
-  templateUrl: './vip-assignee.component.html',
-  styleUrl: './vip-assignee.component.css'
+  templateUrl: './discard-references.component.html',
+  styleUrl: './discard-references.component.css'
 })
-export class VipAssigneeComponent implements AfterViewInit {
+export class DiscardReferencesComponent implements AfterViewInit {
 
   userDetails!: User;
-  @Input() selectedQueueData: string = "";
   searchTerm: string = '';
   officeTypeFilter: string | null = null;
 
@@ -41,9 +42,6 @@ export class VipAssigneeComponent implements AfterViewInit {
     'office',
     'subject',
     'assignedAt',
-    // 'status',
-    'priority',
-    // 'currentQueue',
     'actions'
   ];
   queueReferencesData = new MatTableDataSource<VipReference>();
@@ -81,7 +79,7 @@ export class VipAssigneeComponent implements AfterViewInit {
     this.ngxService.start();
     const queueData = {
       loginId: this.userDetails.loginId,
-      queue: 'VIP_Assignee',
+      queue: 'DISCARDED',
       status: "INBOX",
       search: this.searchTerm,
       page: this.pageIndex,
@@ -91,7 +89,6 @@ export class VipAssigneeComponent implements AfterViewInit {
     }
     this.userMgmtService.getQueueReferencesListPaginated(queueData).subscribe({
       next: (res) => {
-        console.log(res)
         let data = res.content;
 
         // Apply client-side office type filter if set
@@ -118,15 +115,9 @@ export class VipAssigneeComponent implements AfterViewInit {
     this.getQueueReferences();
   }
 
-
-  addSelectedReference(ref: VipReference) {
-
-  }
-
   viewReference(ref: VipReference) {
-    this.userMgmtService.setReferenceDetails(ref);
-    this.router.navigate([`/dashboard/add-reference`], {
-      state: { previousRoute: '/dashboard/vip-assignee' }
+    const viewReferenceDialog = this.dialog.open(ViewReferenceComponent, {
+      data: ref
     });
   }
 
@@ -134,26 +125,16 @@ export class VipAssigneeComponent implements AfterViewInit {
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
     this.searchTerm = '';
     this.officeTypeFilter = null;
-    this.pageIndex = 0; // Reset to first page on new search
+    this.pageIndex = 0;
 
-    // Check if searching for office type
     if (filterValue.includes('minister') || filterValue.includes('ministry')) {
       this.officeTypeFilter = 'MINISTRY';
     } else if (filterValue.includes('secretary')) {
       this.officeTypeFilter = 'SECRETARY';
     } else {
-      // Regular reference number search
       this.searchTerm = filterValue;
     }
 
-    this.getQueueReferences(); // Fetch from server with search term
+    this.getQueueReferences();
   }
-
-  navigateToDetails(ref: VipReference) {
-    this.userMgmtService.setReferenceDetails(ref);
-    this.router.navigate([`/dashboard/add-reference`], {
-      state: { previousRoute: '/dashboard/vip-assignee' }
-    });
-  }
-
 }

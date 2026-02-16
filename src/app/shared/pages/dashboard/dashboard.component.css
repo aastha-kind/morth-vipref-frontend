@@ -53,4 +53,25 @@
     min-width: 140px !important;
 }
 
+/* Filter Row Styles */
+.filters-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
 
+.filter-field {
+    min-width: 180px;
+    flex: 1;
+    max-width: 250px;
+}
+
+@media (max-width: 768px) {
+    .filters-row {
+        flex-direction: column;
+    }
+    .filter-field {
+        max-width: 100%;
+    }
+}

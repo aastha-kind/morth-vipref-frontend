@@ -170,4 +170,9 @@ export class AdminService {
   toggleUserLock(userId: number, lockStatus: boolean): Observable<any> {
     return this.http.put(`${API_ENDPOINTS.users}/${userId}/lock`, { lockStatus });
   }
+
+  // Admin Dashboard Stats
+  getAdminDashboardStats(): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.reference}/admin-dashboard-stats`);
+  }
 }

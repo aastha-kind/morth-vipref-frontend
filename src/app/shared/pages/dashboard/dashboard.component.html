@@ -18,7 +18,7 @@
       </mat-card-content>
       <mat-card-footer>
         <div class="mat-card-footer">
-          <p>Total VIP Reference :<span color="red"> {{totalElements}}</span></p>
+          <p>Total VIP Reference :<span style="color: #3e9393; font-weight: bold;"> {{totalElements}}</span></p>
         </div>
       </mat-card-footer>
     </mat-card>
@@ -33,6 +33,40 @@
       </mat-card-header>
 
       <mat-card-content>
+        <!-- Filters Row - Only for Assigner/Assignee -->
+        <div class="filters-row" *ngIf="isAssignerOrAssignee()">
+          <!-- Date Filter -->
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Date Filter</mat-label>
+            <mat-select [(value)]="selectedDateFilter" (selectionChange)="onDateFilterChange()">
+              <mat-option *ngFor="let option of dateFilterOptions" [value]="option.value">
+                {{option.label}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Queue Filter - Only for Assigner (not Assignee) -->
+          <mat-form-field appearance="outline" class="filter-field" *ngIf="isAssigner()">
+            <mat-label>Queue Filter</mat-label>
+            <mat-select [(value)]="selectedQueueFilter" (selectionChange)="onQueueFilterChange()">
+              <mat-option *ngFor="let option of queueFilterOptions" [value]="option.value">
+                {{option.label}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Priority Filter -->
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Priority Filter</mat-label>
+            <mat-select [(value)]="selectedPriorityFilter" (selectionChange)="onPriorityFilterChange()">
+              <mat-option *ngFor="let option of priorityFilterOptions" [value]="option.value">
+                {{option.label}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Search Field -->
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>Search by Reference No</mat-label>
           <input matInput (keyup)="applyFilter($event)" placeholder="Enter reference number">
@@ -41,29 +75,29 @@
       </mat-card-content>
 
       <div class="overflow-x-auto p-4">
-        <table mat-table [dataSource]="VipReferenceData" matSort class="mat-elevation-z8 border">
+        <table mat-table [dataSource]="VipReferenceData" matSort matSortActive="assignedAt" matSortDirection="desc" class="mat-elevation-z8 border">
 
           <!-- Reference Number Column -->
           <ng-container matColumnDef="referenceNo">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Reference No</th>
+            <th mat-header-cell *matHeaderCellDef>Reference No</th>
             <td mat-cell *matCellDef="let element">{{element.referenceNo}}</td>
           </ng-container>
 
           <!-- Status Column -->
           <ng-container matColumnDef="currentQueue">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Current Queue</th>
+            <th mat-header-cell *matHeaderCellDef>Current Queue</th>
             <td mat-cell *matCellDef="let element">{{element.currentQueue}}</td>
           </ng-container>
 
           <!-- Subject Column -->
           <ng-container matColumnDef="subject">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Subject</th>
+            <th mat-header-cell *matHeaderCellDef>Subject</th>
             <td mat-cell *matCellDef="let element">{{element.subject}}</td>
           </ng-container>
 
           <!-- Priority Column -->
           <ng-container matColumnDef="priority">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Priority</th>
+            <th mat-header-cell *matHeaderCellDef>Priority</th>
             <td mat-cell *matCellDef="let element">
               {{element.priority ? element.priority : 'NA'}}
             </td>
@@ -83,7 +117,7 @@
 
           <!-- Action Column -->
           <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <th mat-header-cell *matHeaderCellDef>Status</th>
             <td mat-cell *matCellDef="let element">
               <button mat-icon-button (click)="viewReference(element)">
                 <mat-icon style="color: #3e9393;">visibility</mat-icon>
@@ -93,6 +127,16 @@
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell" [colSpan]="displayedColumns.length" style="text-align: center; padding: 20px;">
+              <ng-container *ngIf="searchTerm; else noData">
+                <p style="margin: 0; color: #666;">No records found for "{{searchTerm}}"</p>
+              </ng-container>
+              <ng-template #noData>
+                <p style="margin: 0; color: #666;">No references available.</p>
+              </ng-template>
+            </td>
+          </tr>
         </table>
 
         <mat-paginator

@@ -26,6 +26,7 @@ import { VipAssigneeComponent } from './pages/vip-assignee/vip-assignee.componen
 import { VipFinalReplyComponent } from './pages/vip-final-reply/vip-final-reply.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { ClosedReferencesComponent } from './pages/closed-references/closed-references.component';
+import { DiscardReferencesComponent } from './pages/discard-references/discard-references.component';
 
 const routes: Routes = [
   {
@@ -55,7 +56,8 @@ const routes: Routes = [
       {path:'vip-assigner', component:VipAssignerComponent},
       {path:'vip-assignee', component:VipAssigneeComponent},
       {path:'vip-final-reply',component:VipFinalReplyComponent},
-      {path:'vip-closed-references',component:ClosedReferencesComponent}
+      {path:'vip-closed-references',component:ClosedReferencesComponent},
+      {path:'vip-discard-references',component:DiscardReferencesComponent}
     ]
   },
   {

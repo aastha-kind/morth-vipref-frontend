@@ -16,4 +16,6 @@ export interface Role {
     contactNumber?:string;
     emailId?:string;
     userLocked?:boolean;
+    officeType?: string; // Office type code (e.g., "MINISTRY", "SECRETARY")
+    officeTypeName?: string; // Office type name (e.g., "Ministry Office", "Secretary Office")
   }

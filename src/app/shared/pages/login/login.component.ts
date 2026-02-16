@@ -56,16 +56,23 @@ export class LoginComponent {
     this.userMgmtService.loginVipUser(loginData).subscribe({
       next: (res: any) => {
         if (res !== undefined && res !== null) {
+          // Add officeType to user object before storing
+          const userWithOfficeType = {
+            ...res.user,
+            officeType: res.officeType,
+            officeTypeName: res.officeTypeName
+          };
+
           if (res.user.roles[0].roleName == "Admin") {
             this.router.navigate(['/administrator']);
             sessionStorage.setItem('token', res.token);
-            sessionStorage.setItem('user', JSON.stringify(res.user));
+            sessionStorage.setItem('user', JSON.stringify(userWithOfficeType));
             this.ngxService.stop();
           }
           else if (res.user.roles[0].roleName == "Initiator" || res.user.roles[0].roleName == "Assigner" || res.user.roles[0].roleName == "Assignee" || res.user.roles[0].roleName == "Final_Reply") {
             this.router.navigate(['/dashboard']);
             sessionStorage.setItem('token', res.token);
-            sessionStorage.setItem('user', JSON.stringify(res.user));
+            sessionStorage.setItem('user', JSON.stringify(userWithOfficeType));
             this.ngxService.stop();
           }
           else {

@@ -1,6 +1,6 @@
 <div class="overflow-x-auto px-4 pb-4">
         <div class="govt-title">
-      <div class="title-main">VIP Assignee</div>
+      <div class="title-main">VIP Assignee Inbox</div>
 
     </div>
 
@@ -11,45 +11,51 @@
       <mat-icon matPrefix>search</mat-icon>
     </mat-form-field>
 
-  <table mat-table [dataSource]="queueReferencesData" matSort class="mat-elevation-z8 border">
+  <table mat-table [dataSource]="queueReferencesData" matSort matSortActive="assignedAt" matSortDirection="desc" class="mat-elevation-z8 border">
 
     <!-- Reference Number Column -->
     <ng-container matColumnDef="referenceNo">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Reference No</th>
+      <th mat-header-cell *matHeaderCellDef>Reference No</th>
+      <td mat-cell *matCellDef="let element">{{element.referenceNo}}</td>
+    </ng-container>
+
+    <!-- Office Column -->
+    <ng-container matColumnDef="office">
+      <th mat-header-cell *matHeaderCellDef>Office</th>
       <td mat-cell *matCellDef="let element">
-        <span>{{element.referenceNo}}</span>
         <span *ngIf="element.initiatorOfficeType === 'MINISTRY'" class="office-badge badge-ministry">
-          Ministry
+          Minister Office
         </span>
         <span *ngIf="element.initiatorOfficeType === 'SECRETARY'" class="office-badge badge-secretary">
-          Secretary
+          Secretary Office
         </span>
+        <span *ngIf="!element.initiatorOfficeType">-</span>
       </td>
     </ng-container>
 
-    <!-- Status Column -->
-    <ng-container matColumnDef="currentQueue">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Current Queue</th>
+    <!-- Current Queue Column -->
+    <!-- <ng-container matColumnDef="currentQueue">
+      <th mat-header-cell *matHeaderCellDef>Current Queue</th>
       <td mat-cell *matCellDef="let element">{{element.currentQueue}}</td>
-    </ng-container>
+    </ng-container> -->
 
     <!-- Subject Column -->
     <ng-container matColumnDef="subject">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Subject</th>
+      <th mat-header-cell *matHeaderCellDef>Subject</th>
       <td mat-cell *matCellDef="let element">{{element.subject}}</td>
     </ng-container>
 
     <!-- Status Column -->
-    <ng-container matColumnDef="status">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+    <!-- <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
       <td mat-cell *matCellDef="let element">
         {{element.status}}
       </td>
-    </ng-container>
+    </ng-container> -->
 
     <!-- Priority Column -->
     <ng-container matColumnDef="priority">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Priority</th>
+      <th mat-header-cell *matHeaderCellDef>Priority</th>
       <td mat-cell *matCellDef="let element">
         {{element.priority}}
       </td>

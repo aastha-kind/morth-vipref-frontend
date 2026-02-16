@@ -50,6 +50,10 @@ export class SideNavComponent {
             case "Close_Reference":
               this.queuesList.push({ name: "Closed_References", route: 'vip-closed-references' });
               break;
+
+            case "Discard_Reference":
+              this.queuesList.push({ name: "Discard_References", route: 'vip-discard-references' });
+              break;
           }
         });
         this.ngxService.stop();

@@ -108,7 +108,7 @@
                 </div>
                 <div class="input-container">
                   <div>
-                    <input matInput [matDatepicker]="picker2" [max]="maxDate" formControlName="dateOfReceiving" class="mat-input"
+                    <input matInput [matDatepicker]="picker2" [min]="minDateOfReceiving" [max]="maxDate" formControlName="dateOfReceiving" class="mat-input"
                       placeholder="Date Of Receiving">
                     <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
                     <mat-datepicker #picker2></mat-datepicker>
@@ -205,15 +205,11 @@
               </div>
               <div class="form-field">
                 <div class="label-field">
-                  <label>Constituency <span class="text-red-500">*</span></label>
+                  <label>Constituency</label>
                 </div>
 
                 <div class="input-container">
                   <input matInput formControlName="constituency" class="mat-input" placeholder="Enter Constituency">
-                  <mat-error class="mat-error"
-                    *ngIf="addVipReferenceDetails.controls['constituency'].hasError('required') && addVipReferenceDetails.controls['constituency'].touched">
-                    Please select constituency
-                  </mat-error>
                 </div>
               </div>
               <div class="form-field" *ngIf="showReferencNo">
@@ -290,7 +286,8 @@
               <!-- Update Reference Button - Before Documents Section -->
               <div class="form-field" *ngIf="showReferencNo">
                 <div class="btn-group">
-                  <button mat-raised-button color="primary" (click)="updateVipReferenceDetails()">
+                  <button mat-raised-button color="primary" (click)="updateVipReferenceDetails()"
+                    [disabled]="addVipReferenceDetails.disabled">
                     Update Reference
                   </button>
                 </div>
@@ -549,7 +546,7 @@
                   <select matNativeControl formControlName="assigneeDesignation" (change)="selectedDesignation($event)">
                     <option value="" disabled selected>Select Designation</option>
                     <option *ngFor="let designation of designationList" [value]="designation.designationCode">
-                      {{ designation.designationCode }}
+                      {{ designation.designationDescription || designation.designationCode }}
                     </option>
                   </select>
                   <mat-error class="mat-error"
@@ -605,10 +602,16 @@
                     </ng-container>
 
 
-                    <!-- Reference Number Column -->
+                    <!-- Sr No Column -->
                     <ng-container matColumnDef="id">
                       <th mat-header-cell *matHeaderCellDef>Sr No</th>
                       <td mat-cell *matCellDef="let element;let i=index;">{{i+1}}</td>
+                    </ng-container>
+
+                    <!-- Draft No Column -->
+                    <ng-container matColumnDef="draftReplyId">
+                      <th mat-header-cell *matHeaderCellDef>Draft No</th>
+                      <td mat-cell *matCellDef="let element">{{element.draftReplyId}}</td>
                     </ng-container>
 
                     <!-- Status Column -->
@@ -1150,7 +1153,7 @@
                   <!-- Designation Column -->
                   <ng-container matColumnDef="designation">
                     <th mat-header-cell *matHeaderCellDef>DESIGNATION</th>
-                    <td mat-cell *matCellDef="let element">{{element.designation}}</td>
+                    <td mat-cell *matCellDef="let element">{{element.designationName || element.designation}}</td>
                   </ng-container>
 
                   <!-- State Column -->
@@ -1220,7 +1223,7 @@
               <!-- Existing documents for saved references -->
               <optgroup label="Uploaded Documents" *ngIf="documentList.length > 0">
                 <option *ngFor="let document of documentList" [value]="document.fileName">
-                  {{document.fileOriginalName}}
+                  {{cleanFilename(document.fileOriginalName)}}
                 </option>
               </optgroup>
             </select>
@@ -1240,7 +1243,7 @@
         <div class="dropbox" id="dropbox">
           <div class="dropbox-icon">📁</div>
           <div class="dropbox-text">Select files here</div>
-          <div class="dropbox-subtext">Supported formats: JPEG, PNG, PDF (Max 5MB)</div>
+          <div class="dropbox-subtext">Supported formats: JPEG, PNG, PDF (Max 2MB)</div>
           <button mat-raised-button color="primary" (click)="openDialog()"> <mat-icon>upload</mat-icon> Upload
             Document</button>
           <input type="file" id="fileInput" multiple hidden>
@@ -1259,7 +1262,7 @@
             </h3>
             <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font-size: 14px;">
               <strong style="color: #666;">File Name:</strong>
-              <span>{{selectedDocumentDetails.fileOriginalName || selectedDocumentDetails.fileName}}</span>
+              <span>{{cleanFilename(selectedDocumentDetails.fileOriginalName || selectedDocumentDetails.fileName)}}</span>
 
               <strong style="color: #666;">Document Type:</strong>
               <span>{{selectedDocumentDetails.documentType || 'Not specified'}}</span>

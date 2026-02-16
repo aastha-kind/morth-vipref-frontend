@@ -1,4 +1,4 @@
-
+//const BASE_URL = "/vip-api";
 const BASE_URL = "http://localhost:4600";
 
 export const API_ENDPOINTS = {
@@ -12,5 +12,6 @@ export const API_ENDPOINTS = {
    linkedReferences:`${BASE_URL}/linked-references`,
    reports:`${BASE_URL}/api/reports`,
    categories:`${BASE_URL}/api/categories`,
-   subcategories:`${BASE_URL}/api/subcategories`
+   subcategories:`${BASE_URL}/api/subcategories`,
+   documentTypes:`${BASE_URL}/api/document-types`
   };

@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { User } from '../../../../interface/user.model';
 
@@ -26,9 +26,33 @@ export class ChangePasswordDialogComponent {
 
   initializeForm(): void {
     this.changePasswordForm = this.fb.group({
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, Validators.minLength(8), this.strongPasswordValidator]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
+  }
+
+  // Strong password validator: requires uppercase, lowercase, digit, and special character
+  strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+    if (!value) {
+      return null;
+    }
+
+    const hasUpperCase = /[A-Z]/.test(value);
+    const hasLowerCase = /[a-z]/.test(value);
+    const hasDigit = /[0-9]/.test(value);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+    const passwordValid = hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
+
+    return passwordValid ? null : {
+      weakPassword: {
+        hasUpperCase,
+        hasLowerCase,
+        hasDigit,
+        hasSpecialChar
+      }
+    };
   }
 
   passwordMatchValidator(form: FormGroup) {

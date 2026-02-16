@@ -2,6 +2,10 @@ import { DatePipe } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { VipReferenceDetailsResponse, VipReferenceDocumentResponse } from '../../interface/reference-details-response.model';
+import { UsermgmtService } from '../../service/usermgmt.service';
+import { VipDesignationList } from '../../interface/vip-designation-list.model';
+import { ToasterService } from '../../utilities/toaster.service';
 
 @Component({
   selector: 'app-view-reference',
@@ -12,41 +16,230 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class ViewReferenceComponent {
   viewReference!: FormGroup;
-  referenceDetails: any;
+  referenceDetails: VipReferenceDetailsResponse;
+  documents: VipReferenceDocumentResponse[] = [];
+  displayedDocColumns: string[] = ['documentType', 'fileName', 'uploadedBy', 'uploadedAt', 'actions'];
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private datePipe: DatePipe) {
+  isLoading: boolean = false;
+
+  constructor(@Inject(MAT_DIALOG_DATA) public data: any, private datePipe: DatePipe, private userMgmtService: UsermgmtService, private toaster: ToasterService) {
     this.referenceDetails = data;
+    this.documents = data.documents || [];
   }
 
   ngOnInit() {
     this.viewReference = new FormGroup({
+      // Basic Reference Information
       "referenceNo": new FormControl(),
       "subject": new FormControl(),
-      "assignedAt": new FormControl(),
       "priority": new FormControl(),
       "currentQueue": new FormControl(),
-      "status": new FormControl(),
-      "actions": new FormControl()
-    })
-    const formattedReceivedDate = this.datePipe.transform(
-      this.referenceDetails.assignedAt,
-      'dd MMM yyyy HH:mm:ss'
-    );
-    this.setFormData(formattedReceivedDate);
+      "initiatorOfficeType": new FormControl(),
+
+      // Date Information
+      "receivedDate": new FormControl(),
+      "dateOfLetter": new FormControl(),
+      "dateOfEntry": new FormControl(),
+
+      // VIP/Dignitary Information
+      "nameOfDignitary": new FormControl(),
+      "designation": new FormControl(),
+      "designation_name": new FormControl(),
+      "emailId": new FormControl(),
+      "state": new FormControl(),
+      "constituency": new FormControl(),
+
+      // Category Information
+      "categoryOfSubject": new FormControl(),
+      "subCategoryOfSubject": new FormControl(),
+
+      // Assignment Information
+      "toLoginId": new FormControl()
+    });
+
+    // If full details are missing, fetch them from backend
+    if (this.data.referenceNo && !this.data.receivedDate && !this.data.nameOfDignitary) {
+      this.loadFullReferenceDetails(this.data.referenceNo);
+    } else {
+      this.setFormData();
+    }
   }
 
-  setFormData(formattedReceivedDate:any) {
-    this.viewReference.get('referenceNo')?.setValue(this.referenceDetails.referenceNo);
-    this.viewReference.get('referenceNo')?.disable()
-    this.viewReference.get('subject')?.setValue(this.referenceDetails.subject)
-    this.viewReference.get('subject')?.disable()
-    this.viewReference.get('assignedAt')?.setValue(formattedReceivedDate)
-    this.viewReference.get('assignedAt')?.disable()
-    this.viewReference.get('priority')?.setValue(this.referenceDetails.priority)
-    this.viewReference.get('priority')?.disable()
-    this.viewReference.get('currentQueue')?.setValue(this.referenceDetails.currentQueue)
-    this.viewReference.get('currentQueue')?.disable()
-    this.viewReference.get('status')?.setValue(this.referenceDetails.status)
-    this.viewReference.get('status')?.disable()
+  private loadFullReferenceDetails(referenceNo: string) {
+    this.isLoading = true;
+    this.userMgmtService.getReferenceDetails(referenceNo).subscribe({
+      next: (details: VipReferenceDetailsResponse) => {
+        this.referenceDetails = details;
+        this.documents = details.documents || [];
+        this.setFormData();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        // Fallback to basic data if fetch fails
+        this.setFormData();
+        this.isLoading = false;
+      }
+    });
+  }
+
+  setFormData() {
+    // Format dates
+    const formattedReceivedDate = this.formatDate(this.referenceDetails.receivedDate);
+    const formattedDateOfLetter = this.formatDate(this.referenceDetails.dateOfLetter);
+    const formattedDateOfEntry = this.formatDate(this.referenceDetails.dateOfEntry);
+
+    // Basic Reference Information
+    this.setFieldValue('referenceNo', this.referenceDetails.referenceNo);
+    this.setFieldValue('subject', this.referenceDetails.subject);
+    this.setFieldValue('priority', this.referenceDetails.priority || 'Not Set');
+    this.setFieldValue('currentQueue', this.formatQueueName(this.referenceDetails.currentQueue));
+    this.setFieldValue('initiatorOfficeType', this.formatOfficeType(this.referenceDetails.initiatorOfficeType));
+
+    // Date Information
+    this.setFieldValue('receivedDate', formattedReceivedDate);
+    this.setFieldValue('dateOfLetter', formattedDateOfLetter);
+    this.setFieldValue('dateOfEntry', formattedDateOfEntry);
+
+    // VIP/Dignitary Information
+    this.setFieldValue('nameOfDignitary', this.referenceDetails.nameOfDignitary);
+    this.setFieldValue('designation', this.referenceDetails.designation);
+    this.loadDesignationName();
+    this.setFieldValue('emailId', this.referenceDetails.emailId);
+    this.setFieldValue('state', this.referenceDetails.state);
+    this.setFieldValue('constituency', this.referenceDetails.constituency);
+
+    // Category Information
+    this.setFieldValue('categoryOfSubject', this.referenceDetails.categoryOfSubject);
+    this.setFieldValue('subCategoryOfSubject', this.referenceDetails.subCategoryOfSubject);
+
+    // Assignment Information
+    this.setFieldValue('toLoginId', this.referenceDetails.toLoginId || 'Not Assigned');
+  }
+
+  private loadDesignationName() {
+    const designationCode = this.referenceDetails.designation;
+    if (designationCode) {
+      this.userMgmtService.getVipDesignationList().subscribe({
+        next: (designations: VipDesignationList[]) => {
+          const match = designations.find(d => d.designationCode === designationCode);
+          if (match) {
+            this.setFieldValue('designation', match.designationName);
+          }
+        }
+      });
+    }
+  }
+
+  private setFieldValue(fieldName: string, value: any) {
+    const control = this.viewReference.get(fieldName);
+    if (control) {
+      control.setValue(value || 'N/A');
+      control.disable();
+    }
+  }
+
+  private formatDate(dateValue: any): string {
+    if (!dateValue) return 'N/A';
+    return this.datePipe.transform(dateValue, 'dd MMM yyyy HH:mm:ss') || 'N/A';
+  }
+
+  private formatQueueName(queue: string): string {
+    if (!queue) return 'N/A';
+    // Convert queue names like VIP_initiator to "VIP Initiator"
+    return queue.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+
+  private formatOfficeType(officeType: string | undefined): string {
+    if (!officeType) return 'N/A';
+    if (officeType === 'MINISTRY') return 'Ministry Office';
+    if (officeType === 'SECRETARY') return 'Secretary Office';
+    return officeType;
+  }
+
+  formatDocumentDate(dateValue: any): string {
+    if (!dateValue) return 'N/A';
+    return this.datePipe.transform(dateValue, 'dd MMM yyyy') || 'N/A';
+  }
+
+  getPriorityClass(priority: string): string {
+    if (!priority) return '';
+    switch (priority.toLowerCase()) {
+      case 'high': return 'priority-high';
+      case 'normal': return 'priority-normal';
+      case 'low': return 'priority-low';
+      default: return '';
+    }
+  }
+
+  getQueueStatusClass(queue: string): string {
+    if (!queue) return '';
+    const lowerQueue = queue.toLowerCase();
+    if (lowerQueue.includes('initiator')) return 'queue-initiator';
+    if (lowerQueue.includes('assigner')) return 'queue-assigner';
+    if (lowerQueue.includes('assignee')) return 'queue-assignee';
+    if (lowerQueue.includes('final')) return 'queue-final';
+    return '';
+  }
+
+  private getUserId(): number {
+    const userData = sessionStorage.getItem("user");
+    if (userData) {
+      const user = JSON.parse(userData);
+      return user.id || 0;
+    }
+    return 0;
+  }
+
+  viewDocument(doc: VipReferenceDocumentResponse) {
+    const docId = doc.id || doc.dmsDocumentId;
+    if (!docId) {
+      this.toaster.error('Document ID not available');
+      return;
+    }
+
+    this.toaster.info('Opening document...');
+    this.userMgmtService.downloadDocumentById(docId, this.getUserId()).subscribe({
+      next: (blob: Blob) => {
+        if (blob.size === 0) {
+          this.toaster.error('Document is empty or not found');
+          return;
+        }
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      },
+      error: (err) => {
+        console.error('Error viewing document:', err);
+        this.toaster.error('Failed to open document. Please try again.');
+      }
+    });
+  }
+
+  downloadDocument(doc: VipReferenceDocumentResponse) {
+    const docId = doc.id || doc.dmsDocumentId;
+    if (!docId) {
+      this.toaster.error('Document ID not available');
+      return;
+    }
+
+    this.toaster.info('Downloading document...');
+    this.userMgmtService.downloadDocumentById(docId, this.getUserId()).subscribe({
+      next: (blob: Blob) => {
+        if (blob.size === 0) {
+          this.toaster.error('Document is empty or not found');
+          return;
+        }
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = doc.fileOriginalName || doc.fileName || 'document';
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.toaster.success('Document downloaded successfully');
+      },
+      error: (err) => {
+        console.error('Error downloading document:', err);
+        this.toaster.error('Failed to download document. Please try again.');
+      }
+    });
   }
 }

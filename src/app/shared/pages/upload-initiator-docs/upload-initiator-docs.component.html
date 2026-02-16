@@ -28,13 +28,13 @@
 
         <select matNativeControl formControlName="documentType">
           <option value="" disabled selected>Select Document Type </option>
-          <option value="letter">Letter</option>
-          <option value="memo">Memo</option>
-          <option value="draft">Draft</option>
+          <option *ngFor="let docType of documentTypes" [value]="docType.typeName">
+            {{ docType.typeName }}
+          </option>
         </select>
       </div>
 
-      <div class="form-field">
+      <div class="form-field" *ngIf="userDetails?.roles?.[0]?.roleName !== 'Initiator'">
         <div class="label-field">
           <label style="font-style: italic;">Comments</label>
         </div>

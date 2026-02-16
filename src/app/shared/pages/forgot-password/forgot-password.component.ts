@@ -17,7 +17,6 @@ export class ForgotPasswordComponent implements OnInit {
   resetPasswordForm!: FormGroup;
 
   currentStep: number = 1; // 1 = forgot password, 2 = reset password
-  temporaryPassword: string = '';
   savedLoginId: string = '';
 
   hideTempPassword: boolean = true;
@@ -72,7 +71,6 @@ export class ForgotPasswordComponent implements OnInit {
       next: (res: any) => {
         this.ngxService.stop();
         if (res.success) {
-          this.temporaryPassword = res.temporaryPassword;
           this.savedLoginId = requestData.loginId;
           this.currentStep = 2;
           this.toastr.success(res.message, 'Success');
@@ -118,14 +116,6 @@ export class ForgotPasswordComponent implements OnInit {
         const errorMessage = err.error?.message || 'Failed to reset password';
         this.toastr.error(errorMessage, 'Error');
       }
-    });
-  }
-
-  copyToClipboard(): void {
-    navigator.clipboard.writeText(this.temporaryPassword).then(() => {
-      this.toastr.info('Temporary password copied to clipboard', 'Copied');
-    }).catch(() => {
-      this.toastr.error('Failed to copy to clipboard', 'Error');
     });
   }
 

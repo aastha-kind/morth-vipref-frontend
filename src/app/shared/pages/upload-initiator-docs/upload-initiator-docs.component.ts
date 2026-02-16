@@ -22,6 +22,7 @@ export class UploadInitiatorDocsComponent {
   userDetails!: User;
   private ngxService = inject(NgxUiLoaderService);
   private toastr = inject(ToastrService);
+  documentTypes: any[] = [];
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: VipReferenceDetailsResponse, private dialogRef: MatDialogRef<UploadInitiatorDocsComponent>) {
     this.initiateUploadForm();
@@ -30,6 +31,24 @@ export class UploadInitiatorDocsComponent {
   ngOnInit() {
     this.getUserDetails();
     this.refernceDetails = this.data;
+    this.loadDocumentTypes();
+  }
+
+  loadDocumentTypes() {
+    // Initiator role should only see "Letter" document type
+    if (this.userDetails?.roles?.[0]?.roleName === 'Initiator') {
+      this.documentTypes = [{ typeName: 'Letter' }];
+      return;
+    }
+    this.userMgmtService.getActiveDocumentTypes().subscribe({
+      next: (response: any) => {
+        this.documentTypes = response;
+      },
+      error: (err) => {
+        console.error('Error loading document types:', err);
+        this.toastr.error('Failed to load document types');
+      }
+    });
   }
   getUserDetails() {
     const userData = sessionStorage.getItem("user");
@@ -58,8 +77,8 @@ export class UploadInitiatorDocsComponent {
         return;
       }
 
-      // Validate size (max 50MB = 50 * 1024 * 1024)
-      if (file.size > 2 * 1024 * 1024) {
+      // Validate size (max 5MB to match DMS limit)
+      if (file.size > 5 * 1024 * 1024) {
         this.uploadReferenceDocs.get('file')?.setErrors({ maxSizeExceeded: true });
         return;
       }

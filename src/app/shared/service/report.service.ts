@@ -67,4 +67,9 @@ export class ReportService {
   getUserLoginReport(): Observable<any> {
     return this.http.get<any>(`${API_ENDPOINTS.reports}/user-login/by-user`);
   }
+
+  // Get Reference Detail
+  getReferenceDetail(referenceNo: string): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.reports}/reference-detail/${referenceNo}`);
+  }
 }

@@ -45,6 +45,7 @@ export class InitiatorFormComponent {
   public scrollMode: ScrollModeType = ScrollModeType.vertical;
   pdfSrc: string | ArrayBuffer | Blob | Uint8Array | undefined;
   maxDate: Date = new Date(); // Maximum date for date pickers (today)
+  minDateOfReceiving: Date | null = null; // Minimum date for Date of Receiving (based on Date of Letter)
   private dialog = inject(MatDialog);
   private userMgmtService = inject(UsermgmtService);
   private ngxService = inject(NgxUiLoaderService);
@@ -100,6 +101,7 @@ export class InitiatorFormComponent {
   savedDraftReplyCol: string[] = [
     'select',
     'id',
+    'draftReplyId',
     'editedBy',
     'editedAt',
     'fileName',
@@ -142,12 +144,22 @@ export class InitiatorFormComponent {
     this.getCategoryList();
 
     // Capture the previous route from navigation state or query params
-    const navigation = this.router.getCurrentNavigation();
-    const state = navigation?.extras?.state;
+    // Use history.state since getCurrentNavigation() is null after navigation completes
+    const state = history.state;
+    console.log('Navigation state:', state);
+
     if (state && state['previousRoute']) {
       this.previousRoute = state['previousRoute'];
     } else if (this.activateRoute.snapshot.queryParams['returnUrl']) {
       this.previousRoute = this.activateRoute.snapshot.queryParams['returnUrl'];
+    }
+
+    // Check if editing a draft from navigation state
+    if (state && state['isDraft'] && state['draftReferenceId']) {
+      console.log('Loading draft with ID:', state['draftReferenceId']);
+      this.draftReferenceId = state['draftReferenceId'];
+      // Load draft data into form
+      this.loadDraftData(state['draftReferenceId']);
     }
 
     // Check if referenceNo is provided in route params
@@ -155,6 +167,103 @@ export class InitiatorFormComponent {
     if (referenceNo) {
       this.loadReferenceByNumber(referenceNo);
       this.loadLinkedReferences();
+    }
+  }
+
+  loadDraftData(draftReferenceId: number) {
+    this.ngxService.start();
+    const apiUrl = `${API_ENDPOINTS.reference}/reference-details-by-id/${draftReferenceId}`;
+    console.log('Fetching draft data from:', apiUrl);
+
+    // Fetch draft details from API using reference ID
+    this.http.get<any>(apiUrl).subscribe({
+      next: (res) => {
+        this.ngxService.stop();
+        console.log('Draft data received:', res);
+        if (res) {
+          // Populate form with draft data
+          const formValues = {
+            dateOfLetter: this.parseLocalDate(res.dateOfLetter),
+            dateOfReceiving: this.parseLocalDate(res.receivedDate),
+            dateOfEntry: this.parseLocalDate(res.dateOfEntry) || new Date(),
+            nameOfDiginitary: res.nameOfDignitary || '',
+            emailId: res.emailId || '',
+            designation: res.designation || '',
+            state: res.state || '',
+            constituency: res.constituency || '',
+            priority: res.priority || '',
+            catgOfSubject: res.categoryOfSubject || '',
+            subCatgOfSubject: res.subCategoryOfSubject || '',
+            subjectOrIssue: res.subject || ''
+          };
+          console.log('Patching form with values:', formValues);
+          this.addVipReferenceDetails.patchValue(formValues);
+
+          // Update minDateOfReceiving if dateOfLetter exists
+          if (res.dateOfLetter) {
+            this.minDateOfReceiving = this.parseLocalDate(res.dateOfLetter);
+          }
+
+          // Load subcategories if category is set
+          if (res.categoryOfSubject) {
+            this.getSubCategoryList(res.categoryOfSubject);
+          }
+
+          // Load documents if available
+          if (res.documents && res.documents.length > 0) {
+            this.documentList = res.documents;
+            console.log('Draft documents loaded:', this.documentList);
+            // Select the first document by default
+            if (this.documentList.length > 0) {
+              this.selectedDocument = this.documentList[0].fileName;
+              this.selectedDocumentDetails = this.documentList[0];
+              // Load PDF preview if it's a PDF
+              if (this.documentList[0].filePath || this.documentList[0].dmsDocumentId) {
+                this.loadDocumentPreview(this.documentList[0]);
+              }
+            }
+          }
+
+          this.toastr.info('Draft loaded. Continue editing and submit when ready.');
+        }
+      },
+      error: (err) => {
+        this.ngxService.stop();
+        console.error('Error loading draft:', err);
+        this.toastr.error('Failed to load draft data');
+      }
+    });
+  }
+
+  loadDocumentPreview(doc: any) {
+    const token = sessionStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    // Check if document is stored in DMS
+    if (doc.storageType === 'dms' && doc.dmsDocumentId) {
+      const apiUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document-by-id`;
+      const body = { documentId: doc.id, userId: 0 };
+      this.http.post(apiUrl, body, { responseType: 'blob', headers: headers }).subscribe({
+        next: (blob) => {
+          this.pdfSrc = URL.createObjectURL(blob);
+        },
+        error: (err) => {
+          console.error('Error loading DMS document preview:', err);
+        }
+      });
+    } else {
+      // Fallback: local file path
+      const downloadUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document?filePath=${encodeURIComponent(doc.filePath)}`;
+      this.http.get(downloadUrl, { responseType: 'blob', headers: headers }).subscribe({
+        next: (blob) => {
+          this.pdfSrc = URL.createObjectURL(blob);
+        },
+        error: (err) => {
+          console.error('Error loading document preview:', err);
+        }
+      });
     }
   }
 
@@ -304,7 +413,7 @@ export class InitiatorFormComponent {
       "emailId": new FormControl(""),
       "designation": new FormControl("", Validators.required),
       "state": new FormControl("", Validators.required),
-      "constituency": new FormControl("", Validators.required),
+      "constituency": new FormControl(""),
       "priority": new FormControl(""),
       "catgOfSubject": new FormControl("", Validators.required),
       "subCatgOfSubject": new FormControl("", Validators.required),
@@ -314,7 +423,24 @@ export class InitiatorFormComponent {
         "documentType": new FormControl(""),
         "comments": new FormControl("")
       })
-    })
+    });
+
+    // Update minDateOfReceiving when dateOfLetter changes
+    this.addVipReferenceDetails.get('dateOfLetter')?.valueChanges.subscribe((value) => {
+      if (value) {
+        this.minDateOfReceiving = new Date(value);
+        // If current dateOfReceiving is before the new minDate, clear it
+        const currentReceivingDate = this.addVipReferenceDetails.get('dateOfReceiving')?.value;
+        if (currentReceivingDate) {
+          const receivingDate = new Date(currentReceivingDate);
+          if (receivingDate < this.minDateOfReceiving) {
+            this.addVipReferenceDetails.get('dateOfReceiving')?.setValue(null);
+          }
+        }
+      } else {
+        this.minDateOfReceiving = null;
+      }
+    });
   }
 
   initiateforwardReferenceForm() {
@@ -379,7 +505,7 @@ export class InitiatorFormComponent {
   }
 
   loadDocument(selectedDoc: any) {
-    if (!selectedDoc || !selectedDoc.filePath) {
+    if (!selectedDoc || (!selectedDoc.filePath && !selectedDoc.dmsDocumentId)) {
       this.pdfSrc = undefined;
       this.selectedDocumentDetails = null;
       this.toastr.warning('Document path not available');
@@ -389,7 +515,6 @@ export class InitiatorFormComponent {
     // Store selected document details
     this.selectedDocumentDetails = selectedDoc;
 
-    const apiUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document?filePath=${encodeURIComponent(selectedDoc.filePath)}`;
     const token = sessionStorage.getItem('token');
 
     if (!token) {
@@ -405,7 +530,40 @@ export class InitiatorFormComponent {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-    console.log(apiUrl, headers);
+
+    // Check if document is stored in DMS
+    if (selectedDoc.storageType === 'dms' && selectedDoc.dmsDocumentId) {
+      // Use DMS download endpoint (POST)
+      const apiUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document-by-id`;
+      const body = { documentId: selectedDoc.id, userId: 0 };
+      console.log('Loading from DMS:', apiUrl, body);
+      this.http.post(apiUrl, body, { responseType: 'blob', headers: headers }).subscribe({
+        next: (blob: Blob) => {
+          if (blob && blob.size > 0) {
+            this.pdfSrc = blob;
+            this.selectedDocument = selectedDoc.fileName;
+            console.log('Document loaded from DMS:', selectedDoc.fileName);
+          } else {
+            this.pdfSrc = undefined;
+            this.selectedDocumentDetails = null;
+            this.toastr.warning('Document is empty or invalid');
+          }
+          this.ngxService.stop();
+        },
+        error: (err) => {
+          this.ngxService.stop();
+          console.error('DMS Document load error:', err);
+          this.pdfSrc = undefined;
+          this.selectedDocumentDetails = null;
+          this.toastr.error('Failed to load document from DMS');
+        }
+      });
+      return;
+    }
+
+    // Fallback: Use local file path endpoint (GET)
+    const apiUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document?filePath=${encodeURIComponent(selectedDoc.filePath)}`;
+    console.log('Loading from local:', apiUrl);
     // Fetch the document as a Blob with explicit headers
     this.http.get(apiUrl, { responseType: 'blob', headers: headers }).subscribe({
       next: (blob: Blob) => {
@@ -667,6 +825,15 @@ export class InitiatorFormComponent {
       formData.append("vipReferenceId", this.draftReferenceId.toString());
     }
 
+    // Append pending documents for draft
+    if (this.pendingDocuments.length > 0) {
+      this.pendingDocuments.forEach(doc => {
+        formData.append("files", doc.file);
+        formData.append("documentTypes", doc.documentType || "");
+        formData.append("comments", doc.comments || "");
+      });
+    }
+
     this.userMgmtService.addVipReferenceDetails(formData).subscribe({
       next: (res: any) => {
         if (res && res.referenceId) {
@@ -691,8 +858,24 @@ export class InitiatorFormComponent {
     if (isNaN(d.getTime())) {
       return '';
     }
-    // Get YYYY-MM-DD and add fixed time
-    return d.toISOString().split('T')[0] + 'T00:00:00';
+    // Use local date components to avoid UTC timezone shift
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}T00:00:00`;
+  }
+
+  // Parse date string as local date to avoid UTC timezone shift
+  parseLocalDate(dateStr: string | null | undefined): Date | null {
+    if (!dateStr) return null;
+    // Extract YYYY-MM-DD part and create date using local components
+    const parts = dateStr.substring(0, 10).split('-');
+    if (parts.length !== 3) return null;
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // JS months are 0-based
+    const day = parseInt(parts[2], 10);
+    const d = new Date(year, month, day);
+    return isNaN(d.getTime()) ? null : d;
   }
 
   resetAddReferenceForm() {
@@ -752,25 +935,40 @@ export class InitiatorFormComponent {
   }
 
   setReferenceDetails() {
+    // Find category ID from name or use as-is if already an ID
+    let categoryId = this.refernceDetails.categoryOfSubject;
+    if (categoryId && this.categoryList.length > 0) {
+      // Check if it's a name (not a number) and find the matching ID
+      const isNumeric = !isNaN(Number(categoryId));
+      if (!isNumeric) {
+        const matchedCategory = this.categoryList.find(
+          cat => cat.categoryDescription === categoryId || cat.categoryName === categoryId
+        );
+        if (matchedCategory) {
+          categoryId = matchedCategory.categoryId.toString();
+        }
+      }
+    }
+
     this.addVipReferenceDetails.patchValue({
       referenceNo: this.refernceDetails.referenceNo,
-      dateOfLetter: this.refernceDetails.dateOfLetter,
-      dateOfReceiving: this.refernceDetails.receivedDate,
-      dateOfEntry: this.refernceDetails.dateOfEntry,
+      dateOfLetter: this.parseLocalDate(this.refernceDetails.dateOfLetter),
+      dateOfReceiving: this.parseLocalDate(this.refernceDetails.receivedDate),
+      dateOfEntry: this.parseLocalDate(this.refernceDetails.dateOfEntry),
       nameOfDiginitary: this.refernceDetails.nameOfDignitary,
       emailId: this.refernceDetails.emailId,
       designation: this.refernceDetails.designation,
       state: this.refernceDetails.state,
       constituency: this.refernceDetails.constituency,
       priority: this.refernceDetails.priority,
-      catgOfSubject: this.refernceDetails.categoryOfSubject,
+      catgOfSubject: categoryId,
       subCatgOfSubject: this.refernceDetails.subCategoryOfSubject,
       subjectOrIssue: this.refernceDetails.subject
     });
 
-    // Load subcategories if category is already selected
-    if (this.refernceDetails.categoryOfSubject) {
-      this.getSubCategoryList(Number(this.refernceDetails.categoryOfSubject));
+    // Load subcategories if category is already selected (only if it's a valid number)
+    if (categoryId && !isNaN(Number(categoryId))) {
+      this.getSubCategoryList(Number(categoryId));
     }
 
     // Populate the file and document details
@@ -817,6 +1015,8 @@ export class InitiatorFormComponent {
     this.userMgmtService.getActiveAssigners().subscribe({
       next: (response: any) => {
         this.activeAssignersList = response;
+        // Auto-select assigner based on user's office type
+        this.autoSelectAssigner();
         this.ngxService.stop();
       },
       error: (err) => {
@@ -826,11 +1026,78 @@ export class InitiatorFormComponent {
     })
   }
 
+  /**
+   * Auto-select assigner based on the logged-in user's office type.
+   * Logic:
+   * 1. If only one assigner exists, select that one
+   * 2. If multiple assigners exist, try to match by office type
+   * 3. If no match found by office type, don't auto-select (let user choose)
+   */
+  autoSelectAssigner() {
+    if (!this.activeAssignersList || this.activeAssignersList.length === 0) {
+      return;
+    }
+
+    // If already editing a reference with an assigned assigner, don't override
+    if (this.selectedAssigner) {
+      return;
+    }
+
+    const userOfficeType = this.userDetails?.officeType;
+
+    // If only one assigner, auto-select it
+    if (this.activeAssignersList.length === 1) {
+      this.selectedAssigner = this.activeAssignersList[0];
+      console.log('Auto-selected single assigner:', this.selectedAssigner);
+      return;
+    }
+
+    // If user has an office type, try to find matching assigner
+    if (userOfficeType) {
+      const matchingAssigner = this.activeAssignersList.find(
+        (assigner: any) => assigner.officeType === userOfficeType
+      );
+
+      if (matchingAssigner) {
+        this.selectedAssigner = matchingAssigner;
+        console.log('Auto-selected assigner by office type:', this.selectedAssigner);
+        return;
+      }
+    }
+
+    // If no match by office type but all assigners have the same office type, select the first one
+    const uniqueOfficeTypes = new Set(
+      this.activeAssignersList.map((a: any) => a.officeType).filter((t: any) => t)
+    );
+    if (uniqueOfficeTypes.size <= 1) {
+      this.selectedAssigner = this.activeAssignersList[0];
+      console.log('Auto-selected first assigner (all same office type):', this.selectedAssigner);
+    }
+  }
+
   getCategoryList() {
     this.ngxService.start();
     this.adminService.getAllCategories().subscribe({
       next: (response: any) => {
         this.categoryList = response;
+
+        // If reference details are already loaded, re-apply category value
+        if (this.refernceDetails?.categoryOfSubject && this.categoryList.length > 0) {
+          let categoryId = this.refernceDetails.categoryOfSubject;
+          const isNumeric = !isNaN(Number(categoryId));
+          if (!isNumeric) {
+            const matchedCategory = this.categoryList.find(
+              (cat: any) => cat.categoryDescription === categoryId || cat.categoryName === categoryId
+            );
+            if (matchedCategory) {
+              categoryId = matchedCategory.categoryId.toString();
+              this.addVipReferenceDetails.patchValue({ catgOfSubject: categoryId });
+              // Also load subcategories
+              this.getSubCategoryList(Number(categoryId));
+            }
+          }
+        }
+
         this.ngxService.stop();
       },
       error: (err) => {
@@ -857,6 +1124,37 @@ export class InitiatorFormComponent {
     this.adminService.getSubCategoriesByCategoryId(categoryId).subscribe({
       next: (response: any) => {
         this.subCategoryList = response;
+
+        // Auto-select subcategory if it has value "NA" (category has no subcategory)
+        const naSubCategory = this.subCategoryList.find(
+          (subCat: any) => subCat.subCatName === 'NA' || subCat.subCategoryName === 'NA'
+        );
+        if (naSubCategory) {
+          this.addVipReferenceDetails.patchValue({
+            subCatgOfSubject: naSubCategory.subCatId.toString()
+          });
+          this.ngxService.stop();
+          return;
+        }
+
+        // After loading subcategories, set the subcategory value if available
+        if (this.refernceDetails?.subCategoryOfSubject && this.subCategoryList.length > 0) {
+          let subCategoryId = this.refernceDetails.subCategoryOfSubject;
+          const isNumeric = !isNaN(Number(subCategoryId));
+          if (!isNumeric) {
+            // Find subcategory ID from name
+            const matchedSubCategory = this.subCategoryList.find(
+              (subCat: any) => subCat.subCatName === subCategoryId || subCat.subCategoryName === subCategoryId
+            );
+            if (matchedSubCategory) {
+              subCategoryId = matchedSubCategory.subCatId.toString();
+            }
+          }
+          this.addVipReferenceDetails.patchValue({
+            subCatgOfSubject: subCategoryId
+          });
+        }
+
         this.ngxService.stop();
       },
       error: (err) => {
@@ -1008,6 +1306,13 @@ export class InitiatorFormComponent {
     const selectedOrganization = event.target.value;
     if (selectedOrganization !== null && selectedOrganization !== undefined) {
       this.forwardReferenceForm.get('assigneeOffice')?.enable();
+      this.forwardReferenceForm.get('assigneeOffice')?.setValue('');
+      this.forwardReferenceForm.get('assigneeDesignation')?.setValue('');
+      this.forwardReferenceForm.get('assigneeDesignation')?.disable();
+      this.forwardReferenceForm.get('assigneeName')?.setValue('');
+      this.forwardReferenceForm.get('assigneeName')?.disable();
+      this.designationList = [];
+      this.userLists = [];
       this.getOfficeList(selectedOrganization);
     }
 
@@ -1018,30 +1323,54 @@ export class InitiatorFormComponent {
     // }
   }
 
+  // getOfficeList(selectedOrganization: string) {
+  //   this.ngxService.start();
+  //   this.userMgmtService.getOfficeList(selectedOrganization).subscribe({
+  //     next: (response) => {
+  //       this.officeTypeList = response;
+  //       this.ngxService.stop()
+  //     },
+  //     error: (err) => {
+  //       this.ngxService.stop();
+  //     }
+  //   })
+  // }
+
+
   getOfficeList(selectedOrganization: string) {
-    this.ngxService.start();
-    this.userMgmtService.getOfficeList(selectedOrganization).subscribe({
-      next: (response) => {
-        this.officeTypeList = response;
-        this.ngxService.stop()
-      },
-      error: (err) => {
-        this.ngxService.stop();
-      }
-    })
-  }
+  this.ngxService.start();
+  this.userMgmtService.getOfficeList(selectedOrganization).subscribe({
+    next: (response: OfficeList[]) => {
+      // Remove duplicates based on officeName (or officeId if you have it)
+      const uniqueOffices = response.filter(
+        (office, index, self) =>
+          index === self.findIndex((o) => o.officeName === office.officeName)
+      );
+      console.log(`Before: ${response.length} → After dedupe: ${uniqueOffices.length}`);
+
+      this.officeTypeList = uniqueOffices;
+      this.ngxService.stop();
+    },
+  });
+}
 
   selectedOffice(event: any) {
     const selectedOffice = event.target.value;
     if (selectedOffice !== null && selectedOffice !== undefined) {
       this.forwardReferenceForm.get('assigneeDesignation')?.enable();
+      this.forwardReferenceForm.get('assigneeDesignation')?.setValue('');
+      this.forwardReferenceForm.get('assigneeName')?.setValue('');
+      this.forwardReferenceForm.get('assigneeName')?.disable();
+      this.userLists = [];
       this.getDesignationList();
     }
   }
 
   getDesignationList() {
     this.ngxService.start();
-    this.userMgmtService.getDesignationList(this.forwardReferenceForm.get("assigneeOrganization")?.value).subscribe({
+    const selectedOfficeName = this.forwardReferenceForm.get("assigneeOffice")?.value;
+    console.log('getDesignationList - selectedOfficeName:', selectedOfficeName);
+    this.userMgmtService.getDesignationListByOfficeName(selectedOfficeName).subscribe({
       next: (response) => {
         this.designationList = response;
         this.ngxService.stop()
@@ -1052,9 +1381,9 @@ export class InitiatorFormComponent {
     })
   }
 
-  getFinalReplyDesignation(selectedOrg: string) {
+  getFinalReplyDesignation(officeName: string) {
     this.ngxService.start();
-    this.userMgmtService.getDesignationList(selectedOrg).subscribe({
+    this.userMgmtService.getDesignationListByOfficeName(officeName).subscribe({
       next: (response) => {
         this.designationList = response;
         this.ngxService.stop()
@@ -1094,22 +1423,23 @@ export class InitiatorFormComponent {
     const organizationCode = this.forwardReferenceForm.get("assigneeOrganization")?.value;
     const organization = this.organizationsList.find((res) => res.organizationCode == organizationCode)
     const officeName = this.forwardReferenceForm.get("assigneeOffice")?.value;
-    const office = this.officeTypeList.find((res) => res.officeName == officeName)
     const designationCode = this.forwardReferenceForm.get("assigneeDesignation")?.value;
-    const designation = this.designationList.find((res) => res.designationCode == designationCode)
 
     const userInfo = {
       "organization": organization?.organizationId,
-      "office": office?.officeId,
-      "designation": designation?.designationId
+      "officeName": officeName,
+      "designationCode": designationCode
     }
+    console.log('getUserList - payload sent to /get-users:', userInfo);
     this.userMgmtService.getUserList(userInfo).subscribe({
       next: (response: any) => {
+        console.log('getUserList - API response:', response);
         // Filter out the currently logged-in user to prevent self-forwarding
         this.userLists = response.filter((user: UserList) => user.loginId !== this.userDetails.loginId);
         this.ngxService.stop()
       },
       error: (err) => {
+        console.error('getUserList - API error:', err);
         this.ngxService.stop();
       }
     })
@@ -1586,12 +1916,12 @@ export class InitiatorFormComponent {
   private ReferenceAction(actionName: string) {
     if (actionName == 'finalReply') {
       this.getOfficeList("MORTH");
-      this.getFinalReplyDesignation("MORTH");
       this.adminService.getUserListByRoleId('2').subscribe({
         next: (res: any) => {
           if (res && res.length > 0) {
             const user = res[0];
-
+            const officeForDesignation = this.officeTypeList.find((o: any) => o.officeId === user.office);
+            this.getFinalReplyDesignation(officeForDesignation ? officeForDesignation.officeName : '');
             // Wait for all lists to load
             setTimeout(() => {
               const organizationObj = this.organizationsList.find(
@@ -1641,11 +1971,12 @@ export class InitiatorFormComponent {
     }
     else if (actionName == 'Discard') {
       this.getOfficeList("MORTH");
-      this.getFinalReplyDesignation("MORTH");
       this.adminService.getUserListByRoleId('1').subscribe({
         next: (res: any) => {
           if (res && res.length > 0) {
             const user = res[0];
+            const officeForDesignation = this.officeTypeList.find((o: any) => o.officeId === user.office);
+            this.getFinalReplyDesignation(officeForDesignation ? officeForDesignation.officeName : '');
             // Wait for all lists to load
             setTimeout(() => {
               const organizationObj = this.organizationsList.find(
@@ -1686,11 +2017,12 @@ export class InitiatorFormComponent {
     }
     else if (actionName == 'AssignBack') {
       this.getOfficeList("MORTH");
-      this.getFinalReplyDesignation("MORTH");
       this.adminService.getUserListByRoleId('2').subscribe({
         next: (res: any) => {
           if (res && res.length > 0) {
             const user = res[0];
+            const officeForDesignation = this.officeTypeList.find((o: any) => o.officeId === user.office);
+            this.getFinalReplyDesignation(officeForDesignation ? officeForDesignation.officeName : '');
             // Wait for all lists to load
             setTimeout(() => {
               const organizationObj = this.organizationsList.find(
@@ -1897,6 +2229,7 @@ export class InitiatorFormComponent {
 
     return null;
   }
+
 
   // ========== Linked References Methods ==========
 
@@ -2169,5 +2502,17 @@ export class InitiatorFormComponent {
     const numSelected = this.linkedReferencesSelection.selected.length;
     const numRows = this.linkedReferencesData.data.length;
     return numSelected === numRows && numRows > 0;
+  }
+
+  /**
+   * Remove timestamp prefix from filename for display
+   * Example: "1765340372547_Draft_Reply_v1.pdf" -> "Draft_Reply_v1.pdf"
+   */
+  cleanFilename(filename: string): string {
+    if (!filename) {
+      return filename;
+    }
+    // Remove timestamp prefix pattern: digits_
+    return filename.replace(/^\d+_/, '');
   }
 }

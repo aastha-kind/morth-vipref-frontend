@@ -1,4 +1,4 @@
-import { Component, inject, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { VipReference } from '../dashboard/dashboard.component';
 import { MatPaginator } from '@angular/material/paginator';
@@ -17,16 +17,19 @@ import { ViewReferenceComponent } from '../view-reference/view-reference.compone
   templateUrl: './vip-assigner.component.html',
   styleUrl: './vip-assigner.component.css'
 })
-export class VipAssignerComponent {
+export class VipAssignerComponent implements AfterViewInit {
 
   userDetails!: User;
   @Input() selectedQueueData: string = "";
-  searchTerm: string = ''; // Add search term variable
+  searchTerm: string = '';
+  officeTypeFilter: string | null = null;
 
   // Pagination variables
   pageIndex: number = 0;
   pageSize: number = 10;
   totalElements: number = 0;
+  sortColumn: string = 'assignedAt';
+  sortDirection: string = 'desc';
 
   private router = inject(Router);
   private userMgmtService = inject(UsermgmtService);
@@ -36,10 +39,11 @@ export class VipAssignerComponent {
 
   displayedColumns: string[] = [
     'referenceNo',
+    'office',
     'subject',
     'assignedAt',
-    'status',
-    'currentQueue',
+    // 'status',
+    // 'currentQueue',
     'actions'
   ];
   queueReferencesData = new MatTableDataSource<VipReference>();
@@ -49,6 +53,21 @@ export class VipAssignerComponent {
   ngOnInit() {
     this.getUserDetails();
     this.getQueueReferences();
+  }
+
+  ngAfterViewInit() {
+    this.initializeSort();
+  }
+
+  initializeSort() {
+    if (this.sort) {
+      this.sort.sortChange.subscribe(() => {
+        this.sortColumn = this.sort.active;
+        this.sortDirection = this.sort.direction || 'asc';
+        this.pageIndex = 0;
+        this.getQueueReferences();
+      });
+    }
   }
 
   getUserDetails() {
@@ -64,14 +83,25 @@ export class VipAssignerComponent {
       loginId: this.userDetails.loginId,
       queue: 'VIP_Assigner',
       status: "INBOX",
-      search: this.searchTerm, // Include search parameter
-      page: this.pageIndex, // Include page number
-      size: this.pageSize // Include page size
+      search: this.searchTerm,
+      page: this.pageIndex,
+      size: this.pageSize,
+      sortBy: this.sortColumn,
+      sortDir: this.sortDirection
     }
     this.userMgmtService.getQueueReferencesListPaginated(queueData).subscribe({
       next: (res) => {
-        this.queueReferencesData.data = res.content;
-        this.totalElements = res.totalElements;
+        let data = res.content;
+
+        // Apply client-side office type filter if set
+        if (this.officeTypeFilter) {
+          data = data.filter((item: VipReference) => item.initiatorOfficeType === this.officeTypeFilter);
+          this.totalElements = data.length;
+        } else {
+          this.totalElements = res.totalElements;
+        }
+
+        this.queueReferencesData.data = data;
         console.log(res)
         this.ngxService.stop();
       },
@@ -101,9 +131,21 @@ export class VipAssignerComponent {
   }
 
   applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value.trim();
-    this.searchTerm = filterValue;
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    this.searchTerm = '';
+    this.officeTypeFilter = null;
     this.pageIndex = 0; // Reset to first page on new search
+
+    // Check if searching for office type
+    if (filterValue.includes('minister') || filterValue.includes('ministry')) {
+      this.officeTypeFilter = 'MINISTRY';
+    } else if (filterValue.includes('secretary')) {
+      this.officeTypeFilter = 'SECRETARY';
+    } else {
+      // Regular reference number search
+      this.searchTerm = filterValue;
+    }
+
     this.getQueueReferences(); // Fetch from server with search term
   }
 

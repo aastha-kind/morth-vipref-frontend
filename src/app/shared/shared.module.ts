@@ -21,7 +21,7 @@ import { ViewReferenceComponent } from './pages/view-reference/view-reference.co
 import { NgxUiLoaderModule } from "ngx-ui-loader";
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 
-import { EditorModule } from '@tinymce/tinymce-angular';
+import { EditorModule, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 import { ReplyEditorComponent } from './pages/reply-editor/reply-editor.component';
 import { UploadReplyComponent } from './pages/upload-reply/upload-reply.component';
 import { NavbarComponent } from './pages/navbar/navbar.component';
@@ -57,6 +57,7 @@ import { SideNavComponent } from './pages/side-nav/side-nav.component';
 import { ViewEditorComponent } from './pages/view-editor/view-editor.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { ClosedReferencesComponent } from './pages/closed-references/closed-references.component';
+import { DiscardReferencesComponent } from './pages/discard-references/discard-references.component';
 
 @NgModule({
   declarations: [
@@ -106,6 +107,7 @@ import { ClosedReferencesComponent } from './pages/closed-references/closed-refe
     ViewEditorComponent,
     ForgotPasswordComponent,
     ClosedReferencesComponent,
+    DiscardReferencesComponent,
   ],
   imports: [
     CommonModule,
@@ -119,6 +121,9 @@ import { ClosedReferencesComponent } from './pages/closed-references/closed-refe
     EditorModule,
     NgChartsModule,
     RecaptchaModule
+  ],
+  providers: [
+    { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }
   ]
 })
 export class SharedModule { }

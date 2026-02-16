@@ -31,6 +31,8 @@ export class MasterReportsComponent implements OnInit {
   };
   vipCustomizeData: any[] = [];
   vipCustomizeResponse: any = null;
+  vipCustomizeSortColumn: string = 'receivingDate';
+  vipCustomizeSortDirection: 'asc' | 'desc' = 'desc';
 
   // VIP Pendency Report
   vipPendencyFilters = {
@@ -38,14 +40,20 @@ export class MasterReportsComponent implements OnInit {
   };
   vipPendencyData: any[] = [];
   vipPendencyResponse: any = null;
+  vipPendencySortColumn: string = 'pendingDays';
+  vipPendencySortDirection: 'asc' | 'desc' = 'desc';
 
   // MIS Report
   misData: any[] = [];
   misResponse: any = null;
+  misSortColumn: string = 'state';
+  misSortDirection: 'asc' | 'desc' = 'asc';
 
   // NHAI MIS Report
   nhaiMisData: any[] = [];
   nhaiMisResponse: any = null;
+  nhaiMisSortColumn: string = 'state';
+  nhaiMisSortDirection: 'asc' | 'desc' = 'asc';
 
   // State-Org Report
   stateOrgFilters = {
@@ -55,6 +63,8 @@ export class MasterReportsComponent implements OnInit {
   };
   stateOrgData: any[] = [];
   stateOrgResponse: any = null;
+  stateOrgSortColumn: string = 'state';
+  stateOrgSortDirection: 'asc' | 'desc' = 'asc';
 
   // Officer-Wise Report
   officerWiseFilters = {
@@ -62,10 +72,14 @@ export class MasterReportsComponent implements OnInit {
   };
   officerWiseData: any[] = [];
   officerWiseResponse: any = null;
+  officerWiseSortColumn: string = 'office';
+  officerWiseSortDirection: 'asc' | 'desc' = 'asc';
 
   // User Login Report
   userLoginData: any[] = [];
   userLoginResponse: any = null;
+  userLoginSortColumn: string = 'organisation';
+  userLoginSortDirection: 'asc' | 'desc' = 'asc';
 
   // Master Data for dropdowns
   categoryList: any[] = [];
@@ -74,6 +88,11 @@ export class MasterReportsComponent implements OnInit {
   vipDesignationList: any[] = [];
   priorities: string[] = ['Priority', 'Normal'];
   organisations: string[] = ['All', 'MoRTH', 'NHAI', 'NHIDCL'];
+
+  // Reference Detail Modal
+  showReferenceDetailModal = false;
+  referenceDetailLoading = false;
+  referenceDetail: any = null;
 
   constructor(
     private reportService: ReportService,
@@ -143,11 +162,38 @@ export class MasterReportsComponent implements OnInit {
 
   // VIP Customize Report Methods
   loadVipCustomizeReport(): void {
+    // Validate date range is selected
+    if (!this.vipCustomizeFilters.receivingFromDate || !this.vipCustomizeFilters.receivingToDate) {
+      this.toaster.error('Please select both From Date and To Date to generate the report');
+      return;
+    }
+
+    // Validate date range does not exceed 1 year
+    const fromDate = new Date(this.vipCustomizeFilters.receivingFromDate);
+    const toDate = new Date(this.vipCustomizeFilters.receivingToDate);
+
+    // Check if from date is before to date
+    if (fromDate > toDate) {
+      this.toaster.error('From Date cannot be greater than To Date');
+      return;
+    }
+
+    // Calculate difference in days
+    const diffTime = Math.abs(toDate.getTime() - fromDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // 365 days = 1 year (366 for leap year consideration)
+    if (diffDays > 365) {
+      this.toaster.error('Date range cannot exceed 1 year. Please select a date range within 1 year to avoid data load issues.');
+      return;
+    }
+
     this.loading = true;
     this.reportService.getVipCustomizeReport(this.vipCustomizeFilters).subscribe({
       next: (response) => {
         this.vipCustomizeResponse = response;
         this.vipCustomizeData = response.reportData || [];
+        this.sortVipCustomizeData(this.vipCustomizeSortColumn, this.vipCustomizeSortDirection);
         this.loading = false;
         if (this.vipCustomizeData.length === 0) {
           this.toaster.info('No records found');
@@ -158,6 +204,39 @@ export class MasterReportsComponent implements OnInit {
         this.toaster.error('Failed to load report');
         this.loading = false;
       }
+    });
+  }
+
+  sortVipCustomizeTable(column: string): void {
+    if (this.vipCustomizeSortColumn === column) {
+      this.vipCustomizeSortDirection = this.vipCustomizeSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.vipCustomizeSortColumn = column;
+      this.vipCustomizeSortDirection = 'asc';
+    }
+    this.sortVipCustomizeData(column, this.vipCustomizeSortDirection);
+  }
+
+  sortVipCustomizeData(column: string, direction: 'asc' | 'desc'): void {
+    this.vipCustomizeData.sort((a, b) => {
+      let aVal = a[column];
+      let bVal = b[column];
+
+      if (column === 'receivingDate' || column === 'letterDate') {
+        aVal = aVal ? new Date(aVal).getTime() : 0;
+        bVal = bVal ? new Date(bVal).getTime() : 0;
+      } else if (column === 'pendingWith') {
+        // Numeric sorting for pending days
+        aVal = aVal && aVal !== '-' ? parseInt(aVal, 10) : -1;
+        bVal = bVal && bVal !== '-' ? parseInt(bVal, 10) : -1;
+      } else {
+        aVal = aVal ? aVal.toString().toLowerCase() : '';
+        bVal = bVal ? bVal.toString().toLowerCase() : '';
+      }
+
+      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      return 0;
     });
   }
 
@@ -304,11 +383,18 @@ export class MasterReportsComponent implements OnInit {
 
   // VIP Pendency Report Methods
   loadVipPendencyReport(): void {
+    // Validate pendency type is selected
+    if (!this.vipPendencyFilters.pendencyType) {
+      this.toaster.error('Please select Pendency Type from dropdown to generate the report');
+      return;
+    }
+
     this.loading = true;
     this.reportService.getVipPendencyReport(this.vipPendencyFilters).subscribe({
       next: (response) => {
         this.vipPendencyResponse = response;
         this.vipPendencyData = response.pendencyData || [];
+        this.sortVipPendencyData(this.vipPendencySortColumn, this.vipPendencySortDirection);
         this.loading = false;
         if (this.vipPendencyData.length === 0) {
           this.toaster.info('No records found');
@@ -319,6 +405,39 @@ export class MasterReportsComponent implements OnInit {
         this.toaster.error('Failed to load report');
         this.loading = false;
       }
+    });
+  }
+
+  sortVipPendencyTable(column: string): void {
+    if (this.vipPendencySortColumn === column) {
+      this.vipPendencySortDirection = this.vipPendencySortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.vipPendencySortColumn = column;
+      this.vipPendencySortDirection = 'asc';
+    }
+    this.sortVipPendencyData(column, this.vipPendencySortDirection);
+  }
+
+  sortVipPendencyData(column: string, direction: 'asc' | 'desc'): void {
+    this.vipPendencyData.sort((a, b) => {
+      let aVal = a[column];
+      let bVal = b[column];
+
+      // Handle numeric columns
+      if (column === 'pendingDays' || column === 'sNo') {
+        aVal = aVal !== null && aVal !== undefined ? parseInt(aVal) : 0;
+        bVal = bVal !== null && bVal !== undefined ? parseInt(bVal) : 0;
+      } else if (column === 'assignedAt') {
+        aVal = aVal ? new Date(aVal).getTime() : 0;
+        bVal = bVal ? new Date(bVal).getTime() : 0;
+      } else {
+        aVal = aVal ? aVal.toString().toLowerCase() : '';
+        bVal = bVal ? bVal.toString().toLowerCase() : '';
+      }
+
+      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      return 0;
     });
   }
 
@@ -334,28 +453,35 @@ export class MasterReportsComponent implements OnInit {
       return;
     }
 
-    const doc = new jsPDF('p', 'mm', 'a4');
+    const doc = new jsPDF('l', 'mm', 'a4');
     doc.setFontSize(16);
     doc.text('VIP Pendency Report', 14, 15);
     doc.setFontSize(10);
-    doc.text(`Status As On: ${this.vipPendencyResponse?.statusAsOn || ''}`, 14, 22);
-    doc.text(`Total To Be Assigned: ${this.vipPendencyResponse?.totalToBeAssigned || 0}`, 14, 27);
-    doc.text(`Total In Progress: ${this.vipPendencyResponse?.totalInProgress || 0}`, 14, 32);
+    doc.text(`Status As On: ${this.formatDateTime(this.vipPendencyResponse?.statusAsOn) || ''}`, 14, 22);
+    doc.text(`Pendency Type: ${this.vipPendencyResponse?.criteriaPendencyType || ''}`, 14, 27);
+    doc.text(`Total Records: ${this.vipPendencyResponse?.totalRecords || 0}`, 14, 32);
 
-    const headers = [['S.No.', 'Organisation', 'Designation', 'To Be Assigned', 'In Progress']];
+    const headers = [['S.No.', 'Reference No', 'Dignitary Name', 'Subject', 'State', 'Assignee Name', 'Login ID', 'Designation', 'Organisation', 'Office', 'Pending Days', 'Status']];
     const data = this.vipPendencyData.map((item) => [
       item.sNo?.toString() || '-',
-      item.organisation || '-',
+      item.referenceNo || '-',
+      item.dignitaryName || '-',
+      item.subject || '-',
+      item.state || '-',
+      item.assigneeName || '-',
+      item.assigneeLoginId || '-',
       item.designation || '-',
-      item.toBeAssigned?.toString() || '0',
-      item.inProgress?.toString() || '0'
+      item.organisation || '-',
+      item.office || '-',
+      item.pendingDays?.toString() || '0',
+      item.status || '-'
     ]);
 
     autoTable(doc, {
       head: headers,
       body: data,
       startY: 37,
-      styles: { fontSize: 10 },
+      styles: { fontSize: 7 },
       headStyles: { fillColor: [76, 175, 80] }
     });
 
@@ -369,13 +495,20 @@ export class MasterReportsComponent implements OnInit {
       return;
     }
 
-    const headers = ['S.No.', 'Organisation', 'Designation', 'To Be Assigned', 'In Progress'];
+    const headers = ['S.No.', 'Reference No', 'Dignitary Name', 'Subject', 'State', 'Assignee Name', 'Login ID', 'Designation', 'Organisation', 'Office', 'Pending Days', 'Status'];
     const csvData = this.vipPendencyData.map((item) => [
       item.sNo?.toString() || '-',
-      item.organisation || '-',
+      item.referenceNo || '-',
+      item.dignitaryName || '-',
+      item.subject || '-',
+      item.state || '-',
+      item.assigneeName || '-',
+      item.assigneeLoginId || '-',
       item.designation || '-',
-      item.toBeAssigned?.toString() || '0',
-      item.inProgress?.toString() || '0'
+      item.organisation || '-',
+      item.office || '-',
+      item.pendingDays?.toString() || '0',
+      item.status || '-'
     ]);
 
     let csv = headers.join(',') + '\n';
@@ -399,13 +532,20 @@ export class MasterReportsComponent implements OnInit {
       return;
     }
 
-    const headers = ['S.No.', 'Organisation', 'Designation', 'To Be Assigned', 'In Progress'];
+    const headers = ['S.No.', 'Reference No', 'Dignitary Name', 'Subject', 'State', 'Assignee Name', 'Login ID', 'Designation', 'Organisation', 'Office', 'Pending Days', 'Status'];
     const csvData = this.vipPendencyData.map((item) => [
       item.sNo?.toString() || '-',
-      item.organisation || '-',
+      item.referenceNo || '-',
+      item.dignitaryName || '-',
+      item.subject || '-',
+      item.state || '-',
+      item.assigneeName || '-',
+      item.assigneeLoginId || '-',
       item.designation || '-',
-      item.toBeAssigned?.toString() || '0',
-      item.inProgress?.toString() || '0'
+      item.organisation || '-',
+      item.office || '-',
+      item.pendingDays?.toString() || '0',
+      item.status || '-'
     ]);
 
     let csv = headers.join('\t') + '\n';
@@ -430,6 +570,7 @@ export class MasterReportsComponent implements OnInit {
       next: (response) => {
         this.misResponse = response;
         this.misData = response.stateWiseData || [];
+        this.sortMISData(this.misSortColumn, this.misSortDirection);
         this.loading = false;
       },
       error: (err) => {
@@ -437,6 +578,36 @@ export class MasterReportsComponent implements OnInit {
         this.toaster.error('Failed to load report');
         this.loading = false;
       }
+    });
+  }
+
+  sortMISTable(column: string): void {
+    if (this.misSortColumn === column) {
+      this.misSortDirection = this.misSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.misSortColumn = column;
+      this.misSortDirection = 'asc';
+    }
+    this.sortMISData(column, this.misSortDirection);
+  }
+
+  sortMISData(column: string, direction: 'asc' | 'desc'): void {
+    this.misData.sort((a, b) => {
+      let aVal = a[column];
+      let bVal = b[column];
+
+      // Handle numeric columns
+      if (column === 'total' || column === 'sNo') {
+        aVal = aVal ? parseInt(aVal) : 0;
+        bVal = bVal ? parseInt(bVal) : 0;
+      } else {
+        aVal = aVal ? aVal.toString().toLowerCase() : '';
+        bVal = bVal ? bVal.toString().toLowerCase() : '';
+      }
+
+      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      return 0;
     });
   }
 
@@ -540,13 +711,47 @@ export class MasterReportsComponent implements OnInit {
       next: (response) => {
         this.nhaiMisResponse = response;
         this.nhaiMisData = response.stateWiseData || [];
+        this.sortNHAIMISData(this.nhaiMisSortColumn, this.nhaiMisSortDirection);
         this.loading = false;
+        if (this.nhaiMisData.length === 0) {
+          this.toaster.info('No NHAI records found');
+        }
       },
       error: (err) => {
         console.error('Error loading NHAI MIS Report', err);
         this.toaster.error('Failed to load report');
         this.loading = false;
       }
+    });
+  }
+
+  sortNHAIMISTable(column: string): void {
+    if (this.nhaiMisSortColumn === column) {
+      this.nhaiMisSortDirection = this.nhaiMisSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.nhaiMisSortColumn = column;
+      this.nhaiMisSortDirection = 'asc';
+    }
+    this.sortNHAIMISData(column, this.nhaiMisSortDirection);
+  }
+
+  sortNHAIMISData(column: string, direction: 'asc' | 'desc'): void {
+    this.nhaiMisData.sort((a, b) => {
+      let aVal = a[column];
+      let bVal = b[column];
+
+      // Handle numeric columns
+      if (column === 'total' || column === 'sNo') {
+        aVal = aVal ? parseInt(aVal) : 0;
+        bVal = bVal ? parseInt(bVal) : 0;
+      } else {
+        aVal = aVal ? aVal.toString().toLowerCase() : '';
+        bVal = bVal ? bVal.toString().toLowerCase() : '';
+      }
+
+      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      return 0;
     });
   }
 
@@ -645,18 +850,85 @@ export class MasterReportsComponent implements OnInit {
 
   // State-Org Report Methods
   loadStateOrgReport(): void {
+    // Validate organisation is selected
+    if (!this.stateOrgFilters.organisation) {
+      this.toaster.error('Please select Organisation from dropdown to generate the report');
+      return;
+    }
+
+    // Validate date range is selected
+    if (!this.stateOrgFilters.fromDate || !this.stateOrgFilters.toDate) {
+      this.toaster.error('Please select both From Date and To Date to generate the report');
+      return;
+    }
+
+    // Validate date range does not exceed 1 year
+    const fromDate = new Date(this.stateOrgFilters.fromDate);
+    const toDate = new Date(this.stateOrgFilters.toDate);
+
+    // Check if from date is before to date
+    if (fromDate > toDate) {
+      this.toaster.error('From Date cannot be greater than To Date');
+      return;
+    }
+
+    // Calculate difference in days
+    const diffTime = Math.abs(toDate.getTime() - fromDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // 365 days = 1 year
+    if (diffDays > 365) {
+      this.toaster.error('Date range cannot exceed 1 year. Please select a date range within 1 year to avoid data load issues.');
+      return;
+    }
+
     this.loading = true;
     this.reportService.getStateOrgReport(this.stateOrgFilters).subscribe({
       next: (response) => {
         this.stateOrgResponse = response;
         this.stateOrgData = response.stateWiseData || [];
+        this.sortStateOrgData(this.stateOrgSortColumn, this.stateOrgSortDirection);
         this.loading = false;
+        if (this.stateOrgData.length === 0) {
+          this.toaster.info('No records found');
+        }
       },
       error: (err) => {
         console.error('Error loading State-Org Report', err);
         this.toaster.error('Failed to load report');
         this.loading = false;
       }
+    });
+  }
+
+  sortStateOrgTable(column: string): void {
+    if (this.stateOrgSortColumn === column) {
+      this.stateOrgSortDirection = this.stateOrgSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.stateOrgSortColumn = column;
+      this.stateOrgSortDirection = 'asc';
+    }
+    this.sortStateOrgData(column, this.stateOrgSortDirection);
+  }
+
+  sortStateOrgData(column: string, direction: 'asc' | 'desc'): void {
+    this.stateOrgData.sort((a, b) => {
+      let aVal = a[column];
+      let bVal = b[column];
+
+      // Handle numeric columns
+      if (column === 'totalReference' || column === 'toBeAssigned' || column === 'inProgress' ||
+          column === 'closed' || column === 'discard' || column === 'sNo') {
+        aVal = aVal ? parseInt(aVal) : 0;
+        bVal = bVal ? parseInt(bVal) : 0;
+      } else {
+        aVal = aVal ? aVal.toString().toLowerCase() : '';
+        bVal = bVal ? bVal.toString().toLowerCase() : '';
+      }
+
+      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      return 0;
     });
   }
 
@@ -770,18 +1042,58 @@ export class MasterReportsComponent implements OnInit {
 
   // Officer-Wise Report Methods
   loadOfficerWiseReport(): void {
+    // Validate organisation is selected
+    if (!this.officerWiseFilters.organisation) {
+      this.toaster.error('Please select Organisation from dropdown to generate the report');
+      return;
+    }
+
     this.loading = true;
     this.reportService.getOfficerWiseReport(this.officerWiseFilters).subscribe({
       next: (response) => {
         this.officerWiseResponse = response;
         this.officerWiseData = response.officerWiseData || [];
+        this.sortOfficerWiseData(this.officerWiseSortColumn, this.officerWiseSortDirection);
         this.loading = false;
+        if (this.officerWiseData.length === 0) {
+          this.toaster.info('No records found');
+        }
       },
       error: (err) => {
         console.error('Error loading Officer-Wise Report', err);
         this.toaster.error('Failed to load report');
         this.loading = false;
       }
+    });
+  }
+
+  sortOfficerWiseTable(column: string): void {
+    if (this.officerWiseSortColumn === column) {
+      this.officerWiseSortDirection = this.officerWiseSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.officerWiseSortColumn = column;
+      this.officerWiseSortDirection = 'asc';
+    }
+    this.sortOfficerWiseData(column, this.officerWiseSortDirection);
+  }
+
+  sortOfficerWiseData(column: string, direction: 'asc' | 'desc'): void {
+    this.officerWiseData.sort((a, b) => {
+      let aVal = a[column];
+      let bVal = b[column];
+
+      // Handle numeric columns
+      if (column === 'total' || column === 'sNo') {
+        aVal = aVal ? parseInt(aVal) : 0;
+        bVal = bVal ? parseInt(bVal) : 0;
+      } else {
+        aVal = aVal ? aVal.toString().toLowerCase() : '';
+        bVal = bVal ? bVal.toString().toLowerCase() : '';
+      }
+
+      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      return 0;
     });
   }
 
@@ -891,6 +1203,7 @@ export class MasterReportsComponent implements OnInit {
       next: (response) => {
         this.userLoginResponse = response;
         this.userLoginData = response.userLoginData || [];
+        this.sortUserLoginData(this.userLoginSortColumn, this.userLoginSortDirection);
         this.loading = false;
       },
       error: (err) => {
@@ -898,6 +1211,39 @@ export class MasterReportsComponent implements OnInit {
         this.toaster.error('Failed to load report');
         this.loading = false;
       }
+    });
+  }
+
+  sortUserLoginTable(column: string): void {
+    if (this.userLoginSortColumn === column) {
+      this.userLoginSortDirection = this.userLoginSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.userLoginSortColumn = column;
+      this.userLoginSortDirection = 'asc';
+    }
+    this.sortUserLoginData(column, this.userLoginSortDirection);
+  }
+
+  sortUserLoginData(column: string, direction: 'asc' | 'desc'): void {
+    this.userLoginData.sort((a, b) => {
+      let aVal = a[column];
+      let bVal = b[column];
+
+      // Handle numeric columns
+      if (column === 'failureAttemptCount' || column === 'sNo') {
+        aVal = aVal ? parseInt(aVal) : 0;
+        bVal = bVal ? parseInt(bVal) : 0;
+      } else if (column === 'lastLoginTime') {
+        aVal = aVal ? new Date(aVal).getTime() : 0;
+        bVal = bVal ? new Date(bVal).getTime() : 0;
+      } else {
+        aVal = aVal ? aVal.toString().toLowerCase() : '';
+        bVal = bVal ? bVal.toString().toLowerCase() : '';
+      }
+
+      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      return 0;
     });
   }
 
@@ -1023,5 +1369,41 @@ export class MasterReportsComponent implements OnInit {
 
   onTabChange(index: number): void {
     this.selectedTabIndex = index;
+  }
+
+  // Reference Detail Modal Methods
+  openReferenceDetail(referenceNo: string): void {
+    if (!referenceNo || referenceNo === '-') {
+      this.toaster.warning('Invalid reference number');
+      return;
+    }
+
+    this.showReferenceDetailModal = true;
+    this.referenceDetailLoading = true;
+    this.referenceDetail = null;
+
+    this.reportService.getReferenceDetail(referenceNo).subscribe({
+      next: (response) => {
+        this.referenceDetail = response;
+        this.referenceDetailLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading reference detail', err);
+        this.toaster.error('Failed to load reference details');
+        this.referenceDetailLoading = false;
+        this.showReferenceDetailModal = false;
+      }
+    });
+  }
+
+  closeReferenceDetailModal(): void {
+    this.showReferenceDetailModal = false;
+    this.referenceDetail = null;
+  }
+
+  formatDateTime(date: any): string {
+    if (!date) return '-';
+    const d = new Date(date);
+    return d.toLocaleDateString('en-GB') + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
   }
 }

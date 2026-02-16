@@ -1,107 +1,171 @@
 <div class="container-fluid dashboard-template">
-        <div class="row mb-3">
-          <!-- Daily Income -->
-          <div class="col-12 col-lg-3 mb-3">
-            <mat-card class="h-100">
-              <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <small>Daily Income</small>
-                  <h4>45,895</h4>
-                  <small class="text-success">▲ 4%</small>
-                </div>
-                <div style="width:120px">
-                  <canvas baseChart [data]="sparklineData" [options]="sparklineOptions" chartType="line"></canvas>
-                </div>
-              </div>
-            </mat-card>
+  <!-- Summary Cards Row -->
+  <div class="row mb-4">
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <mat-card class="summary-card h-100">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Total References</small>
+            <h3 class="mb-0">{{ totalReferences }}</h3>
           </div>
-
-          <!-- Orders -->
-          <div class="col-12 col-lg-6 mb-3">
-            <mat-card class="h-100">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <h5 class="mb-0">Orders</h5>
-                <mat-select>
-                  <mat-option>Week</mat-option>
-                  <mat-option>Month</mat-option>
-                </mat-select>
-              </div>
-              <div style="height:320px">
-                <canvas baseChart [data]="lineChartData" [options]="lineChartOptions" chartType="line"></canvas>
-              </div>
-            </mat-card>
-          </div>
-
-          <!-- Traffic -->
-          <div class="col-12 col-lg-3 mb-3">
-            <mat-card class="h-100">
-              <h6>Traffic</h6>
-              <table class="table table-borderless mb-0">
-                <tbody>
-                  <tr *ngFor="let t of traffic">
-                    <td>{{t.day}}</td>
-                    <td>{{t.visits}}</td>
-                    <td class="text-end">{{t.trend}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </mat-card>
-          </div>
-
-          <div class="col-12 col-lg-3 mb-3">
-            <mat-card class="h-100">
-              <h6>Traffic</h6>
-              <table class="table table-borderless mb-0">
-                <tbody>
-                  <tr *ngFor="let t of traffic">
-                    <td>{{t.day}}</td>
-                    <td>{{t.visits}}</td>
-                    <td class="text-end">{{t.trend}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </mat-card>
-          </div>
-          <div class="col-12 col-lg-3 mb-3">
-            <mat-card class="h-100">
-              <h6>Traffic</h6>
-              <table class="table table-borderless mb-0">
-                <tbody>
-                  <tr *ngFor="let t of traffic">
-                    <td>{{t.day}}</td>
-                    <td>{{t.visits}}</td>
-                    <td class="text-end">{{t.trend}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </mat-card>
-          </div>
-          
-        </div>
-
-        <!-- ===== Lower Row ===== -->
-        <div class="row">
-          <div class="col-12 col-lg-8 mb-3">
-            <mat-card style="height:240px">
-              <h6>Country Orders Statistics</h6>
-              <div class="d-flex align-items-center justify-content-center h-100 text-muted">
-                Map placeholder
-              </div>
-            </mat-card>
-          </div>
-
-          <div class="col-12 col-lg-4 mb-3">
-            <mat-card class="mb-3">
-              <h6>Today's Profit</h6>
-              <h3>572,900</h3>
-            </mat-card>
-            <mat-card>
-              <h6>Quick Actions</h6>
-              <div class="d-flex gap-2">
-                <button mat-stroked-button color="primary">New</button>
-                <button mat-stroked-button color="accent">Upload</button>
-              </div>
-            </mat-card>
+          <div class="icon-container bg-primary-light">
+            <mat-icon class="text-primary">description</mat-icon>
           </div>
         </div>
-      </div>
+      </mat-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <mat-card class="summary-card h-100">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Total Users</small>
+            <h3 class="mb-0">{{ totalUsers }}</h3>
+          </div>
+          <div class="icon-container bg-success-light">
+            <mat-icon class="text-success">people</mat-icon>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <mat-card class="summary-card h-100">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Organizations</small>
+            <h3 class="mb-0">{{ totalOrganizations }}</h3>
+          </div>
+          <div class="icon-container bg-warning-light">
+            <mat-icon class="text-warning">business</mat-icon>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <div class="col-12 col-sm-6 col-lg-3 mb-3">
+      <mat-card class="summary-card h-100">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted">Categories</small>
+            <h3 class="mb-0">{{ totalCategories }}</h3>
+          </div>
+          <div class="icon-container bg-info-light">
+            <mat-icon class="text-info">category</mat-icon>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Charts Row 1: Organization-wise References & Users -->
+  <div class="row mb-4">
+    <div class="col-12 col-lg-8 mb-3">
+      <mat-card class="h-100">
+        <div class="card-header-custom">
+          <h6 class="mb-0">Organisation-wise Total References</h6>
+          <small class="text-muted">References distribution across MORTH, NHIDCL, NHAI and other organizations</small>
+        </div>
+        <div class="chart-container" style="height: 320px;">
+          <canvas baseChart
+                  [data]="orgReferencesChartData"
+                  [options]="orgReferencesChartOptions"
+                  type="bar">
+          </canvas>
+        </div>
+      </mat-card>
+    </div>
+
+    <div class="col-12 col-lg-4 mb-3">
+      <mat-card class="h-100">
+        <div class="card-header-custom">
+          <h6 class="mb-0">Users by Organisation</h6>
+          <small class="text-muted">User distribution across organizations</small>
+        </div>
+        <div class="chart-container" style="height: 320px;">
+          <canvas baseChart
+                  [data]="orgUsersChartData"
+                  [options]="orgUsersChartOptions"
+                  type="pie">
+          </canvas>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Charts Row 2: Reference Status & Monthly Trend -->
+  <div class="row mb-4">
+    <div class="col-12 col-lg-4 mb-3">
+      <mat-card class="h-100">
+        <div class="card-header-custom">
+          <h6 class="mb-0">Reference Status</h6>
+          <small class="text-muted">Current status of all references</small>
+        </div>
+        <div class="chart-container" style="height: 280px;">
+          <canvas baseChart
+                  [data]="referenceStatusChartData"
+                  [options]="referenceStatusChartOptions"
+                  type="doughnut">
+          </canvas>
+        </div>
+      </mat-card>
+    </div>
+
+    <div class="col-12 col-lg-8 mb-3">
+      <mat-card class="h-100">
+        <div class="card-header-custom">
+          <h6 class="mb-0">Monthly References Trend</h6>
+          <small class="text-muted">References received per month</small>
+        </div>
+        <div class="chart-container" style="height: 280px;">
+          <canvas baseChart
+                  [data]="monthlyReferencesChartData"
+                  [options]="monthlyReferencesChartOptions"
+                  type="line">
+          </canvas>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Organization Stats Table -->
+  <div class="row">
+    <div class="col-12">
+      <mat-card>
+        <div class="card-header-custom">
+          <h6 class="mb-0">Organisation Statistics</h6>
+          <small class="text-muted">Detailed breakdown by organization</small>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Organisation</th>
+                <th class="text-center">Total References</th>
+                <th class="text-center">Total Users</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let org of organizations">
+                <td>{{ org.organizationName || org.name }}</td>
+                <td class="text-center">
+                  <span class="badge bg-primary">
+                    {{ getOrgReferenceCount(org.organizationName || org.name) }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-success">
+                    {{ getOrgUserCount(org.organizationName || org.name) }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="organizations.length === 0">
+                <td colspan="3" class="text-center text-muted">No organizations found</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</div>

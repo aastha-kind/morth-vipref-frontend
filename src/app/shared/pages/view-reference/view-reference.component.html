@@ -1,52 +1,217 @@
-<div class="dashboard-card">
-    <mat-card class="example-card" appearance="outlined">
-      <mat-card-header>
-        <mat-card-title style="cursor: pointer;">REFERENCE DETAILS</mat-card-title>
-      </mat-card-header>
-    </mat-card>
-    <mat-card-content class="reference-form-container">
-        <form [formGroup]="viewReference" class="reference-form">
-    
+<div class="view-reference-dialog">
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">description</mat-icon>
+      <h2>Reference Details</h2>
+    </div>
+    <span class="reference-badge">{{referenceDetails.referenceNo}}</span>
+  </div>
+
+  <!-- Content -->
+  <div class="dialog-content">
+    <form [formGroup]="viewReference">
+
+      <!-- Basic Reference Information Section -->
+      <div class="section">
+        <div class="section-header">
+          <mat-icon>assignment</mat-icon>
+          <span>Basic Information</span>
+        </div>
+        <div class="section-content">
+          <div class="form-row">
             <div class="form-field">
-              <div class="label-field">
-                <label>Reference No</label>
+              <label>Reference No</label>
+              <input matInput formControlName="referenceNo" class="mat-input readonly-input">
+            </div>
+            <div class="form-field">
+              <label>Subject</label>
+              <input matInput formControlName="subject" class="mat-input readonly-input">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Priority</label>
+              <div class="priority-display" [ngClass]="getPriorityClass(referenceDetails.priority)">
+                <input matInput formControlName="priority" class="mat-input readonly-input">
               </div>
-              <input matInput formControlName="referenceNo" class="mat-input" >
             </div>
-        
             <div class="form-field">
-              <div class="label-field">
-                <label>Subject</label>
+              <label>Current Queue</label>
+              <div class="queue-display" [ngClass]="getQueueStatusClass(referenceDetails.currentQueue)">
+                <input matInput formControlName="currentQueue" class="mat-input readonly-input">
               </div>
-              <input matInput formControlName="subject" class="mat-input" >
             </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Office Type</label>
+              <input matInput formControlName="initiatorOfficeType" class="mat-input readonly-input">
+            </div>
+            <div class="form-field">
+              <label>Assigned To</label>
+              <input matInput formControlName="toLoginId" class="mat-input readonly-input">
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- Date Information Section -->
+      <div class="section">
+        <div class="section-header">
+          <mat-icon>calendar_today</mat-icon>
+          <span>Date Information</span>
+        </div>
+        <div class="section-content">
+          <div class="form-row three-cols">
             <div class="form-field">
-                <div class="label-field">
-                  <label>Received Date</label>
-                </div>
-                <input matInput formControlName="assignedAt" class="mat-input" >
+              <label>Received Date</label>
+              <input matInput formControlName="receivedDate" class="mat-input readonly-input">
             </div>
+            <div class="form-field">
+              <label>Date of Letter</label>
+              <input matInput formControlName="dateOfLetter" class="mat-input readonly-input">
+            </div>
+            <div class="form-field">
+              <label>Date of Entry</label>
+              <input matInput formControlName="dateOfEntry" class="mat-input readonly-input">
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- VIP/Dignitary Information Section -->
+      <div class="section">
+        <div class="section-header">
+          <mat-icon>person</mat-icon>
+          <span>VIP / Dignitary Information</span>
+        </div>
+        <div class="section-content">
+          <div class="form-row">
             <div class="form-field">
-                <div class="label-field">
-                  <label>Priority</label>
-                </div>
-                <input matInput formControlName="priority" class="mat-input" >
+              <label>Name of Dignitary</label>
+              <input matInput formControlName="nameOfDignitary" class="mat-input readonly-input">
             </div>
+            <div class="form-field">
+              <label>Designation</label>
+              <input matInput formControlName="designation" class="mat-input readonly-input">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Email ID</label>
+              <input matInput formControlName="emailId" class="mat-input readonly-input">
+            </div>
+            <div class="form-field">
+              <label>State</label>
+              <input matInput formControlName="state" class="mat-input readonly-input">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field full-width">
+              <label>Constituency</label>
+              <input matInput formControlName="constituency" class="mat-input readonly-input">
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- Category Information Section -->
+      <div class="section">
+        <div class="section-header">
+          <mat-icon>category</mat-icon>
+          <span>Category Information</span>
+        </div>
+        <div class="section-content">
+          <div class="form-row">
             <div class="form-field">
-                <div class="label-field">
-                  <label>Current Queue</label>
-                </div>
-                <input matInput formControlName="currentQueue" class="mat-input" >
+              <label>Category</label>
+              <input matInput formControlName="categoryOfSubject" class="mat-input readonly-input">
             </div>
             <div class="form-field">
-                <div class="upload-btn-group">
-                    <button mat-raised-button mat-dialog-close class="disabled-look">Close</button>
-                </div>
+              <label>Sub-Category</label>
+              <input matInput formControlName="subCategoryOfSubject" class="mat-input readonly-input">
             </div>
-        </form>
-    </mat-card-content>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents Section -->
+      <div class="section" *ngIf="documents && documents.length > 0">
+        <div class="section-header">
+          <mat-icon>attach_file</mat-icon>
+          <span>Attached Documents ({{documents.length}})</span>
+        </div>
+        <div class="section-content documents-section">
+          <table mat-table [dataSource]="documents" class="documents-table">
+            <!-- Document Type Column -->
+            <ng-container matColumnDef="documentType">
+              <th mat-header-cell *matHeaderCellDef>Document Type</th>
+              <td mat-cell *matCellDef="let doc">{{doc.documentType || 'N/A'}}</td>
+            </ng-container>
+
+            <!-- File Name Column -->
+            <ng-container matColumnDef="fileName">
+              <th mat-header-cell *matHeaderCellDef>File Name</th>
+              <td mat-cell *matCellDef="let doc">
+                <div class="file-info">
+                  <mat-icon class="file-icon">insert_drive_file</mat-icon>
+                  <span>{{doc.fileOriginalName || doc.fileName || 'N/A'}}</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Uploaded By Column -->
+            <ng-container matColumnDef="uploadedBy">
+              <th mat-header-cell *matHeaderCellDef>Uploaded By</th>
+              <td mat-cell *matCellDef="let doc">{{doc.createdBy || 'N/A'}}</td>
+            </ng-container>
+
+            <!-- Uploaded At Column -->
+            <ng-container matColumnDef="uploadedAt">
+              <th mat-header-cell *matHeaderCellDef>Uploaded At</th>
+              <td mat-cell *matCellDef="let doc">{{formatDocumentDate(doc.createdAt)}}</td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let doc">
+                <button mat-icon-button (click)="viewDocument(doc)" title="Open in new tab" style="color: #3e9393;">
+                  <mat-icon>open_in_new</mat-icon>
+                </button>
+                <button mat-icon-button (click)="downloadDocument(doc)" title="Download" style="color: #3e9393;">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedDocColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedDocColumns;"></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- No Documents Message -->
+      <div class="section" *ngIf="!documents || documents.length === 0">
+        <div class="section-header">
+          <mat-icon>attach_file</mat-icon>
+          <span>Attached Documents</span>
+        </div>
+        <div class="section-content no-documents">
+          <mat-icon>folder_off</mat-icon>
+          <span>No documents attached to this reference</span>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <div class="dialog-footer">
+    <button mat-raised-button mat-dialog-close class="close-btn">
+      <mat-icon>close</mat-icon>
+      Close
+    </button>
+  </div>
 </div>
-

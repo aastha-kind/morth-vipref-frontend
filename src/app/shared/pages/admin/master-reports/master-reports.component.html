@@ -63,12 +63,17 @@
                     <input type="text" class="form-control" [(ngModel)]="vipCustomizeFilters.subject" placeholder="Enter Subject">
                   </div>
                   <div class="col-md-3">
-                    <label class="form-label">Receiving From Date</label>
-                    <input type="date" class="form-control" [(ngModel)]="vipCustomizeFilters.receivingFromDate">
+                    <label class="form-label">Receiving From Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" [(ngModel)]="vipCustomizeFilters.receivingFromDate" required>
                   </div>
                   <div class="col-md-3">
-                    <label class="form-label">Receiving To Date</label>
-                    <input type="date" class="form-control" [(ngModel)]="vipCustomizeFilters.receivingToDate">
+                    <label class="form-label">Receiving To Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" [(ngModel)]="vipCustomizeFilters.receivingToDate" required>
+                  </div>
+                </div>
+                <div class="row mt-2">
+                  <div class="col-12">
+                    <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Date range is required and cannot exceed 1 year.</small>
                   </div>
                 </div>
                 <div class="row mt-3">
@@ -108,24 +113,64 @@
                 <thead class="table-success">
                   <tr>
                     <th>S.No.</th>
-                    <th>Request Number</th>
-                    <th>Letter Date</th>
-                    <th>Receiving Date</th>
-                    <th>Dignitary Name</th>
-                    <th>Designation</th>
-                    <th>State</th>
-                    <th>Category</th>
-                    <th>Sub Category</th>
-                    <th>Subject</th>
-                    <th>Priority</th>
-                    <th>Pending With</th>
-                    <th>Status</th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('requestNumber')">
+                      Request Number
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'requestNumber' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('letterDate')">
+                      Letter Date
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'letterDate' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('receivingDate')">
+                      Receiving Date
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'receivingDate' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('dignitaryName')">
+                      Dignitary Name
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'dignitaryName' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('designation')">
+                      Designation
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'designation' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('state')">
+                      State
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'state' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('category')">
+                      Category
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'category' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('subCategory')">
+                      Sub Category
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'subCategory' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('subject')">
+                      Subject
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'subject' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('priority')">
+                      Priority
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'priority' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('pendingWith')">
+                      Pending Days
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'pendingWith' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipCustomizeTable('status')">
+                      Status
+                      <i class="bi" [ngClass]="vipCustomizeSortColumn === 'status' ? (vipCustomizeSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let item of vipCustomizeData; let i = index">
                     <td>{{i + 1}}</td>
-                    <td>{{item.requestNumber || '-'}}</td>
+                    <td>
+                      <a href="javascript:void(0)" class="text-primary text-decoration-underline" style="cursor: pointer;" (click)="openReferenceDetail(item.requestNumber)">
+                        {{item.requestNumber || '-'}}
+                      </a>
+                    </td>
                     <td>{{formatDate(item.letterDate)}}</td>
                     <td>{{formatDate(item.receivingDate)}}</td>
                     <td>{{item.dignitaryName || '-'}}</td>
@@ -137,9 +182,9 @@
                     <td>{{item.priority || '-'}}</td>
                     <td>{{item.pendingWith || '-'}}</td>
                     <td>
-                      <span class="badge" [ngClass]="{
-                        'bg-success': item.status === 'Closed',
-                        'bg-warning': item.status === 'ACTIVE',
+                      <span class="badge text-white" [ngClass]="{
+                        'bg-success': item.status === 'Closed' || item.status === 'CLOSED',
+                        'bg-warning text-dark': item.status === 'ACTIVE',
                         'bg-danger': item.status === 'DISCARDED'
                       }">
                         {{item.status || '-'}}
@@ -169,11 +214,12 @@
               <div class="card-body">
                 <div class="row g-3">
                   <div class="col-md-4">
-                    <label class="form-label">Pendency Type</label>
-                    <select class="form-select" [(ngModel)]="vipPendencyFilters.pendencyType">
+                    <label class="form-label">Pendency Type <span class="text-danger">*</span></label>
+                    <select class="form-select" [(ngModel)]="vipPendencyFilters.pendencyType" required>
                       <option value="">Select Pendency Type</option>
                       <option *ngFor="let org of organisations" [value]="org">{{org}}</option>
                     </select>
+                    <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Select 'All' to view all organisations.</small>
                   </div>
                 </div>
                 <div class="row mt-3">
@@ -213,29 +259,90 @@
                 <thead class="table-success">
                   <tr>
                     <th>S.No.</th>
-                    <th>Organisation</th>
-                    <th>Designation</th>
-                    <th>To Be Assigned</th>
-                    <th>In Progress</th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('referenceNo')">
+                      Reference No
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'referenceNo' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('dignitaryName')">
+                      Dignitary Name
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'dignitaryName' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('subject')">
+                      Subject
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'subject' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('state')">
+                      State
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'state' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('assigneeName')">
+                      Assignee Name
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'assigneeName' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('assigneeLoginId')">
+                      Login ID
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'assigneeLoginId' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('designation')">
+                      Designation
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'designation' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('organisation')">
+                      Organisation
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'organisation' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('office')">
+                      Office
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'office' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('pendingDays')">
+                      Pending Days
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'pendingDays' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('status')">
+                      Status
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'status' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of vipPendencyData">
-                    <td>{{item.sNo}}</td>
-                    <td>{{item.organisation}}</td>
-                    <td>{{item.designation}}</td>
-                    <td>{{item.toBeAssigned}}</td>
-                    <td>{{item.inProgress}}</td>
+                  <tr *ngFor="let item of vipPendencyData; let i = index">
+                    <td>{{i + 1}}</td>
+                    <td>
+                      <a href="javascript:void(0)" class="text-primary text-decoration-underline" style="cursor: pointer;" (click)="openReferenceDetail(item.referenceNo)">
+                        {{item.referenceNo || '-'}}
+                      </a>
+                    </td>
+                    <td>{{item.dignitaryName || '-'}}</td>
+                    <td>{{item.subject || '-'}}</td>
+                    <td>{{item.state || '-'}}</td>
+                    <td>{{item.assigneeName || '-'}}</td>
+                    <td><code>{{item.assigneeLoginId || '-'}}</code></td>
+                    <td>{{item.designation || '-'}}</td>
+                    <td>{{item.organisation || '-'}}</td>
+                    <td>{{item.office || '-'}}</td>
+                    <td>
+                      <span class="badge bg-danger">{{item.pendingDays || 0}} days</span>
+                    </td>
+                    <td>
+                      <span class="badge text-white" [ngClass]="{
+                        'bg-success': item.status === 'Closed' || item.status === 'CLOSED',
+                        'bg-warning text-dark': item.status === 'ACTIVE',
+                        'bg-danger': item.status === 'DISCARDED'
+                      }">
+                        {{item.status || '-'}}
+                      </span>
+                    </td>
                   </tr>
                 </tbody>
-                <tfoot>
-                  <tr class="table-info fw-bold">
-                    <td colspan="3">Total</td>
-                    <td>{{vipPendencyResponse?.totalToBeAssigned || 0}}</td>
-                    <td>{{vipPendencyResponse?.totalInProgress || 0}}</td>
-                  </tr>
-                </tfoot>
               </table>
+              <div class="mt-2">
+                <strong>Total Records: {{vipPendencyResponse?.totalRecords || 0}}</strong>
+              </div>
+            </div>
+
+            <div *ngIf="!loading && vipPendencyData.length === 0 && vipPendencyResponse" class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>No records found for the selected filter.
             </div>
           </div>
         </mat-tab>
@@ -273,8 +380,14 @@
                 <thead class="table-success">
                   <tr>
                     <th>S.No.</th>
-                    <th>State</th>
-                    <th>Total</th>
+                    <th style="cursor: pointer;" (click)="sortMISTable('state')">
+                      State
+                      <i class="bi" [ngClass]="misSortColumn === 'state' ? (misSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortMISTable('total')">
+                      Total
+                      <i class="bi" [ngClass]="misSortColumn === 'total' ? (misSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
                     <th *ngFor="let key of misData[0]?.designationWiseCount ? (misData[0].designationWiseCount | keyvalue) : []">
                       {{key.key}}
                     </th>
@@ -331,8 +444,14 @@
                 <thead class="table-success">
                   <tr>
                     <th>S.No.</th>
-                    <th>State</th>
-                    <th>Total</th>
+                    <th style="cursor: pointer;" (click)="sortNHAIMISTable('state')">
+                      State
+                      <i class="bi" [ngClass]="nhaiMisSortColumn === 'state' ? (nhaiMisSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortNHAIMISTable('total')">
+                      Total
+                      <i class="bi" [ngClass]="nhaiMisSortColumn === 'total' ? (nhaiMisSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
                     <th *ngFor="let key of nhaiMisData[0]?.designationWiseCount ? (nhaiMisData[0].designationWiseCount | keyvalue) : []">
                       {{key.key}}
                     </th>
@@ -353,6 +472,10 @@
                 <strong>Grand Total: {{nhaiMisResponse?.grandTotal || 0}}</strong>
               </div>
             </div>
+
+            <div *ngIf="!loading && nhaiMisData.length === 0 && nhaiMisResponse" class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>No NHAI records found.
+            </div>
           </div>
         </mat-tab>
 
@@ -366,19 +489,24 @@
               <div class="card-body">
                 <div class="row g-3">
                   <div class="col-md-4">
-                    <label class="form-label">Organisation</label>
-                    <select class="form-select" [(ngModel)]="stateOrgFilters.organisation">
+                    <label class="form-label">Organisation <span class="text-danger">*</span></label>
+                    <select class="form-select" [(ngModel)]="stateOrgFilters.organisation" required>
                       <option value="">Select Organisation</option>
                       <option *ngFor="let org of organisations" [value]="org">{{org}}</option>
                     </select>
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label">From Date</label>
-                    <input type="date" class="form-control" [(ngModel)]="stateOrgFilters.fromDate">
+                    <label class="form-label">From Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" [(ngModel)]="stateOrgFilters.fromDate" required>
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label">To Date</label>
-                    <input type="date" class="form-control" [(ngModel)]="stateOrgFilters.toDate">
+                    <label class="form-label">To Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" [(ngModel)]="stateOrgFilters.toDate" required>
+                  </div>
+                </div>
+                <div class="row mt-2">
+                  <div class="col-12">
+                    <small class="text-muted"><i class="bi bi-info-circle me-1"></i>All fields are required. Date range cannot exceed 1 year.</small>
                   </div>
                 </div>
                 <div class="row mt-3">
@@ -418,13 +546,34 @@
                 <thead class="table-success">
                   <tr>
                     <th>S.No.</th>
-                    <th>State</th>
-                    <th>Organisation</th>
-                    <th>Total Reference</th>
-                    <th>To Be Assigned</th>
-                    <th>In Progress</th>
-                    <th>Closed</th>
-                    <th>Discarded</th>
+                    <th style="cursor: pointer;" (click)="sortStateOrgTable('state')">
+                      State
+                      <i class="bi" [ngClass]="stateOrgSortColumn === 'state' ? (stateOrgSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortStateOrgTable('organisation')">
+                      Organisation
+                      <i class="bi" [ngClass]="stateOrgSortColumn === 'organisation' ? (stateOrgSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortStateOrgTable('totalReference')">
+                      Total Reference
+                      <i class="bi" [ngClass]="stateOrgSortColumn === 'totalReference' ? (stateOrgSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortStateOrgTable('toBeAssigned')">
+                      To Be Assigned
+                      <i class="bi" [ngClass]="stateOrgSortColumn === 'toBeAssigned' ? (stateOrgSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortStateOrgTable('inProgress')">
+                      In Progress
+                      <i class="bi" [ngClass]="stateOrgSortColumn === 'inProgress' ? (stateOrgSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortStateOrgTable('closed')">
+                      Closed
+                      <i class="bi" [ngClass]="stateOrgSortColumn === 'closed' ? (stateOrgSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortStateOrgTable('discard')">
+                      Discarded
+                      <i class="bi" [ngClass]="stateOrgSortColumn === 'discard' ? (stateOrgSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -457,11 +606,12 @@
               <div class="card-body">
                 <div class="row g-3">
                   <div class="col-md-4">
-                    <label class="form-label">Organisation</label>
-                    <select class="form-select" [(ngModel)]="officerWiseFilters.organisation">
+                    <label class="form-label">Organisation <span class="text-danger">*</span></label>
+                    <select class="form-select" [(ngModel)]="officerWiseFilters.organisation" required>
                       <option value="">Select Organisation</option>
                       <option *ngFor="let org of organisations" [value]="org">{{org}}</option>
                     </select>
+                    <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Select 'All' to view all organisations.</small>
                   </div>
                 </div>
                 <div class="row mt-3">
@@ -501,15 +651,27 @@
                 <thead class="table-success">
                   <tr>
                     <th>S.No.</th>
-                    <th>Office</th>
-                    <th>Designation</th>
-                    <th>Employee Name</th>
-                    <th>Total</th>
+                    <th style="cursor: pointer;" (click)="sortOfficerWiseTable('office')">
+                      Office
+                      <i class="bi" [ngClass]="officerWiseSortColumn === 'office' ? (officerWiseSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortOfficerWiseTable('designation')">
+                      Designation
+                      <i class="bi" [ngClass]="officerWiseSortColumn === 'designation' ? (officerWiseSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortOfficerWiseTable('employeeName')">
+                      Employee Name
+                      <i class="bi" [ngClass]="officerWiseSortColumn === 'employeeName' ? (officerWiseSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortOfficerWiseTable('total')">
+                      Total
+                      <i class="bi" [ngClass]="officerWiseSortColumn === 'total' ? (officerWiseSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of officerWiseData">
-                    <td>{{item.sNo}}</td>
+                  <tr *ngFor="let item of officerWiseData; let i = index">
+                    <td>{{i + 1}}</td>
                     <td>{{item.office}}</td>
                     <td>{{item.designation}}</td>
                     <td>{{item.employeeName}}</td>
@@ -520,6 +682,10 @@
               <div class="mt-2">
                 <strong>Grand Total: {{officerWiseResponse?.grandTotal || 0}}</strong>
               </div>
+            </div>
+
+            <div *ngIf="!loading && officerWiseData.length === 0 && officerWiseResponse" class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>No records found for the selected filter.
             </div>
           </div>
         </mat-tab>
@@ -557,22 +723,55 @@
                 <thead class="table-success">
                   <tr>
                     <th>S.No.</th>
-                    <th>Organisation</th>
-                    <th>Office</th>
-                    <th>Designation</th>
-                    <th>Name</th>
-                    <th>Login ID</th>
-                    <th>Contact</th>
-                    <th>Email</th>
-                    <th>Has Login</th>
-                    <th>Last Login</th>
-                    <th>Locked</th>
-                    <th>Failed Attempts</th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('organisation')">
+                      Organisation
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'organisation' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('office')">
+                      Office
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'office' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('designation')">
+                      Designation
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'designation' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('name')">
+                      Name
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'name' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('loginId')">
+                      Login ID
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'loginId' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('contactNumber')">
+                      Contact
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'contactNumber' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('emailId')">
+                      Email
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'emailId' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('hasLoginBefore')">
+                      Has Login
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'hasLoginBefore' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('lastLoginTime')">
+                      Last Login
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'lastLoginTime' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('userLocked')">
+                      Locked
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'userLocked' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortUserLoginTable('failureAttemptCount')">
+                      Failed Attempts
+                      <i class="bi" [ngClass]="userLoginSortColumn === 'failureAttemptCount' ? (userLoginSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of userLoginData">
-                    <td>{{item.sNo}}</td>
+                  <tr *ngFor="let item of userLoginData; let i = index">
+                    <td>{{i + 1}}</td>
                     <td>{{item.organisation}}</td>
                     <td>{{item.office}}</td>
                     <td>{{item.designation}}</td>
@@ -598,3 +797,229 @@
     </div>
   </div>
 </div>
+
+<!-- Reference Detail Modal -->
+<div class="modal fade" [class.show]="showReferenceDetailModal" [style.display]="showReferenceDetailModal ? 'block' : 'none'" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-file-text me-2"></i>Reference Details - {{referenceDetail?.referenceNo || ''}}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeReferenceDetailModal()"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Loading Spinner -->
+        <div *ngIf="referenceDetailLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Loading reference details...</p>
+        </div>
+
+        <!-- Reference Details Content -->
+        <div *ngIf="!referenceDetailLoading && referenceDetail">
+          <!-- Basic Information -->
+          <div class="card mb-3">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Basic Information</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4 mb-2">
+                  <strong>Reference No:</strong><br>
+                  <span class="text-primary">{{referenceDetail.referenceNo || '-'}}</span>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Status:</strong><br>
+                  <span class="badge" [ngClass]="{
+                    'bg-success': referenceDetail.status === 'CLOSED',
+                    'bg-warning text-dark': referenceDetail.status === 'ACTIVE',
+                    'bg-danger': referenceDetail.status === 'DISCARDED'
+                  }">{{referenceDetail.status || '-'}}</span>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Priority:</strong><br>
+                  <span class="badge" [ngClass]="{'bg-danger': referenceDetail.priority === 'Priority', 'bg-secondary': referenceDetail.priority !== 'Priority'}">
+                    {{referenceDetail.priority || '-'}}
+                  </span>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Letter Date:</strong><br>{{formatDate(referenceDetail.letterDate)}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Received Date:</strong><br>{{formatDate(referenceDetail.receivedDate)}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Current Queue:</strong><br>{{referenceDetail.currentQueue || '-'}}
+                </div>
+                <div class="col-12 mb-2">
+                  <strong>Subject:</strong><br>{{referenceDetail.subject || '-'}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dignitary Information -->
+          <div class="card mb-3">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="bi bi-person me-2"></i>Dignitary Information</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4 mb-2">
+                  <strong>Name:</strong><br>{{referenceDetail.dignitaryName || '-'}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Designation:</strong><br>{{referenceDetail.dignitaryDesignation || '-'}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Email:</strong><br>{{referenceDetail.dignitaryEmail || '-'}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>State:</strong><br>{{referenceDetail.state || '-'}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Constituency:</strong><br>{{referenceDetail.constituency || '-'}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Information -->
+          <div class="card mb-3">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="bi bi-tag me-2"></i>Category Information</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <strong>Category:</strong><br>{{referenceDetail.category || '-'}}
+                </div>
+                <div class="col-md-6 mb-2">
+                  <strong>Sub-Category:</strong><br>{{referenceDetail.subCategory || '-'}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Assignment -->
+          <div class="card mb-3" *ngIf="referenceDetail.currentAssigneeName">
+            <div class="card-header bg-warning text-dark">
+              <h6 class="mb-0"><i class="bi bi-person-check me-2"></i>Current Assignment</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4 mb-2">
+                  <strong>Assigned To:</strong><br>{{referenceDetail.currentAssigneeName || '-'}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Login ID:</strong><br><code>{{referenceDetail.currentAssigneeLoginId || '-'}}</code>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Designation:</strong><br>{{referenceDetail.currentAssigneeDesignation || '-'}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Organization:</strong><br>{{referenceDetail.currentAssigneeOrganization || '-'}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Office:</strong><br>{{referenceDetail.currentAssigneeOffice || '-'}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Assigned At:</strong><br>{{formatDateTime(referenceDetail.currentAssignedAt)}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Days Pending:</strong><br>
+                  <span class="badge bg-danger">{{referenceDetail.daysPendingWithCurrentUser || 0}} days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Workflow Information -->
+          <div class="card mb-3">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="bi bi-clock-history me-2"></i>Workflow Information</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4 mb-2">
+                  <strong>Created By:</strong><br>{{referenceDetail.createdBy || '-'}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Created At:</strong><br>{{formatDateTime(referenceDetail.createdAt)}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Updated By:</strong><br>{{referenceDetail.updatedBy || '-'}}
+                </div>
+                <div class="col-md-4 mb-2">
+                  <strong>Updated At:</strong><br>{{formatDateTime(referenceDetail.updatedAt)}}
+                </div>
+                <div class="col-md-4 mb-2" *ngIf="referenceDetail.closedAt">
+                  <strong>Closed At:</strong><br>{{formatDateTime(referenceDetail.closedAt)}}
+                </div>
+                <div class="col-md-4 mb-2" *ngIf="referenceDetail.closedByName">
+                  <strong>Closed By:</strong><br>{{referenceDetail.closedByName}} (<code>{{referenceDetail.closedByLoginId}}</code>)
+                </div>
+                <div class="col-12 mb-2" *ngIf="referenceDetail.closureRemarks">
+                  <strong>Closure Remarks:</strong><br>{{referenceDetail.closureRemarks}}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assignment History -->
+          <div class="card mb-3" *ngIf="referenceDetail.assignmentHistory && referenceDetail.assignmentHistory.length > 0">
+            <div class="card-header bg-info text-white">
+              <h6 class="mb-0"><i class="bi bi-list-task me-2"></i>Assignment History ({{referenceDetail.assignmentHistory.length}} records)</h6>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover table-sm mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>S.No</th>
+                      <th>From User</th>
+                      <th>From Login ID</th>
+                      <th>To User</th>
+                      <th>To Login ID</th>
+                      <th>Designation</th>
+                      <th>Organization</th>
+                      <th>Assigned At</th>
+                      <th>Action</th>
+                      <th>Days Held</th>
+                      <th>Comment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let history of referenceDetail.assignmentHistory">
+                      <td>{{history.sNo}}</td>
+                      <td>{{history.fromUserName || '-'}}</td>
+                      <td><code>{{history.fromUserLoginId || '-'}}</code></td>
+                      <td>{{history.toUserName || '-'}}</td>
+                      <td><code>{{history.toUserLoginId || '-'}}</code></td>
+                      <td>{{history.toUserDesignation || '-'}}</td>
+                      <td>{{history.toUserOrganization || '-'}}</td>
+                      <td>{{formatDateTime(history.assignedAt)}}</td>
+                      <td>{{history.action || '-'}}</td>
+                      <td>
+                        <span class="badge bg-secondary">{{history.daysHeld || 0}} days</span>
+                      </td>
+                      <td>{{history.comment || '-'}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeReferenceDetailModal()">
+          <i class="bi bi-x-lg me-1"></i>Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showReferenceDetailModal" *ngIf="showReferenceDetailModal"></div>

@@ -7,6 +7,8 @@ export interface VipReferenceDocumentResponse {
     comments: string;
     createdAt?: string;
     createdBy?: string;
+    dmsDocumentId?: number;
+    storageType?: string; // 'dms' or 'local'
   }
   
   export interface VipReferenceDetailsResponse {
@@ -19,6 +21,7 @@ export interface VipReferenceDocumentResponse {
     nameOfDignitary: string;
     emailId: string;
     designation: string;
+    designationName?: string;
     state: string;
     constituency: string;
     priority: string;

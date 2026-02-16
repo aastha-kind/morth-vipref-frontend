@@ -54,11 +54,18 @@ export class UsermgmtService {
     return this.http.get<any>(`${API_ENDPOINTS.reference}/reference-list/${userName}`)
   }
 
-  getVipReferenceListPaginated(userName: string, page: number, size: number, search?: string): Observable<PagedResponse<any>> {
+  getVipReferenceListPaginated(userName: string, page: number, size: number, search?: string, sortBy?: string, sortDir?: string): Observable<PagedResponse<any>> {
     let url = `${API_ENDPOINTS.reference}/reference-list/${userName}/paginated?page=${page}&size=${size}`;
     if (search && search.trim() !== '') {
       url += `&search=${encodeURIComponent(search)}`;
     }
+    if (sortBy && sortBy.trim() !== '') {
+      url += `&sortBy=${encodeURIComponent(sortBy)}`;
+    }
+    if (sortDir && sortDir.trim() !== '') {
+      url += `&sortDir=${encodeURIComponent(sortDir)}`;
+    }
+    console.log('API URL:', url);
     return this.http.get<PagedResponse<any>>(url);
   }
 
@@ -75,6 +82,7 @@ export class UsermgmtService {
     return this.http.post<any>(`${API_ENDPOINTS.reference}/user/queue/references`, queueData)
   }
   getQueueReferencesListPaginated(queueData: any): Observable<any> {
+    console.log('Queue API Request:', queueData);
     return this.http.post<any>(`${API_ENDPOINTS.reference}/user/queue/references/paginated`, queueData)
   }
 
@@ -122,11 +130,20 @@ export class UsermgmtService {
     return this.http.get<any>(`${API_ENDPOINTS.referencemaster}/get-designations/${selectedOrganization}`);
   }
 
+  getDesignationListByOffice(officeId: number): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.referencemaster}/get-designations-by-office/${officeId}`);
+  }
+
+  getDesignationListByOfficeName(officeName: string): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.referencemaster}/get-designations-by-office-name/${officeName}`);
+  }
+
   getVipDesignationList(): Observable<any> {
     return this.http.get<any>(`${API_ENDPOINTS.referencemaster}/vip-designations`)
   }
 
   getUserList(userInfo: any): Observable<UserList> {
+    console.log(userInfo);
     return this.http.post<UserList>(`${API_ENDPOINTS.referencemaster}/get-users`, userInfo);
   }
 
@@ -147,7 +164,15 @@ export class UsermgmtService {
     return this.http.post<any>(`${API_ENDPOINTS.referenceWorkFlow}/action-history/get`, referenceData);
   }
 
-  //upload documents api 
+  // Download document by ID (returns blob for viewing/downloading)
+  downloadDocumentById(documentId: number, userId: number): Observable<Blob> {
+    return this.http.post(`${API_ENDPOINTS.referenceWorkFlow}/download-document-by-id`,
+      { documentId, userId },
+      { responseType: 'blob' }
+    )
+  }
+
+  //upload documents api
   uploadReferenceDocuments(uploadDocsData: FormData, referenceId: number): Observable<string> {
     return this.http.post(`${API_ENDPOINTS.reference}/upload-document/${referenceId}`, uploadDocsData,
       {
@@ -209,5 +234,24 @@ export class UsermgmtService {
   // Search knowledge base with criteria
   searchKnowledgeBase(criteria: any): Observable<VipReference[]> {
     return this.http.post<VipReference[]>(`${API_ENDPOINTS.reference}/knowledge-base/search`, criteria);
+  }
+
+  // ========== Document Types Methods ==========
+
+  // Get all active document types
+  getActiveDocumentTypes(): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.documentTypes}/active`);
+  }
+
+  // Get all document types
+  getAllDocumentTypes(): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.documentTypes}`);
+  }
+
+  // ========== Draft References Methods ==========
+
+  // Get draft references for a user
+  getDraftReferences(loginId: string): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.reference}/drafts/${loginId}`);
   }
 }

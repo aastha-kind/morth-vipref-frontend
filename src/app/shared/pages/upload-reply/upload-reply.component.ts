@@ -28,8 +28,8 @@ export class UploadReplyComponent {
         return;
       }
 
-      // Validate size (max 50MB = 50 * 1024 * 1024)
-      if (file.size > 2 * 1024 * 1024) {
+      // Validate size (max 5MB to match DMS limit)
+      if (file.size > 5 * 1024 * 1024) {
         this.uploadReplyDocs.get('file')?.setErrors({ maxSizeExceeded: true });
         return;
       }

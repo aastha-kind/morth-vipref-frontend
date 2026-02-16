@@ -1,4 +1,4 @@
-import { Component, inject, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, ViewChild } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { VipReference } from '../dashboard/dashboard.component';
 import { MatPaginator } from '@angular/material/paginator';
@@ -18,15 +18,22 @@ import { ViewReferenceComponent } from '../view-reference/view-reference.compone
   templateUrl: './vip-initiator.component.html',
   styleUrl: './vip-initiator.component.css'
 })
-export class VipInitiatorComponent {
+export class VipInitiatorComponent implements AfterViewInit {
   userDetails!:User;
   @Input() selectedQueueData:string="";
-  searchTerm: string = ''; // Add search term variable
+  searchTerm: string = '';
+  officeTypeFilter: string | null = null;
 
   // Pagination variables
   pageIndex: number = 0;
   pageSize: number = 10;
   totalElements: number = 0;
+  sortColumn: string = 'assignedAt';
+  sortDirection: string = 'desc';
+
+  // Draft references
+  draftReferences: VipReference[] = [];
+  showDrafts: boolean = true;
 
   private router=inject(Router);
   private userMgmtService = inject(UsermgmtService);
@@ -38,17 +45,34 @@ export class VipInitiatorComponent {
     'referenceNo',
     'subject',
     'assignedAt',
-    'currentQueue',
+    // 'currentQueue',
     'actions',
     // 'priority',
   ];
   queueReferencesData = new MatTableDataSource<VipReference>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  toastr: any;
 
   ngOnInit() {
     this.getUserDetails();
     this.getQueueReferences();
+    this.getDraftReferences();
+  }
+
+  ngAfterViewInit() {
+    this.initializeSort();
+  }
+
+  initializeSort() {
+    if (this.sort) {
+      this.sort.sortChange.subscribe(() => {
+        this.sortColumn = this.sort.active;
+        this.sortDirection = this.sort.direction || 'asc';
+        this.pageIndex = 0;
+        this.getQueueReferences();
+      });
+    }
   }
 
   getUserDetails(){
@@ -64,19 +88,31 @@ export class VipInitiatorComponent {
       loginId:this.userDetails.loginId,
       queue:'VIP_Initiator',
       status: "SENT",
-      search: this.searchTerm, // Include search parameter
-      page: this.pageIndex, // Include page number
-      size: this.pageSize // Include page size
+      search: this.searchTerm,
+      page: this.pageIndex,
+      size: this.pageSize,
+      sortBy: this.sortColumn,
+      sortDir: this.sortDirection
     }
+    console.log('VIP Initiator - Fetching with sort:', queueData);
     this.userMgmtService.getQueueReferencesListPaginated(queueData).subscribe({
       next:(res)=>{
-        this.queueReferencesData.data = res.content;
-        this.totalElements = res.totalElements;
-        console.log(res)
+        console.log('VIP Initiator - Received response:', res);
+        let data = res.content;
+
+        // Apply client-side office type filter if set
+        if (this.officeTypeFilter) {
+          data = data.filter((item: VipReference) => item.initiatorOfficeType === this.officeTypeFilter);
+          this.totalElements = data.length;
+        } else {
+          this.totalElements = res.totalElements;
+        }
+
+        this.queueReferencesData.data = data;
         this.ngxService.stop();
       },
       error:(err)=>{
-        console.log(err);
+        console.error('VIP Initiator - Error:', err);
         this.ngxService.stop();
         this.toasterService.error('Failed to load references');
       }
@@ -99,16 +135,83 @@ export class VipInitiatorComponent {
 
   }
 
-  viewReference(ref: VipReference) {
-    this.router.navigate([`/dashboard/add-reference/${ref.referenceNo}`], {
-      state: { previousRoute: '/dashboard/vip-initiator' }
+  
+   viewReference(ref: VipReference) {
+    this.ngxService.start();
+    // Fetch detailed reference information from API
+    this.userMgmtService.getReferenceDetails(ref.referenceNo).subscribe({
+      next: (detailedRef: any) => {
+        this.ngxService.stop();
+        const viewReferenceDialog = this.dialog.open(ViewReferenceComponent, {
+          data: detailedRef,
+          width: '900px',
+          maxHeight: '90vh'
+        });
+      },
+      error: (err) => {
+        this.ngxService.stop();
+        // Fallback to basic data if API fails
+        this.toastr.warning("Could not fetch complete details, showing basic information");
+        const viewReferenceDialog = this.dialog.open(ViewReferenceComponent, {
+          data: ref,
+          width: '900px',
+          maxHeight: '90vh'
+        });
+      }
     });
   }
 
   applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value.trim();
-    this.searchTerm = filterValue;
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    this.searchTerm = '';
+    this.officeTypeFilter = null;
     this.pageIndex = 0; // Reset to first page on new search
+
+    // Check if searching for office type
+    if (filterValue.includes('minister') || filterValue.includes('ministry')) {
+      this.officeTypeFilter = 'MINISTRY';
+    } else if (filterValue.includes('secretary')) {
+      this.officeTypeFilter = 'SECRETARY';
+    } else {
+      // Regular reference number search
+      this.searchTerm = filterValue;
+    }
+
     this.getQueueReferences(); // Fetch from server with search term
+  }
+
+  getDraftReferences() {
+    if (!this.userDetails || !this.userDetails.loginId) {
+      console.warn('User details not available yet for fetching drafts');
+      return;
+    }
+    console.log('Fetching drafts for user:', this.userDetails.loginId);
+    this.userMgmtService.getDraftReferences(this.userDetails.loginId).subscribe({
+      next: (res) => {
+        console.log('Draft references received:', res);
+        this.draftReferences = res || [];
+      },
+      error: (err) => {
+        console.error('Error fetching drafts:', err);
+        this.draftReferences = [];
+      }
+    });
+  }
+
+  continueDraft(draft: VipReference) {
+    // Navigate to initiator form with draft data
+    this.router.navigate(['/dashboard/add-reference'], {
+      state: {
+        previousRoute: '/dashboard/vip-initiator',
+        isDraft: true,
+        draftReferenceId: draft.referenceId,
+        draftData: draft
+      }
+    });
+  }
+
+  deleteDraft(draft: VipReference) {
+    // TODO: Implement delete draft functionality if needed
+    console.log('Delete draft:', draft);
   }
 }
