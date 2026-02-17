@@ -361,79 +361,30 @@ export class DashboardComponent implements AfterViewInit {
     });
     this.ngxService.start();
 
-    // For Assigner/Assignee, fetch from inbox queue; for Initiator, fetch from sent references
-    if (this.isAssignerOrAssignee()) {
-      // Fetch inbox references for assigner/assignee with filters
-      const queueData: any = {
-        loginId: this.userDetails.loginId,
-        queue: this.isAssigner() ? this.selectedQueueFilter : 'ALL', // Queue filter only for Assigner
-        status: 'INBOX',
-        search: this.searchTerm,
-        page: this.pageIndex,
-        size: this.pageSize,
-        sortBy: this.sortColumn,
-        sortDir: this.sortDirection,
-      };
-
-      // Add date filters if selected
-      if (dateRange.startDate) {
-        queueData.startDate = dateRange.startDate;
-      }
-      if (dateRange.endDate) {
-        queueData.endDate = dateRange.endDate;
-      }
-
-      // Add priority filter if selected
-      if (
-        this.selectedPriorityFilter &&
-        this.selectedPriorityFilter !== 'ALL'
-      ) {
-        queueData.priority = this.selectedPriorityFilter;
-      }
-
-      console.log('Dashboard - Final queueData being sent:', queueData);
-      this.userMgmtService
-        .getQueueReferencesListPaginated(queueData)
-        .subscribe({
-          next: (res: any) => {
-            console.log('Received assigner response:', res);
-            this.VipReferenceData.data = res.content;
-            this.totalElements = res.totalElements;
-            this.pageIndex = res.pageNumber || 0;
-            this.ngxService.stop();
-          },
-          error: (err) => {
-            console.error('Error fetching references:', err);
-            this.toastr.error('No references found for this user');
-            this.ngxService.stop();
-          },
-        });
-    } else {
-      // Initiator - fetch sent references (no filters)
-      this.userMgmtService
-        .getVipReferenceListPaginated(
-          this.userDetails.loginId,
-          this.pageIndex,
-          this.pageSize,
-          this.searchTerm,
-          this.sortColumn,
-          this.sortDirection,
-        )
-        .subscribe({
-          next: (res: PagedResponse<VipReference>) => {
-            console.log('Received initiator response:', res);
-            this.VipReferenceData.data = res.content;
-            this.totalElements = res.totalElements;
-            this.pageIndex = res.pageNumber;
-            this.ngxService.stop();
-          },
-          error: (err) => {
-            console.error('Error fetching references:', err);
-            this.toastr.error('No references found for this user');
-            this.ngxService.stop();
-          },
-        });
-    }
+    // Dashboard uses reference-list API for all roles to show all references for tracking
+    this.userMgmtService
+      .getVipReferenceListPaginated(
+        this.userDetails.loginId,
+        this.pageIndex,
+        this.pageSize,
+        this.searchTerm,
+        this.sortColumn,
+        this.sortDirection,
+      )
+      .subscribe({
+        next: (res: PagedResponse<VipReference>) => {
+          console.log('Received reference list response:', res);
+          this.VipReferenceData.data = res.content;
+          this.totalElements = res.totalElements;
+          this.pageIndex = res.pageNumber;
+          this.ngxService.stop();
+        },
+        error: (err) => {
+          console.error('Error fetching references:', err);
+          this.toastr.error('No references found for this user');
+          this.ngxService.stop();
+        },
+      });
   }
 
   onPageChange(event: PageEvent) {
