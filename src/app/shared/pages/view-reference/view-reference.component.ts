@@ -65,6 +65,51 @@ export class ViewReferenceComponent {
     }
   }
 
+  private stateCodeMap: { [key: string]: string } = {
+  'AP': 'Andhra Pradesh',
+  'AR': 'Arunachal Pradesh',
+  'AS': 'Assam',
+  'BR': 'Bihar',
+  'CG': 'Chhattisgarh',
+  'GA': 'Goa',
+  'GJ': 'Gujarat',
+  'HR': 'Haryana',
+  'HP': 'Himachal Pradesh',
+  'JH': 'Jharkhand',
+  'KA': 'Karnataka',
+  'KL': 'Kerala',
+  'MP': 'Madhya Pradesh',
+  'MH': 'Maharashtra',
+  'MN': 'Manipur',
+  'ML': 'Meghalaya',
+  'MZ': 'Mizoram',
+  'NL': 'Nagaland',
+  'OD': 'Odisha',
+  'PB': 'Punjab',
+  'RJ': 'Rajasthan',
+  'SK': 'Sikkim',
+  'TN': 'Tamil Nadu',
+  'TS': 'Telangana',
+  'TR': 'Tripura',
+  'UK': 'Uttarakhand',
+  'UP': 'Uttar Pradesh',
+  'WB': 'West Bengal',
+  'DL': 'Delhi',
+  'PY': 'Puducherry',
+  'CH': 'Chandigarh',
+  'JK': 'Jammu and Kashmir',
+  'LA': 'Ladakh',
+  'AN': 'Andaman and Nicobar Islands',
+  'DN': 'Dadra and Nagar Haveli and Daman and Diu'
+};
+
+
+private getFullStateName(stateCode: string): string {
+  if (!stateCode) return '';
+  return this.stateCodeMap[stateCode.toUpperCase()] || stateCode;
+}
+
+
   private loadFullReferenceDetails(referenceNo: string) {
     this.isLoading = true;
     this.userMgmtService.getReferenceDetails(referenceNo).subscribe({
@@ -105,7 +150,9 @@ export class ViewReferenceComponent {
     this.setFieldValue('designation', this.referenceDetails.designation);
     this.loadDesignationName();
     this.setFieldValue('emailId', this.referenceDetails.emailId);
-    this.setFieldValue('state', this.referenceDetails.state);
+    //this.setFieldValue('state', this.referenceDetails.state);
+    const fullStateName = this.getFullStateName(this.referenceDetails.state);
+    this.setFieldValue('state', fullStateName);
     this.setFieldValue('constituency', this.referenceDetails.constituency);
 
     // Category Information

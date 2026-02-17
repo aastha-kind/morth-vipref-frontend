@@ -237,9 +237,14 @@ export class DashboardComponent implements AfterViewInit {
     this.ngxService.start();
 
     // Use different API based on user role
-    const dashboardApi = this.isAssignerOrAssignee()
-      ? this.userMgmtService.getDashboardStats(this.userDetails.loginId)
-      : this.userMgmtService.getInitiatorDashboardStats(this.userDetails.loginId);
+    let dashboardApi;
+    if (this.isAssigner()) {
+      dashboardApi = this.userMgmtService.getDashboardStats(this.userDetails.loginId);
+    } else if (this.isAssignee()) {
+      dashboardApi = this.userMgmtService.getAssigneeDashboardStats(this.userDetails.loginId);
+    } else {
+      dashboardApi = this.userMgmtService.getInitiatorDashboardStats(this.userDetails.loginId);
+    }
 
     dashboardApi.subscribe({
       next:(res:any)=>{

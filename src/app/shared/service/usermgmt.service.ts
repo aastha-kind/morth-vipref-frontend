@@ -48,6 +48,9 @@ export class UsermgmtService {
   getInitiatorDashboardStats(userName: string): Observable<any> {
     return this.http.get<any>(`${API_ENDPOINTS.reference}/dashboard-stats-initator/${userName}`)
   }
+  getAssigneeDashboardStats(userName: string): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.reference}/dashboard-stats-assignee/${userName}`)
+  }
 
 
   getVipReferenceList(userName: string): Observable<any> {

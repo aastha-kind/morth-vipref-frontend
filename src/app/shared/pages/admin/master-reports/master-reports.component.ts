@@ -55,6 +55,12 @@ export class MasterReportsComponent implements OnInit {
   nhaiMisSortColumn: string = 'state';
   nhaiMisSortDirection: 'asc' | 'desc' = 'asc';
 
+  // NHIDCL MIS Report
+  nhidclMisData: any[] = [];
+  nhidclMisResponse: any = null;
+  nhidclMisSortColumn: string = 'state';
+  nhidclMisSortDirection: 'asc' | 'desc' = 'asc';
+
   // State-Org Report
   stateOrgFilters = {
     organisation: '',
@@ -843,6 +849,137 @@ export class MasterReportsComponent implements OnInit {
     const a = document.createElement('a');
     a.href = url;
     a.download = 'VIP_MIS_NHAI_Report.xlsx';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    this.toaster.success('Report exported to Excel');
+  }
+
+  // NHIDCL MIS Report Methods
+  loadNHIDCLMISReport(): void {
+    this.loading = true;
+    this.reportService.getNHIDCLMISReport().subscribe({
+      next: (response) => {
+        this.nhidclMisResponse = response;
+        this.nhidclMisData = response.stateWiseData || [];
+        this.sortNHIDCLMISData(this.nhidclMisSortColumn, this.nhidclMisSortDirection);
+        this.loading = false;
+        if (this.nhidclMisData.length === 0) {
+          this.toaster.info('No NHIDCL records found');
+        }
+      },
+      error: (err) => {
+        console.error('Error loading NHIDCL MIS Report', err);
+        this.toaster.error('Failed to load report');
+        this.loading = false;
+      }
+    });
+  }
+
+  sortNHIDCLMISTable(column: string): void {
+    if (this.nhidclMisSortColumn === column) {
+      this.nhidclMisSortDirection = this.nhidclMisSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.nhidclMisSortColumn = column;
+      this.nhidclMisSortDirection = 'asc';
+    }
+    this.sortNHIDCLMISData(column, this.nhidclMisSortDirection);
+  }
+
+  sortNHIDCLMISData(column: string, direction: 'asc' | 'desc'): void {
+    this.nhidclMisData.sort((a, b) => {
+      let aVal = a[column];
+      let bVal = b[column];
+      if (column === 'total' || column === 'sNo') {
+        aVal = aVal ? parseInt(aVal) : 0;
+        bVal = bVal ? parseInt(bVal) : 0;
+      } else {
+        aVal = aVal ? aVal.toString().toLowerCase() : '';
+        bVal = bVal ? bVal.toString().toLowerCase() : '';
+      }
+      if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  exportNHIDCLMISToPDF(): void {
+    if (!this.nhidclMisData || this.nhidclMisData.length === 0) {
+      this.toaster.warning('No data to export');
+      return;
+    }
+    const doc = new jsPDF('l', 'mm', 'a4');
+    doc.setFontSize(16);
+    doc.text('VIP MIS NHIDCL Report', 14, 15);
+    doc.setFontSize(10);
+    doc.text(`Grand Total: ${this.nhidclMisResponse?.grandTotal || 0}`, 14, 22);
+    const designations = Object.keys(this.nhidclMisData[0].designationWiseCount || {});
+    const headers = [['S.No.', 'State', 'Total', ...designations]];
+    const data = this.nhidclMisData.map((item) => [
+      item.sNo?.toString() || '-',
+      item.state || '-',
+      item.total?.toString() || '0',
+      ...designations.map(d => item.designationWiseCount[d]?.toString() || '0')
+    ]);
+    autoTable(doc, {
+      head: headers,
+      body: data,
+      startY: 27,
+      styles: { fontSize: 7 },
+      headStyles: { fillColor: [156, 39, 176] }
+    });
+    doc.save('VIP_MIS_NHIDCL_Report.pdf');
+    this.toaster.success('Report exported to PDF');
+  }
+
+  exportNHIDCLMISToCSV(): void {
+    if (!this.nhidclMisData || this.nhidclMisData.length === 0) {
+      this.toaster.warning('No data to export');
+      return;
+    }
+    const designations = Object.keys(this.nhidclMisData[0].designationWiseCount || {});
+    const headers = ['S.No.', 'State', 'Total', ...designations];
+    const csvData = this.nhidclMisData.map((item) => [
+      item.sNo?.toString() || '-',
+      item.state || '-',
+      item.total?.toString() || '0',
+      ...designations.map(d => item.designationWiseCount[d]?.toString() || '0')
+    ]);
+    let csv = headers.join(',') + '\n';
+    csvData.forEach(row => {
+      csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'VIP_MIS_NHIDCL_Report.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    this.toaster.success('Report exported to CSV');
+  }
+
+  exportNHIDCLMISToExcel(): void {
+    if (!this.nhidclMisData || this.nhidclMisData.length === 0) {
+      this.toaster.warning('No data to export');
+      return;
+    }
+    const designations = Object.keys(this.nhidclMisData[0].designationWiseCount || {});
+    const headers = ['S.No.', 'State', 'Total', ...designations];
+    const csvData = this.nhidclMisData.map((item) => [
+      item.sNo?.toString() || '-',
+      item.state || '-',
+      item.total?.toString() || '0',
+      ...designations.map(d => item.designationWiseCount[d]?.toString() || '0')
+    ]);
+    let csv = headers.join('\t') + '\n';
+    csvData.forEach(row => {
+      csv += row.join('\t') + '\n';
+    });
+    const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'VIP_MIS_NHIDCL_Report.xlsx';
     a.click();
     window.URL.revokeObjectURL(url);
     this.toaster.success('Report exported to Excel');
