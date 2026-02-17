@@ -304,3 +304,7 @@
 .dialog-content::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+::ng-deep .mat-mdc-icon-button .mat-mdc-button-persistent-ripple {
+  position: absolute;
+}

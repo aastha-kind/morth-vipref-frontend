@@ -1,5 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { UploadInitiatorDocsComponent } from '../upload-initiator-docs/upload-initiator-docs.component';
 import { ScrollModeType } from 'ngx-extended-pdf-viewer';
@@ -20,7 +27,10 @@ import { DesignationList } from '../../interface/designation-list.model';
 import { UserList } from '../../interface/user-list.model';
 import { VipDesignationList } from '../../interface/vip-designation-list.model';
 import { State } from '../../interface/state.model';
-import { Action, ROLE_BASED_ACTION_OPTIONS } from '../../interface/action.model';
+import {
+  Action,
+  ROLE_BASED_ACTION_OPTIONS,
+} from '../../interface/action.model';
 import { VipReference } from '../dashboard/dashboard.component';
 import { forkJoin, take } from 'rxjs';
 import { ActionType } from '../../interface/action-type.model';
@@ -34,7 +44,7 @@ import { API_ENDPOINTS } from '../../utilities/api_endpoints';
   selector: 'app-initiator-form',
   standalone: false,
   templateUrl: './initiator-form.component.html',
-  styleUrl: './initiator-form.component.css'
+  styleUrl: './initiator-form.component.css',
 })
 export class InitiatorFormComponent {
   selectedTabIndex = 0;
@@ -55,7 +65,8 @@ export class InitiatorFormComponent {
   addVipReferenceDetails!: FormGroup;
   forwardReferenceForm!: FormGroup;
   selectedReferenceDetails: any;
-  refernceDetails: VipReferenceDetailsResponse = {} as VipReferenceDetailsResponse;
+  refernceDetails: VipReferenceDetailsResponse =
+    {} as VipReferenceDetailsResponse;
   draftReferenceId: number | null = null; // Track draft reference ID
   organizationsList: OrganizationList[] = [];
   officeTypeList: OfficeList[] = [];
@@ -69,7 +80,7 @@ export class InitiatorFormComponent {
   selectedAssigner: any = null; // Selected assigner
   allowedQueues: any[] = [];
   init: EditorComponent['init'] = {
-    plugins: 'lists link image table code help wordcount'
+    plugins: 'lists link image table code help wordcount',
   };
   allowedActions: any[] = [];
   actionTypeOptions: any[] = [];
@@ -96,7 +107,7 @@ export class InitiatorFormComponent {
     'comments',
     'targetUser',
     'targetUserName',
-    'timestamp'
+    'timestamp',
   ];
   savedDraftReplyCol: string[] = [
     'select',
@@ -106,8 +117,8 @@ export class InitiatorFormComponent {
     'editedAt',
     'fileName',
     'versionNumber',
-    'viewDraft'
-  ]
+    'viewDraft',
+  ];
 
   // Linked References properties
   linkedReferencesSearchForm!: FormGroup;
@@ -115,14 +126,28 @@ export class InitiatorFormComponent {
   linkedReferencesData = new MatTableDataSource<any>();
   searchResultsSelection = new SelectionModel<any>(true, []);
   linkedReferencesSelection = new SelectionModel<any>(true, []);
-  searchResultsColumns: string[] = ['select', 'referenceNo', 'subject', 'status'];
-  linkedReferencesColumns: string[] = ['select', 'referenceNo', 'subject', 'status'];
+  searchResultsColumns: string[] = [
+    'select',
+    'referenceNo',
+    'subject',
+    'status',
+  ];
+  linkedReferencesColumns: string[] = [
+    'select',
+    'referenceNo',
+    'subject',
+    'status',
+  ];
 
   documentList: any[] = [];
   selectedDocument: any;
   selectedDocumentDetails: any = null;
   showDocumentInfo: boolean = false;
-  pendingDocuments: Array<{file: File, documentType: string, comments: string}> = []; // For new references
+  pendingDocuments: Array<{
+    file: File;
+    documentType: string;
+    comments: string;
+  }> = []; // For new references
 
   // Knowledge Base properties
   knowledgeBaseForm!: FormGroup;
@@ -130,7 +155,15 @@ export class InitiatorFormComponent {
   knowledgeBaseDataSource = new MatTableDataSource<VipReference>();
   selectedKBReferences: VipReference[] = [];
   knowledgeBaseSearched: boolean = false;
-  knowledgeBaseColumns: string[] = ['select', 'requestNumber', 'nameOfDignitary', 'designation', 'state', 'subjectCategory', 'pending'];
+  knowledgeBaseColumns: string[] = [
+    'select',
+    'requestNumber',
+    'nameOfDignitary',
+    'designation',
+    'state',
+    'subjectCategory',
+    'pending',
+  ];
 
   ngOnInit() {
     this.getUserDetails();
@@ -194,7 +227,7 @@ export class InitiatorFormComponent {
             priority: res.priority || '',
             catgOfSubject: res.categoryOfSubject || '',
             subCatgOfSubject: res.subCategoryOfSubject || '',
-            subjectOrIssue: res.subject || ''
+            subjectOrIssue: res.subject || '',
           };
           console.log('Patching form with values:', formValues);
           this.addVipReferenceDetails.patchValue(formValues);
@@ -218,52 +251,61 @@ export class InitiatorFormComponent {
               this.selectedDocument = this.documentList[0].fileName;
               this.selectedDocumentDetails = this.documentList[0];
               // Load PDF preview if it's a PDF
-              if (this.documentList[0].filePath || this.documentList[0].dmsDocumentId) {
+              if (
+                this.documentList[0].filePath ||
+                this.documentList[0].dmsDocumentId
+              ) {
                 this.loadDocumentPreview(this.documentList[0]);
               }
             }
           }
 
-          this.toastr.info('Draft loaded. Continue editing and submit when ready.');
+          this.toastr.info(
+            'Draft loaded. Continue editing and submit when ready.',
+          );
         }
       },
       error: (err) => {
         this.ngxService.stop();
         console.error('Error loading draft:', err);
         this.toastr.error('Failed to load draft data');
-      }
+      },
     });
   }
 
   loadDocumentPreview(doc: any) {
     const token = sessionStorage.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
 
     // Check if document is stored in DMS
     if (doc.storageType === 'dms' && doc.dmsDocumentId) {
       const apiUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document-by-id`;
       const body = { documentId: doc.id, userId: 0 };
-      this.http.post(apiUrl, body, { responseType: 'blob', headers: headers }).subscribe({
-        next: (blob) => {
-          this.pdfSrc = URL.createObjectURL(blob);
-        },
-        error: (err) => {
-          console.error('Error loading DMS document preview:', err);
-        }
-      });
+      this.http
+        .post(apiUrl, body, { responseType: 'blob', headers: headers })
+        .subscribe({
+          next: (blob) => {
+            this.pdfSrc = URL.createObjectURL(blob);
+          },
+          error: (err) => {
+            console.error('Error loading DMS document preview:', err);
+          },
+        });
     } else {
       // Fallback: local file path
       const downloadUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document?filePath=${encodeURIComponent(doc.filePath)}`;
-      this.http.get(downloadUrl, { responseType: 'blob', headers: headers }).subscribe({
-        next: (blob) => {
-          this.pdfSrc = URL.createObjectURL(blob);
-        },
-        error: (err) => {
-          console.error('Error loading document preview:', err);
-        }
-      });
+      this.http
+        .get(downloadUrl, { responseType: 'blob', headers: headers })
+        .subscribe({
+          next: (blob) => {
+            this.pdfSrc = URL.createObjectURL(blob);
+          },
+          error: (err) => {
+            console.error('Error loading document preview:', err);
+          },
+        });
     }
   }
 
@@ -272,38 +314,40 @@ export class InitiatorFormComponent {
     if (!this.selectedReferenceDetails) {
       return;
     }
-    console.log(this.selectedReferenceDetails);
+
     this.allowedQueues.map((queue) => {
-      if (this.selectedReferenceDetails.currentQueue == "VIP_Initiator") {
+      if (this.selectedReferenceDetails.currentQueue == 'VIP_Initiator') {
         this.showReferencNo = false;
         this.addVipReferenceDetails.get('referenceNo')?.disable();
-      }
-      else if (this.selectedReferenceDetails.currentQueue == "VIP_Assigner") {
+      } else if (this.selectedReferenceDetails.currentQueue == 'VIP_Assigner') {
         this.initiateforwardReferenceForm();
         this.showReferencNo = true;
         this.addVipReferenceDetails.get('referenceNo')?.disable();
         this.addVipReferenceDetails.get('dateOfLetter')?.disable();
         this.addVipReferenceDetails.get('dateOfReceiving')?.disable();
         this.addVipReferenceDetails.get('state')?.disable();
-      }
-      else if (this.selectedReferenceDetails.currentQueue == "VIP_Assignee") {
+      } else if (this.selectedReferenceDetails.currentQueue == 'VIP_Assignee') {
+        this.initiateforwardReferenceForm();
+        this.showReferencNo = true;
+        this.addVipReferenceDetails.disable();
+      } else if (
+        this.selectedReferenceDetails.currentQueue == 'VIP_final_reply'
+      ) {
         this.initiateforwardReferenceForm();
         this.showReferencNo = true;
         this.addVipReferenceDetails.disable();
       }
-      else if (this.selectedReferenceDetails.currentQueue == "VIP_final_reply") {
-        this.initiateforwardReferenceForm();
-        this.showReferencNo = true;
-        this.addVipReferenceDetails.disable();
-      }
-    })
+    });
   }
 
   getUserDetails() {
-    const userData = sessionStorage.getItem("user");
+    const userData = sessionStorage.getItem('user');
     if (userData) {
       this.userDetails = JSON.parse(userData);
-      if (this.userDetails.roles[0].roleId !== undefined && this.userDetails.roles[0].roleId !== null) {
+      if (
+        this.userDetails.roles[0].roleId !== undefined &&
+        this.userDetails.roles[0].roleId !== null
+      ) {
         if (this.userDetails.roles[0].roleName !== 'Initiator') {
           this.userMgmtService.referenceDetails$.pipe(take(1)).subscribe({
             next: (res: any | null) => {
@@ -316,58 +360,60 @@ export class InitiatorFormComponent {
               }
             },
             error: (err: Error) => {
-              this.toastr.error("please enter valid details");
+              this.toastr.error('please enter valid details');
               this.ngxService.stop();
-            }
-          })
+            },
+          });
         }
         this.getUserQueues(this.userDetails);
       }
     }
-
-
   }
 
   getActionAllowed(userDetails: any) {
     this.ngxService.start();
     const userData = {
-      "loginId": userDetails.loginId,
-      "referenceId": this.selectedReferenceDetails?.referenceId
-    }
+      loginId: userDetails.loginId,
+      referenceId: this.selectedReferenceDetails?.referenceId,
+    };
     this.userMgmtService.getUserActionAllowed(userData).subscribe({
       next: (res) => {
         const actionTypes = res?.allowedActions;
         this.allowedActions = actionTypes;
-        const uniqueActionConfigs = Array.from(new Map(actionTypes.map((item: any) => [item.actionType, item])).values());
+        const uniqueActionConfigs = Array.from(
+          new Map(
+            actionTypes.map((item: any) => [item.actionType, item]),
+          ).values(),
+        );
         if (uniqueActionConfigs !== null && uniqueActionConfigs !== undefined) {
           this.actionTypeOptions = uniqueActionConfigs;
         }
-        this.ngxService.stop()
+        this.ngxService.stop();
       },
       error: (err: Error) => {
-        this.toastr.error("Error in getting user actions");
+        this.toastr.error('Error in getting user actions');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   getActionHistory(userDetails: any) {
     this.ngxService.start();
     const userData = {
-      "loginId": userDetails.loginId,
-      "referenceId": this.selectedReferenceDetails?.referenceId
-    }
+      loginId: userDetails.loginId,
+      referenceId: this.selectedReferenceDetails?.referenceId,
+    };
     this.userMgmtService.getActionHistory(userData).subscribe({
       next: (res) => {
         this.actionHistoryData.data = res?.history ? res?.history : [];
         console.log(res);
-        this.ngxService.stop()
+        this.ngxService.stop();
       },
       error: (err: Error) => {
-        this.toastr.error("Error in getting user actions");
+        this.toastr.error('Error in getting user actions');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   getUserQueues(userDetails: User) {
@@ -378,17 +424,29 @@ export class InitiatorFormComponent {
         this.allowedQueues = [];
         queues.forEach((queue: string) => {
           switch (queue) {
-            case "Initiator":
-              this.allowedQueues.push({ name: "VIP_Initiator", route: 'vip-initiator' });
+            case 'Initiator':
+              this.allowedQueues.push({
+                name: 'VIP_Initiator',
+                route: 'vip-initiator',
+              });
               break;
-            case "Assigner":
-              this.allowedQueues.push({ name: "VIP_Assigner", route: 'vip-assigner' });
+            case 'Assigner':
+              this.allowedQueues.push({
+                name: 'VIP_Assigner',
+                route: 'vip-assigner',
+              });
               break;
-            case "Assignee":
-              this.allowedQueues.push({ name: "VIP_Assignee", route: 'vip-assignee' });
+            case 'Assignee':
+              this.allowedQueues.push({
+                name: 'VIP_Assignee',
+                route: 'vip-assignee',
+              });
               break;
-            case "Final_Reply":
-              this.allowedQueues.push({ name: "VIP_Final_Reply", route: 'vip-final-reply' });
+            case 'Final_Reply':
+              this.allowedQueues.push({
+                name: 'VIP_Final_Reply',
+                route: 'vip-final-reply',
+              });
               break;
           }
         });
@@ -396,66 +454,95 @@ export class InitiatorFormComponent {
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("No references found for this user");
+        this.toastr.error('No references found for this user');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   initiateReferenceForm() {
     this.addVipReferenceDetails = new FormGroup({
-      "referenceNo": new FormControl(""),
-      "toLoginId": new FormControl(""),
-      "dateOfLetter": new FormControl("", [Validators.required, this.noFutureDateValidator.bind(this)]),
-      "dateOfReceiving": new FormControl("", [Validators.required, this.noFutureDateValidator.bind(this)]),
-      "dateOfEntry": new FormControl({ value: new Date(), disabled: true }, Validators.required),
-      "nameOfDiginitary": new FormControl("", Validators.required),
-      "emailId": new FormControl(""),
-      "designation": new FormControl("", Validators.required),
-      "state": new FormControl("", Validators.required),
-      "constituency": new FormControl(""),
-      "priority": new FormControl(""),
-      "catgOfSubject": new FormControl("", Validators.required),
-      "subCatgOfSubject": new FormControl("", Validators.required),
-      "subjectOrIssue": new FormControl("", Validators.required),
-      "uploadDocument": new FormGroup({
-        "file": new FormControl("", Validators.required),
-        "documentType": new FormControl(""),
-        "comments": new FormControl("")
-      })
+      referenceNo: new FormControl(''),
+      toLoginId: new FormControl(''),
+      dateOfLetter: new FormControl('', [
+        Validators.required,
+        this.noFutureDateValidator.bind(this),
+      ]),
+      dateOfReceiving: new FormControl('', [
+        Validators.required,
+        this.noFutureDateValidator.bind(this),
+      ]),
+      dateOfEntry: new FormControl(
+        { value: new Date(), disabled: true },
+        Validators.required,
+      ),
+      nameOfDiginitary: new FormControl('', Validators.required),
+      emailId: new FormControl(''),
+      designation: new FormControl('', Validators.required),
+      state: new FormControl('', Validators.required),
+      constituency: new FormControl(''),
+      priority: new FormControl(''),
+      catgOfSubject: new FormControl('', Validators.required),
+      subCatgOfSubject: new FormControl('', Validators.required),
+      subjectOrIssue: new FormControl('', Validators.required),
+      uploadDocument: new FormGroup({
+        file: new FormControl(''),
+        documentType: new FormControl(''),
+        comments: new FormControl(''),
+      }),
     });
 
     // Update minDateOfReceiving when dateOfLetter changes
-    this.addVipReferenceDetails.get('dateOfLetter')?.valueChanges.subscribe((value) => {
-      if (value) {
-        this.minDateOfReceiving = new Date(value);
-        // If current dateOfReceiving is before the new minDate, clear it
-        const currentReceivingDate = this.addVipReferenceDetails.get('dateOfReceiving')?.value;
-        if (currentReceivingDate) {
-          const receivingDate = new Date(currentReceivingDate);
-          if (receivingDate < this.minDateOfReceiving) {
-            this.addVipReferenceDetails.get('dateOfReceiving')?.setValue(null);
+    this.addVipReferenceDetails
+      .get('dateOfLetter')
+      ?.valueChanges.subscribe((value) => {
+        if (value) {
+          this.minDateOfReceiving = new Date(value);
+          // If current dateOfReceiving is before the new minDate, clear it
+          const currentReceivingDate =
+            this.addVipReferenceDetails.get('dateOfReceiving')?.value;
+          if (currentReceivingDate) {
+            const receivingDate = new Date(currentReceivingDate);
+            if (receivingDate < this.minDateOfReceiving) {
+              this.addVipReferenceDetails
+                .get('dateOfReceiving')
+                ?.setValue(null);
+            }
           }
+        } else {
+          this.minDateOfReceiving = null;
         }
-      } else {
-        this.minDateOfReceiving = null;
-      }
-    });
+      });
   }
 
   initiateforwardReferenceForm() {
     this.forwardReferenceForm = new FormGroup({
-      "routingType": new FormControl(""),
-      "actionType": new FormControl("", Validators.required),
-      "action": new FormControl({ value: "", disabled: true }, Validators.required),
-      "replyType": new FormControl({ value: "", disabled: true }),
-      "assigneeOrganization": new FormControl({ value: "", disabled: true }, Validators.required),
-      "assigneeOffice": new FormControl({ value: "", disabled: true }, Validators.required),
-      "assigneeDesignation": new FormControl({ value: "", disabled: true }, Validators.required),
-      "assigneeName": new FormControl({ value: "", disabled: true }, Validators.required),
-      "assignerComment": new FormControl({ value: "", disabled: true }),
-      "actionConfigId": new FormControl(null)
-    })
+      routingType: new FormControl(''),
+      actionType: new FormControl('', Validators.required),
+      action: new FormControl(
+        { value: '', disabled: true },
+        Validators.required,
+      ),
+      replyType: new FormControl({ value: '', disabled: true }),
+      assigneeOrganization: new FormControl(
+        { value: '', disabled: true },
+        Validators.required,
+      ),
+      assigneeOffice: new FormControl(
+        { value: '', disabled: true },
+        Validators.required,
+      ),
+      assigneeDesignation: new FormControl(
+        { value: '', disabled: true },
+        Validators.required,
+      ),
+      assigneeName: new FormControl(
+        { value: '', disabled: true },
+        Validators.required,
+      ),
+      assignerComment: new FormControl({ value: '', disabled: true }),
+      actionConfigId: new FormControl(null),
+    });
   }
 
   onDocumentSelect(event: any) {
@@ -472,7 +559,9 @@ export class InitiatorFormComponent {
     }
 
     // Handle existing documents (for saved references)
-    const selectedDoc = this.documentList.find(doc => doc.fileName === selectedValue);
+    const selectedDoc = this.documentList.find(
+      (doc) => doc.fileName === selectedValue,
+    );
 
     if (selectedDoc && selectedDoc.filePath) {
       this.loadDocument(selectedDoc);
@@ -482,7 +571,10 @@ export class InitiatorFormComponent {
     }
   }
 
-  loadPendingDocument(doc: {file: File, documentType: string, comments: string}, index: number) {
+  loadPendingDocument(
+    doc: { file: File; documentType: string; comments: string },
+    index: number,
+  ) {
     // Store selected pending document details
     this.selectedDocumentDetails = {
       fileOriginalName: doc.file.name,
@@ -490,7 +582,7 @@ export class InitiatorFormComponent {
       documentType: doc.documentType,
       comments: doc.comments,
       createdBy: this.userDetails?.name || 'Current User',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     // Load the file for preview
@@ -528,7 +620,7 @@ export class InitiatorFormComponent {
 
     // Create headers with JWT token
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     });
 
     // Check if document is stored in DMS
@@ -537,12 +629,44 @@ export class InitiatorFormComponent {
       const apiUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document-by-id`;
       const body = { documentId: selectedDoc.id, userId: 0 };
       console.log('Loading from DMS:', apiUrl, body);
-      this.http.post(apiUrl, body, { responseType: 'blob', headers: headers }).subscribe({
+      this.http
+        .post(apiUrl, body, { responseType: 'blob', headers: headers })
+        .subscribe({
+          next: (blob: Blob) => {
+            if (blob && blob.size > 0) {
+              this.pdfSrc = blob;
+              this.selectedDocument = selectedDoc.fileName;
+              console.log('Document loaded from DMS:', selectedDoc.fileName);
+            } else {
+              this.pdfSrc = undefined;
+              this.selectedDocumentDetails = null;
+              this.toastr.warning('Document is empty or invalid');
+            }
+            this.ngxService.stop();
+          },
+          error: (err) => {
+            this.ngxService.stop();
+            console.error('DMS Document load error:', err);
+            this.pdfSrc = undefined;
+            this.selectedDocumentDetails = null;
+            this.toastr.error('Failed to load document from DMS');
+          },
+        });
+      return;
+    }
+
+    // Fallback: Use local file path endpoint (GET)
+    const apiUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document?filePath=${encodeURIComponent(selectedDoc.filePath)}`;
+    console.log('Loading from local:', apiUrl);
+    // Fetch the document as a Blob with explicit headers
+    this.http
+      .get(apiUrl, { responseType: 'blob', headers: headers })
+      .subscribe({
         next: (blob: Blob) => {
           if (blob && blob.size > 0) {
             this.pdfSrc = blob;
             this.selectedDocument = selectedDoc.fileName;
-            console.log('Document loaded from DMS:', selectedDoc.fileName);
+            console.log('Document loaded from backend:', selectedDoc.fileName);
           } else {
             this.pdfSrc = undefined;
             this.selectedDocumentDetails = null;
@@ -552,54 +676,31 @@ export class InitiatorFormComponent {
         },
         error: (err) => {
           this.ngxService.stop();
-          console.error('DMS Document load error:', err);
+          console.error('Document load error:', err);
+          console.error('Failed to load document:', selectedDoc?.fileName);
+          console.error('Document path:', selectedDoc?.filePath);
           this.pdfSrc = undefined;
           this.selectedDocumentDetails = null;
-          this.toastr.error('Failed to load document from DMS');
-        }
+
+          if (err.status === 401) {
+            this.toastr.error('Unauthorized. Please login again.');
+          } else if (err.status === 404) {
+            // Parse error message if available
+            const errorMsg =
+              err.error?.message ||
+              err.message ||
+              'Document not found on server';
+            this.toastr.error(
+              `Document not found: ${selectedDoc?.fileName || 'Unknown file'}`,
+            );
+            console.error('404 Error details:', errorMsg);
+          } else if (err.status === 403) {
+            this.toastr.error('Access denied to this document');
+          } else {
+            this.toastr.error('Error loading document. Please try again.');
+          }
+        },
       });
-      return;
-    }
-
-    // Fallback: Use local file path endpoint (GET)
-    const apiUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document?filePath=${encodeURIComponent(selectedDoc.filePath)}`;
-    console.log('Loading from local:', apiUrl);
-    // Fetch the document as a Blob with explicit headers
-    this.http.get(apiUrl, { responseType: 'blob', headers: headers }).subscribe({
-      next: (blob: Blob) => {
-        if (blob && blob.size > 0) {
-          this.pdfSrc = blob;
-          this.selectedDocument = selectedDoc.fileName;
-          console.log('Document loaded from backend:', selectedDoc.fileName);
-        } else {
-          this.pdfSrc = undefined;
-          this.selectedDocumentDetails = null;
-          this.toastr.warning('Document is empty or invalid');
-        }
-        this.ngxService.stop();
-      },
-      error: (err) => {
-        this.ngxService.stop();
-        console.error('Document load error:', err);
-        console.error('Failed to load document:', selectedDoc?.fileName);
-        console.error('Document path:', selectedDoc?.filePath);
-        this.pdfSrc = undefined;
-        this.selectedDocumentDetails = null;
-
-        if (err.status === 401) {
-          this.toastr.error('Unauthorized. Please login again.');
-        } else if (err.status === 404) {
-          // Parse error message if available
-          const errorMsg = err.error?.message || err.message || 'Document not found on server';
-          this.toastr.error(`Document not found: ${selectedDoc?.fileName || 'Unknown file'}`);
-          console.error('404 Error details:', errorMsg);
-        } else if (err.status === 403) {
-          this.toastr.error('Access denied to this document');
-        } else {
-          this.toastr.error('Error loading document. Please try again.');
-        }
-      }
-    });
   }
 
   loadFirstDocument() {
@@ -615,12 +716,11 @@ export class InitiatorFormComponent {
   }
 
   openDialog() {
-
     const dialogRef = this.dialog.open(UploadInitiatorDocsComponent, {
       data: this.refernceDetails,
       disableClose: false,
       width: '800px',
-      maxHeight: '90vh'
+      maxHeight: '90vh',
     });
 
     dialogRef.afterClosed().subscribe((formGroupDts) => {
@@ -629,20 +729,27 @@ export class InitiatorFormComponent {
         return;
       }
 
-      const uploadGroup = this.addVipReferenceDetails.get('uploadDocument') as FormGroup;
+      const uploadGroup = this.addVipReferenceDetails.get(
+        'uploadDocument',
+      ) as FormGroup;
       uploadGroup.get('file')?.setValue(formGroupDts.selectFile);
       uploadGroup.get('comments')?.setValue(formGroupDts.comments);
       uploadGroup.get('documentType')?.setValue(formGroupDts.documentType);
 
       // If reference exists, refresh the document list from backend
-      if (this.refernceDetails.referenceId !== null && this.refernceDetails.referenceId !== undefined) {
+      if (
+        this.refernceDetails.referenceId !== null &&
+        this.refernceDetails.referenceId !== undefined
+      ) {
         // Refresh reference details to get updated document list
         this.getReferenceDetails();
 
         // Show success message and option to upload more
         if (formGroupDts.uploaded) {
           setTimeout(() => {
-            const uploadMore = confirm('Document uploaded successfully! Do you want to upload another document?');
+            const uploadMore = confirm(
+              'Document uploaded successfully! Do you want to upload another document?',
+            );
             if (uploadMore) {
               this.openDialog(); // Reopen dialog for next upload
             }
@@ -655,7 +762,7 @@ export class InitiatorFormComponent {
           this.pendingDocuments.push({
             file: formGroupDts.selectFile,
             documentType: formGroupDts.documentType,
-            comments: formGroupDts.comments
+            comments: formGroupDts.comments,
           });
 
           const currentIndex = this.pendingDocuments.length - 1;
@@ -667,7 +774,7 @@ export class InitiatorFormComponent {
             documentType: formGroupDts.documentType,
             comments: formGroupDts.comments,
             createdBy: this.userDetails?.name || 'Current User',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           };
 
           // Set selected document for dropdown
@@ -693,17 +800,29 @@ export class InitiatorFormComponent {
         }
       }
     });
-
   }
 
-
-
   addVipReferencDetails() {
+    const uploadGroup = this.addVipReferenceDetails.get(
+      'uploadDocument',
+    ) as FormGroup;
+    const fileControl = uploadGroup.get('file');
+    const file = fileControl?.value;
+
+    // If editing draft and document already exists → remove required
+    if (this.documentList?.length > 0) {
+      fileControl?.clearValidators();
+    } else {
+      fileControl?.setValidators(Validators.required);
+    }
+
+    fileControl?.updateValueAndValidity();
+
     if (this.addVipReferenceDetails.invalid) {
       this.addVipReferenceDetails.markAllAsTouched();
       // Collect invalid fields
       const invalidFields: string[] = [];
-      Object.keys(this.addVipReferenceDetails.controls).forEach(key => {
+      Object.keys(this.addVipReferenceDetails.controls).forEach((key) => {
         const control = this.addVipReferenceDetails.get(key);
         if (control && control.invalid) {
           invalidFields.push(key); // or map to friendly field names if needed
@@ -716,9 +835,11 @@ export class InitiatorFormComponent {
     }
 
     // Validate assigner selection (only for new references, not when editing existing ones)
-    const isEditingExistingReference = this.refernceDetails?.referenceId || this.activateRoute.snapshot.params['referenceNo'];
+    const isEditingExistingReference =
+      this.refernceDetails?.referenceId ||
+      this.activateRoute.snapshot.params['referenceNo'];
     if (!this.selectedAssigner && !isEditingExistingReference) {
-      this.toastr.error("Please select an Assigner");
+      this.toastr.error('Please select an Assigner');
       return;
     }
 
@@ -726,54 +847,73 @@ export class InitiatorFormComponent {
     const vipReferenceDetails = this.addVipReferenceDetails.getRawValue();
 
     // Append normal fields
-    formData.append("fromLoginId", this.userDetails.loginId);
+    formData.append('fromLoginId', this.userDetails.loginId);
     // Use selected assigner if available, otherwise use existing reference's toLoginId or form value
-    const toLoginId = this.selectedAssigner?.loginId || vipReferenceDetails.toLoginId || this.refernceDetails?.toLoginId;
-    formData.append("toLoginId", toLoginId);
-    formData.append("fromRoleId", JSON.stringify(this.userDetails.roles[0].roleId));
-    formData.append("toRoleId", "2");
-    formData.append("dateOfLetter", this.formatDateToIso(vipReferenceDetails.dateOfLetter));
-    formData.append("dateOfReceiving", this.formatDateToIso(vipReferenceDetails.dateOfReceiving));
-    formData.append("dateOfEntry", this.formatDateToIso(vipReferenceDetails.dateOfEntry));
-    formData.append("nameOfDignitary", vipReferenceDetails.nameOfDiginitary);
-    formData.append("emailId", vipReferenceDetails.emailId);
-    formData.append("designation", vipReferenceDetails.designation);
-    formData.append("state", vipReferenceDetails.state);
-    formData.append("constituency", vipReferenceDetails.constituency);
-    formData.append("priority", vipReferenceDetails.priority);
-    formData.append("categoryOfSubject", vipReferenceDetails.catgOfSubject);
-    formData.append("subCategoryOfSubject", vipReferenceDetails.subCatgOfSubject);
-    formData.append("subject", vipReferenceDetails.subjectOrIssue);
-    formData.append("createdBy", this.userDetails.name);
-    formData.append("createdAt", this.formatDateToIso(this.createdDate));
-    formData.append("isDraft", "false");
-    formData.append("actionConfigId", "1");
+    const toLoginId =
+      this.selectedAssigner?.loginId ||
+      vipReferenceDetails.toLoginId ||
+      this.refernceDetails?.toLoginId;
+    formData.append('toLoginId', toLoginId);
+    formData.append(
+      'fromRoleId',
+      JSON.stringify(this.userDetails.roles[0].roleId),
+    );
+    formData.append('toRoleId', '2');
+    formData.append(
+      'dateOfLetter',
+      this.formatDateToIso(vipReferenceDetails.dateOfLetter),
+    );
+    formData.append(
+      'dateOfReceiving',
+      this.formatDateToIso(vipReferenceDetails.dateOfReceiving),
+    );
+    formData.append(
+      'dateOfEntry',
+      this.formatDateToIso(vipReferenceDetails.dateOfEntry),
+    );
+    formData.append('nameOfDignitary', vipReferenceDetails.nameOfDiginitary);
+    formData.append('emailId', vipReferenceDetails.emailId);
+    formData.append('designation', vipReferenceDetails.designation);
+    formData.append('state', vipReferenceDetails.state);
+    formData.append('constituency', vipReferenceDetails.constituency);
+    formData.append('priority', vipReferenceDetails.priority);
+    formData.append('categoryOfSubject', vipReferenceDetails.catgOfSubject);
+    formData.append(
+      'subCategoryOfSubject',
+      vipReferenceDetails.subCatgOfSubject,
+    );
+    formData.append('subject', vipReferenceDetails.subjectOrIssue);
+    formData.append('createdBy', this.userDetails.name);
+    formData.append('createdAt', this.formatDateToIso(this.createdDate));
+    formData.append('isDraft', 'false');
+    formData.append('actionConfigId', '1');
 
     // If submitting an existing draft, include the reference ID
     if (this.draftReferenceId) {
-      formData.append("vipReferenceId", this.draftReferenceId.toString());
+      formData.append('vipReferenceId', this.draftReferenceId.toString());
     }
-
 
     // Append uploaded files - handle both pending documents and single file upload
     if (this.pendingDocuments.length > 0) {
       // Upload all pending documents for new references
-      this.pendingDocuments.forEach(doc => {
-        formData.append("files", doc.file);
-        formData.append("documentTypes", doc.documentType);
-        formData.append("comments", doc.comments || '');
+      this.pendingDocuments.forEach((doc) => {
+        formData.append('files', doc.file);
+        formData.append('documentTypes', doc.documentType);
+        formData.append('comments', doc.comments || '');
       });
     } else {
       // Fallback to single file from uploadDocument form group
-      const uploadGroup = this.addVipReferenceDetails.get('uploadDocument') as FormGroup;
+      const uploadGroup = this.addVipReferenceDetails.get(
+        'uploadDocument',
+      ) as FormGroup;
       const file = uploadGroup.get('file')?.value;
       const documentType = uploadGroup.get('documentType')?.value;
       const comments = uploadGroup.get('comments')?.value;
 
       if (file) {
-        formData.append("files", file); // Backend expects 'files' list
-        formData.append("documentTypes", documentType);
-        formData.append("comments", comments);
+        formData.append('files', file); // Backend expects 'files' list
+        formData.append('documentTypes', documentType);
+        formData.append('comments', comments);
       }
     }
 
@@ -781,17 +921,19 @@ export class InitiatorFormComponent {
       next: (res: any) => {
         this.router.navigate(['/dashboard/vip-initiator']);
         const docCount = this.pendingDocuments.length || 1;
-        this.toastr.success(`Reference ID ${res.referenceId} submitted successfully with ${docCount} document(s)!`);
+        this.toastr.success(
+          `Reference ID ${res.referenceId} submitted successfully with documents!`,
+        );
         this.resetAddReferenceForm();
         this.pendingDocuments = []; // Clear pending documents
         this.draftReferenceId = null; // Clear draft ID after successful submission
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("please enter valid details");
+        this.toastr.error('please enter valid details');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   saveVipReferenceDetails() {
@@ -799,38 +941,56 @@ export class InitiatorFormComponent {
     const formData = new FormData();
 
     // Append normal fields
-    formData.append("fromLoginId", this.userDetails.loginId);
+    formData.append('fromLoginId', this.userDetails.loginId);
     // Use selected assigner if available, otherwise use default
-    formData.append("toLoginId", this.selectedAssigner?.loginId || "GauravPrasad");
-    formData.append("fromRoleId", JSON.stringify(this.userDetails.roles[0].roleId));
-    formData.append("toRoleId", "2");
-    formData.append("dateOfLetter", this.formatDateToIso(vipReferenceDetails.dateOfLetter));
-    formData.append("dateOfReceiving", this.formatDateToIso(vipReferenceDetails.dateOfReceiving));
-    formData.append("dateOfEntry", this.formatDateToIso(vipReferenceDetails.dateOfEntry));
-    formData.append("nameOfDignitary", vipReferenceDetails.nameOfDiginitary);
-    formData.append("emailId", vipReferenceDetails.emailId);
-    formData.append("designation", vipReferenceDetails.designation);
-    formData.append("state", vipReferenceDetails.state);
-    formData.append("constituency", vipReferenceDetails.constituency);
-    formData.append("priority", vipReferenceDetails.priority);
-    formData.append("categoryOfSubject", vipReferenceDetails.catgOfSubject);
-    formData.append("subCategoryOfSubject", vipReferenceDetails.subCatgOfSubject);
-    formData.append("subject", vipReferenceDetails.subjectOrIssue);
-    formData.append("createdBy", this.userDetails.name);
-    formData.append("createdAt", this.formatDateToIso(this.createdDate));
-    formData.append("isDraft", "true");
+    formData.append(
+      'toLoginId',
+      this.selectedAssigner?.loginId || 'GauravPrasad',
+    );
+    formData.append(
+      'fromRoleId',
+      JSON.stringify(this.userDetails.roles[0].roleId),
+    );
+    formData.append('toRoleId', '2');
+    formData.append(
+      'dateOfLetter',
+      this.formatDateToIso(vipReferenceDetails.dateOfLetter),
+    );
+    formData.append(
+      'dateOfReceiving',
+      this.formatDateToIso(vipReferenceDetails.dateOfReceiving),
+    );
+    formData.append(
+      'dateOfEntry',
+      this.formatDateToIso(vipReferenceDetails.dateOfEntry),
+    );
+    formData.append('nameOfDignitary', vipReferenceDetails.nameOfDiginitary);
+    formData.append('emailId', vipReferenceDetails.emailId);
+    formData.append('designation', vipReferenceDetails.designation);
+    formData.append('state', vipReferenceDetails.state);
+    formData.append('constituency', vipReferenceDetails.constituency);
+    formData.append('priority', vipReferenceDetails.priority);
+    formData.append('categoryOfSubject', vipReferenceDetails.catgOfSubject);
+    formData.append(
+      'subCategoryOfSubject',
+      vipReferenceDetails.subCatgOfSubject,
+    );
+    formData.append('subject', vipReferenceDetails.subjectOrIssue);
+    formData.append('createdBy', this.userDetails.name);
+    formData.append('createdAt', this.formatDateToIso(this.createdDate));
+    formData.append('isDraft', 'true');
 
     // If updating an existing draft, include the reference ID
     if (this.draftReferenceId) {
-      formData.append("vipReferenceId", this.draftReferenceId.toString());
+      formData.append('vipReferenceId', this.draftReferenceId.toString());
     }
 
     // Append pending documents for draft
     if (this.pendingDocuments.length > 0) {
-      this.pendingDocuments.forEach(doc => {
-        formData.append("files", doc.file);
-        formData.append("documentTypes", doc.documentType || "");
-        formData.append("comments", doc.comments || "");
+      this.pendingDocuments.forEach((doc) => {
+        formData.append('files', doc.file);
+        formData.append('documentTypes', doc.documentType || '');
+        formData.append('comments', doc.comments || '');
       });
     }
 
@@ -839,19 +999,20 @@ export class InitiatorFormComponent {
         if (res && res.referenceId) {
           // Store the draft reference ID for future updates
           this.draftReferenceId = res.referenceId;
-          this.toastr.success(`Draft Reference ID ${res.referenceId} saved successfully!`);
+          this.toastr.success(
+            `Draft Reference ID ${res.referenceId} saved successfully!`,
+          );
         } else {
-          this.toastr.success("Reference saved successfully");
+          this.toastr.success('Reference saved successfully');
         }
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("please enter valid details");
+        this.toastr.error('please enter valid details');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
-
 
   formatDateToIso(date: any): string {
     const d = new Date(date);
@@ -880,27 +1041,28 @@ export class InitiatorFormComponent {
 
   resetAddReferenceForm() {
     this.addVipReferenceDetails.reset();
-    this.pdfSrc = "";
+    this.pdfSrc = '';
   }
-
 
   getReferenceDetails() {
     this.ngxService.start();
-    this.userMgmtService.getReferenceDetails(this.selectedReferenceDetails.referenceNo).subscribe({
-      next: (res: VipReferenceDetailsResponse) => {
-        this.refernceDetails = res;
-        this.documentList = res.documents ? res.documents : [];
-        console.log('Document list received:', this.documentList);
-        console.log('Total documents:', this.documentList.length);
-        this.setReferenceDetails();
-        this.loadFirstDocument();
-        this.ngxService.stop();
-      },
-      error: (err) => {
-        this.toastr.error("Error in getting reference details");
-        this.ngxService.stop();
-      }
-    })
+    this.userMgmtService
+      .getReferenceDetails(this.selectedReferenceDetails.referenceNo)
+      .subscribe({
+        next: (res: VipReferenceDetailsResponse) => {
+          this.refernceDetails = res;
+          this.documentList = res.documents ? res.documents : [];
+          console.log('Document list received:', this.documentList);
+          console.log('Total documents:', this.documentList.length);
+          this.setReferenceDetails();
+          this.loadFirstDocument();
+          this.ngxService.stop();
+        },
+        error: (err) => {
+          this.toastr.error('Error in getting reference details');
+          this.ngxService.stop();
+        },
+      });
   }
 
   loadReferenceByNumber(referenceNo: string) {
@@ -917,7 +1079,7 @@ export class InitiatorFormComponent {
         // Populate selectedAssigner if toLoginId is available
         if (res.toLoginId && this.activeAssignersList.length > 0) {
           this.selectedAssigner = this.activeAssignersList.find(
-            assigner => assigner.loginId === res.toLoginId
+            (assigner) => assigner.loginId === res.toLoginId,
           );
         }
 
@@ -927,11 +1089,11 @@ export class InitiatorFormComponent {
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("Error loading reference details");
+        this.toastr.error('Error loading reference details');
         this.router.navigate(['/dashboard/vip-initiator']);
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   setReferenceDetails() {
@@ -942,7 +1104,9 @@ export class InitiatorFormComponent {
       const isNumeric = !isNaN(Number(categoryId));
       if (!isNumeric) {
         const matchedCategory = this.categoryList.find(
-          cat => cat.categoryDescription === categoryId || cat.categoryName === categoryId
+          (cat) =>
+            cat.categoryDescription === categoryId ||
+            cat.categoryName === categoryId,
         );
         if (matchedCategory) {
           categoryId = matchedCategory.categoryId.toString();
@@ -963,7 +1127,7 @@ export class InitiatorFormComponent {
       priority: this.refernceDetails.priority,
       catgOfSubject: categoryId,
       subCatgOfSubject: this.refernceDetails.subCategoryOfSubject,
-      subjectOrIssue: this.refernceDetails.subject
+      subjectOrIssue: this.refernceDetails.subject,
     });
 
     // Load subcategories if category is already selected (only if it's a valid number)
@@ -972,11 +1136,14 @@ export class InitiatorFormComponent {
     }
 
     // Populate the file and document details
-    if (this.refernceDetails.documents && this.refernceDetails.documents.length > 0) {
+    if (
+      this.refernceDetails.documents &&
+      this.refernceDetails.documents.length > 0
+    ) {
       this.addVipReferenceDetails.get('uploadDocument')?.patchValue({
         file: this.refernceDetails.documents[0].fileName, // Assuming you're uploading only one file
         documentType: this.refernceDetails.documents[0].documentType,
-        comments: this.refernceDetails.documents[0].comments
+        comments: this.refernceDetails.documents[0].comments,
       });
 
       // Document loading is handled by loadFirstDocument() method called after setReferenceDetails()
@@ -993,8 +1160,8 @@ export class InitiatorFormComponent {
       },
       error: (err) => {
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   getStateList() {
@@ -1006,8 +1173,8 @@ export class InitiatorFormComponent {
       },
       error: (err) => {
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   getActiveAssigners() {
@@ -1020,10 +1187,10 @@ export class InitiatorFormComponent {
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("Error loading assigners");
+        this.toastr.error('Error loading assigners');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   /**
@@ -1055,23 +1222,31 @@ export class InitiatorFormComponent {
     // If user has an office type, try to find matching assigner
     if (userOfficeType) {
       const matchingAssigner = this.activeAssignersList.find(
-        (assigner: any) => assigner.officeType === userOfficeType
+        (assigner: any) => assigner.officeType === userOfficeType,
       );
 
       if (matchingAssigner) {
         this.selectedAssigner = matchingAssigner;
-        console.log('Auto-selected assigner by office type:', this.selectedAssigner);
+        console.log(
+          'Auto-selected assigner by office type:',
+          this.selectedAssigner,
+        );
         return;
       }
     }
 
     // If no match by office type but all assigners have the same office type, select the first one
     const uniqueOfficeTypes = new Set(
-      this.activeAssignersList.map((a: any) => a.officeType).filter((t: any) => t)
+      this.activeAssignersList
+        .map((a: any) => a.officeType)
+        .filter((t: any) => t),
     );
     if (uniqueOfficeTypes.size <= 1) {
       this.selectedAssigner = this.activeAssignersList[0];
-      console.log('Auto-selected first assigner (all same office type):', this.selectedAssigner);
+      console.log(
+        'Auto-selected first assigner (all same office type):',
+        this.selectedAssigner,
+      );
     }
   }
 
@@ -1082,16 +1257,23 @@ export class InitiatorFormComponent {
         this.categoryList = response;
 
         // If reference details are already loaded, re-apply category value
-        if (this.refernceDetails?.categoryOfSubject && this.categoryList.length > 0) {
+        if (
+          this.refernceDetails?.categoryOfSubject &&
+          this.categoryList.length > 0
+        ) {
           let categoryId = this.refernceDetails.categoryOfSubject;
           const isNumeric = !isNaN(Number(categoryId));
           if (!isNumeric) {
             const matchedCategory = this.categoryList.find(
-              (cat: any) => cat.categoryDescription === categoryId || cat.categoryName === categoryId
+              (cat: any) =>
+                cat.categoryDescription === categoryId ||
+                cat.categoryName === categoryId,
             );
             if (matchedCategory) {
               categoryId = matchedCategory.categoryId.toString();
-              this.addVipReferenceDetails.patchValue({ catgOfSubject: categoryId });
+              this.addVipReferenceDetails.patchValue({
+                catgOfSubject: categoryId,
+              });
               // Also load subcategories
               this.getSubCategoryList(Number(categoryId));
             }
@@ -1101,10 +1283,10 @@ export class InitiatorFormComponent {
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("Error loading categories");
+        this.toastr.error('Error loading categories');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   onCategoryChange(event: any) {
@@ -1114,7 +1296,11 @@ export class InitiatorFormComponent {
     this.addVipReferenceDetails.get('subCatgOfSubject')?.setValue('');
     this.subCategoryList = [];
 
-    if (selectedCategoryId !== null && selectedCategoryId !== undefined && selectedCategoryId !== '') {
+    if (
+      selectedCategoryId !== null &&
+      selectedCategoryId !== undefined &&
+      selectedCategoryId !== ''
+    ) {
       this.getSubCategoryList(Number(selectedCategoryId));
     }
   }
@@ -1127,44 +1313,48 @@ export class InitiatorFormComponent {
 
         // Auto-select subcategory if it has value "NA" (category has no subcategory)
         const naSubCategory = this.subCategoryList.find(
-          (subCat: any) => subCat.subCatName === 'NA' || subCat.subCategoryName === 'NA'
+          (subCat: any) =>
+            subCat.subCatName === 'NA' || subCat.subCategoryName === 'NA',
         );
         if (naSubCategory) {
           this.addVipReferenceDetails.patchValue({
-            subCatgOfSubject: naSubCategory.subCatId.toString()
+            subCatgOfSubject: naSubCategory.subCatId.toString(),
           });
           this.ngxService.stop();
           return;
         }
 
         // After loading subcategories, set the subcategory value if available
-        if (this.refernceDetails?.subCategoryOfSubject && this.subCategoryList.length > 0) {
+        if (
+          this.refernceDetails?.subCategoryOfSubject &&
+          this.subCategoryList.length > 0
+        ) {
           let subCategoryId = this.refernceDetails.subCategoryOfSubject;
           const isNumeric = !isNaN(Number(subCategoryId));
           if (!isNumeric) {
             // Find subcategory ID from name
             const matchedSubCategory = this.subCategoryList.find(
-              (subCat: any) => subCat.subCatName === subCategoryId || subCat.subCategoryName === subCategoryId
+              (subCat: any) =>
+                subCat.subCatName === subCategoryId ||
+                subCat.subCategoryName === subCategoryId,
             );
             if (matchedSubCategory) {
               subCategoryId = matchedSubCategory.subCatId.toString();
             }
           }
           this.addVipReferenceDetails.patchValue({
-            subCatgOfSubject: subCategoryId
+            subCatgOfSubject: subCategoryId,
           });
         }
 
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("Error loading subcategories");
+        this.toastr.error('Error loading subcategories');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
-
-
 
   openEditor() {
     const dialogRef = this.dialog.open(ReplyEditorComponent, {
@@ -1173,14 +1363,14 @@ export class InitiatorFormComponent {
       height: '80vh',
       maxHeight: '90vh',
       panelClass: 'reply-dialog',
-      data: this.refernceDetails
+      data: this.refernceDetails,
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result?.data?.message == "Draft saved successfully") {
+      if (result?.data?.message == 'Draft saved successfully') {
         this.selectedTabIndex = 1;
         this.getAllDraftReply(this.refernceDetails?.referenceId);
-        this.toastr.success("Draft reply saved successfully!");
+        this.toastr.success('Draft reply saved successfully!');
       }
     });
   }
@@ -1192,7 +1382,7 @@ export class InitiatorFormComponent {
       height: '65vh',
       maxHeight: '90vh',
       panelClass: 'reply-dialog',
-      data: element
+      data: element,
     });
   }
 
@@ -1205,38 +1395,43 @@ export class InitiatorFormComponent {
       },
       error: (err) => {
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
-
   onActionTypeChange() {
-    this.forwardReferenceForm.get('action')?.setValue("");
+    this.forwardReferenceForm.get('action')?.setValue('');
     const referenceId = this.refernceDetails?.referenceId;
-    const selectedActionType = this.forwardReferenceForm.get('actionType')?.value;
+    const selectedActionType =
+      this.forwardReferenceForm.get('actionType')?.value;
 
     if (!selectedActionType) {
       this.forwardReferenceForm.get('action')?.disable();
-      this.toastr.error("Invalid Action Type Selected.");
+      this.toastr.error('Invalid Action Type Selected.');
       this.actionOptions = [];
       return;
     }
 
     this.actionOptions = this.allowedActions.filter(
-      action => action.actionType?.toLowerCase() === selectedActionType.toLowerCase()
+      (action) =>
+        action.actionType?.toLowerCase() === selectedActionType.toLowerCase(),
     );
 
-    if (selectedActionType === 'Final Draft Reply' && this.actionOptions.length > 0) {
+    if (
+      selectedActionType === 'Final Draft Reply' &&
+      this.actionOptions.length > 0
+    ) {
       this.resetForwardReferencForm('finalDraftReply');
       this.ReferenceAction('finalReply');
       this.getAllDraftReply(referenceId);
-    }
-    else if (selectedActionType === 'Draft Reply' && this.actionOptions.length > 0) {
+    } else if (
+      selectedActionType === 'Draft Reply' &&
+      this.actionOptions.length > 0
+    ) {
       this.resetForwardReferencForm('forwardForReply');
       this.forwardReferenceForm.get('action')?.enable();
       this.getAllDraftReply(referenceId);
-    }
-    else {
+    } else {
       this.resetForwardReferencForm('forwardForReply');
       this.forwardReferenceForm.get('action')?.enable();
     }
@@ -1248,7 +1443,7 @@ export class InitiatorFormComponent {
     const actionName = this.forwardReferenceForm.get('action')?.value;
 
     if (!actionType || !actionName) {
-      this.toastr.error("Action type or name not selected");
+      this.toastr.error('Action type or name not selected');
       this.forwardReferenceForm.get('replyType')?.disable();
       this.forwardReferenceForm.get('assigneeOrganization')?.disable();
       this.updateButtonsVisibility();
@@ -1256,10 +1451,13 @@ export class InitiatorFormComponent {
     }
 
     const selectedActionConfig = this.allowedActions.find(
-      (res: any) => res.actionType === actionType && res.actionName === actionName
+      (res: any) =>
+        res.actionType === actionType && res.actionName === actionName,
     );
     if (selectedActionConfig) {
-      this.forwardReferenceForm.get('actionConfigId')?.setValue(selectedActionConfig.actionConfigId);
+      this.forwardReferenceForm
+        .get('actionConfigId')
+        ?.setValue(selectedActionConfig.actionConfigId);
     } else {
       this.toastr.error('No matching action config found');
     }
@@ -1268,12 +1466,10 @@ export class InitiatorFormComponent {
       this.resetForwardReferencForm('forward');
       this.forwardReferenceForm.get('replyType')?.enable();
       this.forwardReferenceForm.get('assigneeOrganization')?.enable();
-    }
-    else if (actionName == 'Assign Back') {
+    } else if (actionName == 'Assign Back') {
       this.resetForwardReferencForm('forward');
       this.ReferenceAction('AssignBack');
-    }
-    else {
+    } else {
       this.resetForwardReferencForm('forward');
       this.ReferenceAction('Discard');
     }
@@ -1281,7 +1477,7 @@ export class InitiatorFormComponent {
   }
 
   getAllDraftReply(referenceId: number) {
-    console.log(referenceId)
+    console.log(referenceId);
     this.ngxService.start();
     this.userMgmtService.getAllDraftReply(referenceId).subscribe({
       next: (res: any) => {
@@ -1289,10 +1485,10 @@ export class InitiatorFormComponent {
         this.ngxService.stop();
       },
       error: (err: any) => {
-        this.toastr.error("Error in getting draft reply list");
+        this.toastr.error('Error in getting draft reply list');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   selectedRecord(row: any) {
@@ -1300,7 +1496,6 @@ export class InitiatorFormComponent {
     this.selection.select(row);
     this.selectedDraftRecord = row;
   }
-
 
   selectedOrganization(event: any) {
     const selectedOrganization = event.target.value;
@@ -1336,23 +1531,24 @@ export class InitiatorFormComponent {
   //   })
   // }
 
-
   getOfficeList(selectedOrganization: string) {
-  this.ngxService.start();
-  this.userMgmtService.getOfficeList(selectedOrganization).subscribe({
-    next: (response: OfficeList[]) => {
-      // Remove duplicates based on officeName (or officeId if you have it)
-      const uniqueOffices = response.filter(
-        (office, index, self) =>
-          index === self.findIndex((o) => o.officeName === office.officeName)
-      );
-      console.log(`Before: ${response.length} → After dedupe: ${uniqueOffices.length}`);
+    this.ngxService.start();
+    this.userMgmtService.getOfficeList(selectedOrganization).subscribe({
+      next: (response: OfficeList[]) => {
+        // Remove duplicates based on officeName (or officeId if you have it)
+        const uniqueOffices = response.filter(
+          (office, index, self) =>
+            index === self.findIndex((o) => o.officeName === office.officeName),
+        );
+        console.log(
+          `Before: ${response.length} → After dedupe: ${uniqueOffices.length}`,
+        );
 
-      this.officeTypeList = uniqueOffices;
-      this.ngxService.stop();
-    },
-  });
-}
+        this.officeTypeList = uniqueOffices;
+        this.ngxService.stop();
+      },
+    });
+  }
 
   selectedOffice(event: any) {
     const selectedOffice = event.target.value;
@@ -1368,17 +1564,20 @@ export class InitiatorFormComponent {
 
   getDesignationList() {
     this.ngxService.start();
-    const selectedOfficeName = this.forwardReferenceForm.get("assigneeOffice")?.value;
-    console.log('getDesignationList - selectedOfficeName:', selectedOfficeName);
-    this.userMgmtService.getDesignationListByOfficeName(selectedOfficeName).subscribe({
-      next: (response) => {
-        this.designationList = response;
-        this.ngxService.stop()
-      },
-      error: (err) => {
-        this.ngxService.stop();
-      }
-    })
+    const selectedOfficeName =
+      this.forwardReferenceForm.get('assigneeOffice')?.value;
+
+    this.userMgmtService
+      .getDesignationListByOfficeName(selectedOfficeName)
+      .subscribe({
+        next: (response) => {
+          this.designationList = response;
+          this.ngxService.stop();
+        },
+        error: (err) => {
+          this.ngxService.stop();
+        },
+      });
   }
 
   getFinalReplyDesignation(officeName: string) {
@@ -1386,12 +1585,12 @@ export class InitiatorFormComponent {
     this.userMgmtService.getDesignationListByOfficeName(officeName).subscribe({
       next: (response) => {
         this.designationList = response;
-        this.ngxService.stop()
+        this.ngxService.stop();
       },
       error: (err) => {
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   selectedDesignation(event: any) {
@@ -1409,47 +1608,61 @@ export class InitiatorFormComponent {
       this.userMgmtService.getHeadOfOrganization(orgId).subscribe({
         next: (response: any) => {
           this.userLists = response;
-          this.ngxService.stop()
+          this.ngxService.stop();
         },
         error: (err) => {
-          this.toastr.error("Error in getting head of organizations")
+          this.toastr.error('Error in getting head of organizations');
           this.ngxService.stop();
-        }
-      })
+        },
+      });
     }
   }
+
   getUserList() {
     this.ngxService.start();
-    const organizationCode = this.forwardReferenceForm.get("assigneeOrganization")?.value;
-    const organization = this.organizationsList.find((res) => res.organizationCode == organizationCode)
-    const officeName = this.forwardReferenceForm.get("assigneeOffice")?.value;
-    const designationCode = this.forwardReferenceForm.get("assigneeDesignation")?.value;
+    const organizationCode = this.forwardReferenceForm.get(
+      'assigneeOrganization',
+    )?.value;
+    const organization = this.organizationsList.find(
+      (res) => res.organizationCode == organizationCode,
+    );
+    const officeName = this.forwardReferenceForm.get('assigneeOffice')?.value;
+    const designationCode = this.forwardReferenceForm.get(
+      'assigneeDesignation',
+    )?.value;
 
     const userInfo = {
-      "organization": organization?.organizationId,
-      "officeName": officeName,
-      "designationCode": designationCode
-    }
-    console.log('getUserList - payload sent to /get-users:', userInfo);
+      organization: organization?.organizationId,
+      officeName: officeName,
+      designationCode: designationCode,
+    };
+
     this.userMgmtService.getUserList(userInfo).subscribe({
       next: (response: any) => {
-        console.log('getUserList - API response:', response);
         // Filter out the currently logged-in user to prevent self-forwarding
-        this.userLists = response.filter((user: UserList) => user.loginId !== this.userDetails.loginId);
-        this.ngxService.stop()
+        this.userLists = response.filter((user: UserList) => {
+          if (!user) return false;
+          const hasRole2 = user.roles?.some((role) => role.roleId === 2);
+          if (hasRole2) {
+            return true;
+          }
+          return user.loginId !== this.userDetails.loginId;
+        });
+        this.ngxService.stop();
       },
       error: (err) => {
-        console.error('getUserList - API error:', err);
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   selectedUserDetails(event: any) {
     this.selectedUser = [];
     const userId = event.target.value;
     // Filter returns an array, but we only need the first matching user
-    this.selectedUser = this.userLists.filter((res: UserList) => res.id == userId);
+    this.selectedUser = this.userLists.filter(
+      (res: UserList) => res.id == userId,
+    );
 
     // if (!this.selectedUser.length) return;
 
@@ -1480,38 +1693,36 @@ export class InitiatorFormComponent {
     // }
   }
 
-
-
-
-
   updateVipReferenceDetails() {
     this.ngxService.start();
     const updatedData = {
-      nameOfDignitary: this.addVipReferenceDetails.get("nameOfDiginitary")?.value,
-      emailId: this.addVipReferenceDetails.get("emailId")?.value,
-      designation: this.addVipReferenceDetails.get("designation")?.value,
-      state: this.addVipReferenceDetails.get("state")?.value,
-      constituency: this.addVipReferenceDetails.get("constituency")?.value,
-      priority: this.addVipReferenceDetails.get("priority")?.value,
-      catgOfSubject: this.addVipReferenceDetails.get("catgOfSubject")?.value,
-      subCatgOfSubject: this.addVipReferenceDetails.get("subCatgOfSubject")?.value,
-      subjectOrIssue: this.addVipReferenceDetails.get("subjectOrIssue")?.value,
+      nameOfDignitary:
+        this.addVipReferenceDetails.get('nameOfDiginitary')?.value,
+      emailId: this.addVipReferenceDetails.get('emailId')?.value,
+      designation: this.addVipReferenceDetails.get('designation')?.value,
+      state: this.addVipReferenceDetails.get('state')?.value,
+      constituency: this.addVipReferenceDetails.get('constituency')?.value,
+      priority: this.addVipReferenceDetails.get('priority')?.value,
+      catgOfSubject: this.addVipReferenceDetails.get('catgOfSubject')?.value,
+      subCatgOfSubject:
+        this.addVipReferenceDetails.get('subCatgOfSubject')?.value,
+      subjectOrIssue: this.addVipReferenceDetails.get('subjectOrIssue')?.value,
       vipReferenceId: this.refernceDetails.referenceId,
       updatedBy: this.userDetails.name,
-      updatedAt: this.formatDateToIso(this.createdDate)
-    }
+      updatedAt: this.formatDateToIso(this.createdDate),
+    };
 
     this.userMgmtService.updateReference(updatedData).subscribe({
       next: (res) => {
-        this.toastr.success("Reference updated successfully");
+        this.toastr.success('Reference updated successfully');
         this.getReferenceDetails();
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("please enter valid details");
+        this.toastr.error('please enter valid details');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   forwardVipReference() {
@@ -1520,7 +1731,9 @@ export class InitiatorFormComponent {
 
     if (!priorityControl || !priorityControl.value) {
       this.ngxService.stop();
-      this.toastr.warning("Please update the Reference Priority before submitting.");
+      this.toastr.warning(
+        'Please update the Reference Priority before submitting.',
+      );
       priorityControl?.markAsTouched();
       return;
     }
@@ -1529,7 +1742,7 @@ export class InitiatorFormComponent {
       this.forwardReferenceForm.markAllAsTouched();
       // Collect invalid fields
       const invalidFields: string[] = [];
-      Object.keys(this.forwardReferenceForm.controls).forEach(key => {
+      Object.keys(this.forwardReferenceForm.controls).forEach((key) => {
         const control = this.forwardReferenceForm.get(key);
         if (control && control.invalid) {
           invalidFields.push(key); // or map to friendly field names if needed
@@ -1544,32 +1757,31 @@ export class InitiatorFormComponent {
       return;
     }
 
-
     const forwardReferenceDetails = this.forwardReferenceForm.getRawValue();
     const forwardReferenceData = {
-      "referenceId": this.refernceDetails.referenceId,
-      "loginId": this.userDetails.loginId,
-      "actionConfigId": forwardReferenceDetails.actionConfigId,
-      "targetLoginId": this.selectedUser[0].loginId,
-      "assigneeOrganization": forwardReferenceDetails.assigneeOrganization,
-      "assigneeOffice": forwardReferenceDetails.assigneeOffice,
-      "assigneeDesignation": forwardReferenceDetails.assigneeDesignation,
-      "assigneeName": forwardReferenceDetails.assigneeName,
-      "comments": forwardReferenceDetails.assignerComment
-    }
+      referenceId: this.refernceDetails.referenceId,
+      loginId: this.userDetails.loginId,
+      actionConfigId: forwardReferenceDetails.actionConfigId,
+      targetLoginId: this.selectedUser[0].loginId,
+      assigneeOrganization: forwardReferenceDetails.assigneeOrganization,
+      assigneeOffice: forwardReferenceDetails.assigneeOffice,
+      assigneeDesignation: forwardReferenceDetails.assigneeDesignation,
+      assigneeName: forwardReferenceDetails.assigneeName,
+      comments: forwardReferenceDetails.assignerComment,
+    };
 
     this.userMgmtService.forwardReference(forwardReferenceData).subscribe({
       next: (res) => {
         this.router.navigate([this.previousRoute]);
-        this.toastr.success("Reference updated successfully");
+        this.toastr.success('Reference updated successfully');
         this.getReferenceDetails();
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("please enter valid details");
+        this.toastr.error('please enter valid details');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
     // if (this.forwardReferenceForm.get("actionType")?.value == "final_draft_reply") {
     //   const forwardReferenceDetails = this.forwardReferenceForm.getRawValue();
     //   const forwardReferenceData = {
@@ -1641,8 +1853,6 @@ export class InitiatorFormComponent {
     //   "assignerComment": this.forwardReferenceForm.get("assignerComment")?.value
     // }
     // }
-
-
   }
 
   discardVipReference() {
@@ -1651,7 +1861,7 @@ export class InitiatorFormComponent {
       this.forwardReferenceForm.markAllAsTouched();
       // Collect invalid fields
       const invalidFields: string[] = [];
-      Object.keys(this.forwardReferenceForm.controls).forEach(key => {
+      Object.keys(this.forwardReferenceForm.controls).forEach((key) => {
         const control = this.forwardReferenceForm.get(key);
         if (control && control.invalid) {
           invalidFields.push(key); // or map to friendly field names if needed
@@ -1667,29 +1877,29 @@ export class InitiatorFormComponent {
     }
     const forwardReferenceDetails = this.forwardReferenceForm.getRawValue();
     const forwardReferenceData = {
-      "referenceId": this.refernceDetails.referenceId,
-      "loginId": this.userDetails.loginId,
-      "actionConfigId": forwardReferenceDetails.actionConfigId,
-      "targetLoginId": "morth-initiator",
-      "assigneeOrganization": forwardReferenceDetails.assigneeOrganization,
-      "assigneeOffice": forwardReferenceDetails.assigneeOffice,
-      "assigneeDesignation": forwardReferenceDetails.assigneeDesignation,
-      "assigneeName": forwardReferenceDetails.assigneeName,
-      "comments": forwardReferenceDetails.assignerComment
-    }
+      referenceId: this.refernceDetails.referenceId,
+      loginId: this.userDetails.loginId,
+      actionConfigId: forwardReferenceDetails.actionConfigId,
+      targetLoginId: 'GauravPrasad',
+      assigneeOrganization: forwardReferenceDetails.assigneeOrganization,
+      assigneeOffice: forwardReferenceDetails.assigneeOffice,
+      assigneeDesignation: forwardReferenceDetails.assigneeDesignation,
+      assigneeName: forwardReferenceDetails.assigneeName,
+      comments: forwardReferenceDetails.assignerComment,
+    };
 
     this.userMgmtService.forwardReference(forwardReferenceData).subscribe({
       next: (res) => {
         this.router.navigate([this.previousRoute]);
-        this.toastr.success("Reference updated successfully");
+        this.toastr.success('Reference updated successfully');
         this.getReferenceDetails();
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("please enter valid details");
+        this.toastr.error('please enter valid details');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   assignBack() {
@@ -1698,7 +1908,7 @@ export class InitiatorFormComponent {
       this.forwardReferenceForm.markAllAsTouched();
       // Collect invalid fields
       const invalidFields: string[] = [];
-      Object.keys(this.forwardReferenceForm.controls).forEach(key => {
+      Object.keys(this.forwardReferenceForm.controls).forEach((key) => {
         const control = this.forwardReferenceForm.get(key);
         if (control && control.invalid) {
           invalidFields.push(key); // or map to friendly field names if needed
@@ -1714,29 +1924,29 @@ export class InitiatorFormComponent {
     }
     const forwardReferenceDetails = this.forwardReferenceForm.getRawValue();
     const forwardReferenceData = {
-      "referenceId": this.refernceDetails.referenceId,
-      "loginId": this.userDetails.loginId,
-      "actionConfigId": forwardReferenceDetails.actionConfigId,
-      "targetLoginId": "GauravPrasad",
-      "assigneeOrganization": forwardReferenceDetails.assigneeOrganization,
-      "assigneeOffice": forwardReferenceDetails.assigneeOffice,
-      "assigneeDesignation": forwardReferenceDetails.assigneeDesignation,
-      "assigneeName": forwardReferenceDetails.assigneeName,
-      "comments": forwardReferenceDetails.assignerComment
-    }
+      referenceId: this.refernceDetails.referenceId,
+      loginId: this.userDetails.loginId,
+      actionConfigId: forwardReferenceDetails.actionConfigId,
+      targetLoginId: 'GauravPrasad',
+      assigneeOrganization: forwardReferenceDetails.assigneeOrganization,
+      assigneeOffice: forwardReferenceDetails.assigneeOffice,
+      assigneeDesignation: forwardReferenceDetails.assigneeDesignation,
+      assigneeName: forwardReferenceDetails.assigneeName,
+      comments: forwardReferenceDetails.assignerComment,
+    };
 
     this.userMgmtService.forwardReference(forwardReferenceData).subscribe({
       next: (res) => {
         this.router.navigate([this.previousRoute]);
-        this.toastr.success("Reference Assign Back successfully");
+        this.toastr.success('Reference Assign Back successfully');
         this.getReferenceDetails();
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("please enter valid details");
+        this.toastr.error('please enter valid details');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   senDraftReply() {
@@ -1745,7 +1955,7 @@ export class InitiatorFormComponent {
       this.forwardReferenceForm.markAllAsTouched();
       // Collect invalid fields
       const invalidFields: string[] = [];
-      Object.keys(this.forwardReferenceForm.controls).forEach(key => {
+      Object.keys(this.forwardReferenceForm.controls).forEach((key) => {
         const control = this.forwardReferenceForm.get(key);
         if (control && control.invalid) {
           invalidFields.push(key); // or map to friendly field names if needed
@@ -1763,31 +1973,31 @@ export class InitiatorFormComponent {
     const draftReplyId = this.selectedDraftRecord?.draftReplyId;
     const forwardReferenceDetails = this.forwardReferenceForm.getRawValue();
     const forwardReferenceData = {
-      "referenceId": this.refernceDetails.referenceId,
-      "loginId": this.userDetails.loginId,
-      "actionConfigId": forwardReferenceDetails.actionConfigId,
-      "targetLoginId": this.selectedUser[0].loginId,
-      "assigneeOrganization": forwardReferenceDetails.assigneeOrganization,
-      "assigneeOffice": forwardReferenceDetails.assigneeOffice,
-      "assigneeDesignation": forwardReferenceDetails.assigneeDesignation,
-      "assigneeName": forwardReferenceDetails.assigneeName,
-      "comments": forwardReferenceDetails.assignerComment
-    }
+      referenceId: this.refernceDetails.referenceId,
+      loginId: this.userDetails.loginId,
+      actionConfigId: forwardReferenceDetails.actionConfigId,
+      targetLoginId: this.selectedUser[0].loginId,
+      assigneeOrganization: forwardReferenceDetails.assigneeOrganization,
+      assigneeOffice: forwardReferenceDetails.assigneeOffice,
+      assigneeDesignation: forwardReferenceDetails.assigneeDesignation,
+      assigneeName: forwardReferenceDetails.assigneeName,
+      comments: forwardReferenceDetails.assignerComment,
+    };
 
     forkJoin({
       forward: this.userMgmtService.forwardReference(forwardReferenceData),
-      update: this.userMgmtService.uploadDraftReply(draftReplyId)
+      update: this.userMgmtService.uploadDraftReply(draftReplyId),
     }).subscribe({
       next: (res) => {
         this.router.navigate([this.previousRoute]);
-        this.toastr.success("Draft Reply Sent Successfully");
+        this.toastr.success('Draft Reply Sent Successfully');
         this.getReferenceDetails();
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("Something went wrong");
+        this.toastr.error('Something went wrong');
         this.ngxService.stop();
-      }
+      },
     });
   }
 
@@ -1796,7 +2006,7 @@ export class InitiatorFormComponent {
       this.forwardReferenceForm.markAllAsTouched();
       // Collect invalid fields
       const invalidFields: string[] = [];
-      Object.keys(this.forwardReferenceForm.controls).forEach(key => {
+      Object.keys(this.forwardReferenceForm.controls).forEach((key) => {
         const control = this.forwardReferenceForm.get(key);
         if (control && control.invalid) {
           invalidFields.push(key); // or map to friendly field names if needed
@@ -1811,32 +2021,31 @@ export class InitiatorFormComponent {
       return;
     }
 
-
     const forwardReferenceDetails = this.forwardReferenceForm.getRawValue();
     const forwardReferenceData = {
-      "referenceId": this.refernceDetails.referenceId,
-      "loginId": this.userDetails.loginId,
-      "actionConfigId": forwardReferenceDetails.actionConfigId,
-      "targetLoginId": "GauravPrasad",
-      "assigneeOrganization": forwardReferenceDetails.assigneeOrganization,
-      "assigneeOffice": forwardReferenceDetails.assigneeOffice,
-      "assigneeDesignation": forwardReferenceDetails.assigneeDesignation,
-      "assigneeName": forwardReferenceDetails.assigneeName,
-      "comments": forwardReferenceDetails.assignerComment
-    }
+      referenceId: this.refernceDetails.referenceId,
+      loginId: this.userDetails.loginId,
+      actionConfigId: forwardReferenceDetails.actionConfigId,
+      targetLoginId: 'GauravPrasad',
+      assigneeOrganization: forwardReferenceDetails.assigneeOrganization,
+      assigneeOffice: forwardReferenceDetails.assigneeOffice,
+      assigneeDesignation: forwardReferenceDetails.assigneeDesignation,
+      assigneeName: forwardReferenceDetails.assigneeName,
+      comments: forwardReferenceDetails.assignerComment,
+    };
 
     this.userMgmtService.forwardReference(forwardReferenceData).subscribe({
       next: (res) => {
         this.router.navigate([this.previousRoute]);
-        this.toastr.success("Reference Move To Final Reply Queue successfully");
+        this.toastr.success('Reference Move To Final Reply Queue successfully');
         this.getReferenceDetails();
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("please enter valid details");
+        this.toastr.error('please enter valid details');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   closeReference() {
@@ -1845,7 +2054,7 @@ export class InitiatorFormComponent {
       this.forwardReferenceForm.markAllAsTouched();
       // Collect invalid fields
       const invalidFields: string[] = [];
-      Object.keys(this.forwardReferenceForm.controls).forEach(key => {
+      Object.keys(this.forwardReferenceForm.controls).forEach((key) => {
         const control = this.forwardReferenceForm.get(key);
         if (control && control.invalid) {
           invalidFields.push(key); // or map to friendly field names if needed
@@ -1862,29 +2071,29 @@ export class InitiatorFormComponent {
     const forwardReferenceDetails = this.forwardReferenceForm.getRawValue();
     console.log(forwardReferenceDetails);
     const forwardReferenceData = {
-      "referenceId": this.refernceDetails.referenceId,
-      "loginId": this.userDetails.loginId,
-      "actionConfigId": forwardReferenceDetails.actionConfigId,
-      "targetLoginId": "GauravPrasad",
-      "assigneeOrganization": forwardReferenceDetails.assigneeOrganization,
-      "assigneeOffice": forwardReferenceDetails.assigneeOffice,
-      "assigneeDesignation": forwardReferenceDetails.assigneeDesignation,
-      "assigneeName": forwardReferenceDetails.assigneeName,
-      "comments": forwardReferenceDetails.assignerComment
-    }
+      referenceId: this.refernceDetails.referenceId,
+      loginId: this.userDetails.loginId,
+      actionConfigId: forwardReferenceDetails.actionConfigId,
+      targetLoginId: 'GauravPrasad',
+      assigneeOrganization: forwardReferenceDetails.assigneeOrganization,
+      assigneeOffice: forwardReferenceDetails.assigneeOffice,
+      assigneeDesignation: forwardReferenceDetails.assigneeDesignation,
+      assigneeName: forwardReferenceDetails.assigneeName,
+      comments: forwardReferenceDetails.assignerComment,
+    };
 
     this.userMgmtService.forwardReference(forwardReferenceData).subscribe({
       next: (res) => {
         this.router.navigate([this.previousRoute]);
-        this.toastr.success("Reference Closed successfully");
+        this.toastr.success('Reference Closed successfully');
         this.getReferenceDetails();
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("please enter valid details");
+        this.toastr.error('please enter valid details');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   getFinalAssigneeList() {
@@ -1895,50 +2104,64 @@ export class InitiatorFormComponent {
         this.ngxService.stop();
       },
       error: (err) => {
-        this.toastr.error("please enter valid details");
+        this.toastr.error('please enter valid details');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
   setFinalAssigneeDetails() {
-    this.forwardReferenceForm.get("action")?.setValue("forward"),
-      this.forwardReferenceForm.get("assigneeOrganization")?.setValue(this.userLists[0].organization, { emitEvent: true });
+    (this.forwardReferenceForm.get('action')?.setValue('forward'),
+      this.forwardReferenceForm
+        .get('assigneeOrganization')
+        ?.setValue(this.userLists[0].organization, { emitEvent: true }));
     // this.getOfficeList();
     // this.getDesignationList();
 
     setTimeout(() => {
-      this.forwardReferenceForm.get("assigneeOffice")?.setValue(this.userLists[0].office);
-      this.forwardReferenceForm.get("assigneeDesignation")?.setValue(this.userLists[0].designation);
-    }, 100)
+      this.forwardReferenceForm
+        .get('assigneeOffice')
+        ?.setValue(this.userLists[0].office);
+      this.forwardReferenceForm
+        .get('assigneeDesignation')
+        ?.setValue(this.userLists[0].designation);
+    }, 100);
   }
 
   private ReferenceAction(actionName: string) {
     if (actionName == 'finalReply') {
-      this.getOfficeList("MORTH");
+      this.getOfficeList('MORTH');
       this.adminService.getUserListByRoleId('2').subscribe({
         next: (res: any) => {
           if (res && res.length > 0) {
             const user = res[0];
-            const officeForDesignation = this.officeTypeList.find((o: any) => o.officeId === user.office);
-            this.getFinalReplyDesignation(officeForDesignation ? officeForDesignation.officeName : '');
+            const officeForDesignation = this.officeTypeList.find(
+              (o: any) => o.officeId === user.office,
+            );
+            this.getFinalReplyDesignation(
+              officeForDesignation ? officeForDesignation.officeName : '',
+            );
             // Wait for all lists to load
             setTimeout(() => {
               const organizationObj = this.organizationsList.find(
-                (o: any) => o.organizationId === user.organization
+                (o: any) => o.organizationId === user.organization,
               );
               const designationObj = this.designationList.find(
-                (d: any) => d.designationId === user.designation
+                (d: any) => d.designationId === user.designation,
               );
               const officeObj = this.officeTypeList.find(
-                (o: any) => o.officeId === user.office
+                (o: any) => o.officeId === user.office,
               );
               // ✅ Patch only after lists are available
               this.forwardReferenceForm.patchValue({
-                action: "Forward",
-                assigneeOrganization: organizationObj ? organizationObj.organizationCode : '',
+                action: 'Forward',
+                assigneeOrganization: organizationObj
+                  ? organizationObj.organizationCode
+                  : '',
                 assigneeOffice: officeObj ? officeObj.officeName : '',
-                assigneeDesignation: designationObj ? designationObj.designationCode : '',
+                assigneeDesignation: designationObj
+                  ? designationObj.designationCode
+                  : '',
               });
 
               // Now load user dropdown and enable comment field
@@ -1948,10 +2171,16 @@ export class InitiatorFormComponent {
               // );
 
               const selectedActionConfig = this.allowedActions.find(
-                (res: any) => res.actionType === this.forwardReferenceForm.get('actionType')?.value && res.actionName === this.forwardReferenceForm.get('action')?.value
+                (res: any) =>
+                  res.actionType ===
+                    this.forwardReferenceForm.get('actionType')?.value &&
+                  res.actionName ===
+                    this.forwardReferenceForm.get('action')?.value,
               );
               if (selectedActionConfig) {
-                this.forwardReferenceForm.get('actionConfigId')?.setValue(selectedActionConfig.actionConfigId);
+                this.forwardReferenceForm
+                  .get('actionConfigId')
+                  ?.setValue(selectedActionConfig.actionConfigId);
               } else {
                 this.toastr.error('No matching action config found');
               }
@@ -1960,49 +2189,54 @@ export class InitiatorFormComponent {
               this.forwardReferenceForm.get('assignerComment')?.enable();
               this.forwardReferenceForm.get('replyType')?.enable();
               // Optionally disable other form controls
-
             }, 300);
           }
         },
-        error: (err: Error) => {
-
-        }
-      })
-    }
-    else if (actionName == 'Discard') {
-      this.getOfficeList("MORTH");
-      this.adminService.getUserListByRoleId('1').subscribe({
-        next: (res: any) => {
+        error: (err: Error) => {},
+      });
+    } else if (actionName == 'Discard') {
+      this.getOfficeList('MORTH');
+      this.adminService.getUserListByRoleId('2').subscribe({
+        next: async (res: any) => {
           if (res && res.length > 0) {
             const user = res[0];
-            const officeForDesignation = this.officeTypeList.find((o: any) => o.officeId === user.office);
-            this.getFinalReplyDesignation(officeForDesignation ? officeForDesignation.officeName : '');
+            const officeForDesignation = this.officeTypeList.find(
+              (o: any) => o.officeId === user.office,
+            );
+            await this.getFinalReplyDesignation(
+              officeForDesignation ? officeForDesignation.officeName : '',
+            );
             // Wait for all lists to load
-            setTimeout(() => {
+            setTimeout(async () => {
               const organizationObj = this.organizationsList.find(
-                (o: any) => o.organizationId === user.organization
-              );
-              const designationObj = this.designationList.find(
-                (d: any) => d.designationId === user.designation
+                (o: any) => o.organizationId === user.organization,
               );
               const officeObj = this.officeTypeList.find(
-                (o: any) => o.officeId === user.office
+                (o: any) => o.officeId === user.office,
               );
+              const designationObj = this.designationList.find(
+                (d: any) => d.designationId === user.designation,
+              );
+
               // ✅ Patch only after lists are available
+
               this.forwardReferenceForm.patchValue({
-                assigneeOrganization: organizationObj ? organizationObj.organizationCode : '',
+                assigneeOrganization: organizationObj
+                  ? organizationObj.organizationCode
+                  : '',
                 assigneeOffice: officeObj ? officeObj.officeName : '',
-                assigneeDesignation: designationObj ? designationObj.designationCode : '',
+                assigneeDesignation: designationObj
+                  ? designationObj.designationCode
+                  : '',
               });
 
               // Now load user dropdown and enable comment field
-              this.getUserList();
+              await this.getUserList();
               // const assigneeObj = this.userLists.find(
               //   (o: any) => o.id === user.id
               // );
               // this.selectedUser = this.userLists.filter((res: UserList) => res.id == 695);
-              this.forwardReferenceForm.patchValue({ assigneeName: 330 });
-
+              this.forwardReferenceForm.patchValue({ assigneeName: 6158 });
 
               // Optionally disable other form controls
               this.disableReferenceForwardControl(actionName);
@@ -2010,35 +2244,40 @@ export class InitiatorFormComponent {
             }, 300); // Give small delay for lists to be populated
           }
         },
-        error: (err: Error) => {
-
-        }
-      })
-    }
-    else if (actionName == 'AssignBack') {
-      this.getOfficeList("MORTH");
+        error: (err: Error) => {},
+      });
+    } else if (actionName == 'AssignBack') {
+      this.getOfficeList('MORTH');
       this.adminService.getUserListByRoleId('2').subscribe({
         next: (res: any) => {
           if (res && res.length > 0) {
             const user = res[0];
-            const officeForDesignation = this.officeTypeList.find((o: any) => o.officeId === user.office);
-            this.getFinalReplyDesignation(officeForDesignation ? officeForDesignation.officeName : '');
+            const officeForDesignation = this.officeTypeList.find(
+              (o: any) => o.officeId === user.office,
+            );
+            this.getFinalReplyDesignation(
+              officeForDesignation ? officeForDesignation.officeName : '',
+            );
             // Wait for all lists to load
             setTimeout(() => {
               const organizationObj = this.organizationsList.find(
-                (o: any) => o.organizationId === user.organization
+                (o: any) => o.organizationId === user.organization,
               );
               const designationObj = this.designationList.find(
-                (d: any) => d.designationId === user.designation
+                (d: any) => d.designationId === user.designation,
               );
               const officeObj = this.officeTypeList.find(
-                (o: any) => o.officeId === user.office
+                (o: any) => o.officeId === user.office,
               );
               // ✅ Patch only after lists are available
               this.forwardReferenceForm.patchValue({
-                assigneeOrganization: organizationObj ? organizationObj.organizationCode : '',
+                assigneeOrganization: organizationObj
+                  ? organizationObj.organizationCode
+                  : '',
                 assigneeOffice: officeObj ? officeObj.officeName : '',
-                assigneeDesignation: designationObj ? designationObj.designationCode : '',
+                assigneeDesignation: designationObj
+                  ? designationObj.designationCode
+                  : '',
               });
 
               // Now load user dropdown and enable comment field
@@ -2051,110 +2290,101 @@ export class InitiatorFormComponent {
               this.disableReferenceForwardControl(actionName);
               this.forwardReferenceForm.get('assignerComment')?.enable();
               // Optionally disable other form controls
-
             }, 300);
           }
         },
-        error: (err: Error) => {
-
-        }
-      })
-    }
-    else {
-
+        error: (err: Error) => {},
+      });
+    } else {
     }
   }
 
   disableReferenceForwardControl(actionName: string) {
     if (actionName == 'finalReply') {
       const fieldsToDisable = [
-        "action",
-        "assigneeOrganization",
-        "assigneeOffice",
-        "assigneeDesignation",
-        "assigneeName",
-        "assignerComment"
+        'action',
+        'assigneeOrganization',
+        'assigneeOffice',
+        'assigneeDesignation',
+        'assigneeName',
+        'assignerComment',
       ];
-      fieldsToDisable.forEach(field => {
+      fieldsToDisable.forEach((field) => {
         this.forwardReferenceForm.get(field)?.disable();
       });
-    }
-    else if (actionName == 'Discard') {
+    } else if (actionName == 'Discard') {
       const fieldsToDisable = [
-        "replyType",
-        "assigneeOrganization",
-        "assigneeOffice",
-        "assigneeDesignation",
-        "assigneeName",
+        'replyType',
+        'assigneeOrganization',
+        'assigneeOffice',
+        'assigneeDesignation',
+        'assigneeName',
       ];
-      fieldsToDisable.forEach(field => {
+      fieldsToDisable.forEach((field) => {
         this.forwardReferenceForm.get(field)?.disable();
       });
-    }
-    else if (actionName == 'AssignBack') {
+    } else if (actionName == 'AssignBack') {
       const fieldsToDisable = [
-        "action",
-        "replyType",
-        "assigneeOrganization",
-        "assigneeOffice",
-        "assigneeDesignation",
-        "assigneeName",
-        "assignerComment"
+        'action',
+        'replyType',
+        'assigneeOrganization',
+        'assigneeOffice',
+        'assigneeDesignation',
+        'assigneeName',
+        'assignerComment',
       ];
-      fieldsToDisable.forEach(field => {
+      fieldsToDisable.forEach((field) => {
         this.forwardReferenceForm.get(field)?.disable();
       });
+    } else {
     }
-    else { }
   }
 
   resetForwardReferencForm(actionName: string) {
     if (actionName == 'forwardForReply') {
       const fieldsToResetAndDisable = [
-        "action",
-        "replyType",
-        "assigneeOrganization",
-        "assigneeOffice",
-        "assigneeDesignation",
-        "assigneeName",
-        "assignerComment"
+        'action',
+        'replyType',
+        'assigneeOrganization',
+        'assigneeOffice',
+        'assigneeDesignation',
+        'assigneeName',
+        'assignerComment',
       ];
 
-      fieldsToResetAndDisable.forEach(field => {
+      fieldsToResetAndDisable.forEach((field) => {
         const control = this.forwardReferenceForm.get(field);
         if (control) {
           control.reset('');
         }
       });
-    }
-    else if (actionName == 'forward') {
+    } else if (actionName == 'forward') {
       const fieldsToResetAndDisable = [
-        "replyType",
-        "assigneeOrganization",
-        "assigneeOffice",
-        "assigneeDesignation",
-        "assigneeName",
-        "assignerComment"
+        'replyType',
+        'assigneeOrganization',
+        'assigneeOffice',
+        'assigneeDesignation',
+        'assigneeName',
+        'assignerComment',
       ];
 
-      fieldsToResetAndDisable.forEach(field => {
+      fieldsToResetAndDisable.forEach((field) => {
         const control = this.forwardReferenceForm.get(field);
         if (control) {
           control.reset('');
         }
       });
-    }
-    else if (actionName == 'finalDraftReply') {
+    } else if (actionName == 'finalDraftReply') {
       const fieldsToResetAndDisable = [
-        "action",
-        "assigneeOrganization",
-        "assigneeOffice",
-        "assigneeDesignation",
-        "assigneeName",
-        "assignerComment"
+        'action',
+        'assigneeOrganization',
+        'assigneeOffice',
+        'assigneeDesignation',
+        'assigneeName',
+        'assignerComment',
       ];
 
-      fieldsToResetAndDisable.forEach(field => {
+      fieldsToResetAndDisable.forEach((field) => {
         const control = this.forwardReferenceForm.get(field);
         if (control) {
           control.reset('');
@@ -2176,7 +2406,7 @@ export class InitiatorFormComponent {
     // Case: Final Draft Reply → only final reply button
     if (actionType === 'Final Draft Reply') {
       this.showFinalReplyBtn = true;
-      console.log("showFinalReplyBtn", this.showFinalReplyBtn);
+      console.log('showFinalReplyBtn', this.showFinalReplyBtn);
       return;
     }
 
@@ -2200,14 +2430,12 @@ export class InitiatorFormComponent {
   }
 
   // Your PDF list
-  onSelectChange(event: any) {
-
-  }
+  onSelectChange(event: any) {}
 
   // Dropdown handler
 
   showVersionHistory() {
-    alert("amhindra bhagat")
+    alert('amhindra bhagat');
   }
 
   // Custom validator to check if date is not in the future
@@ -2230,7 +2458,6 @@ export class InitiatorFormComponent {
     return null;
   }
 
-
   // ========== Linked References Methods ==========
 
   initiateLinkedReferencesSearchForm() {
@@ -2244,7 +2471,7 @@ export class InitiatorFormComponent {
       state: new FormControl(''),
       constituency: new FormControl(''),
       categoryOfSubject: new FormControl(''),
-      subject: new FormControl('')
+      subject: new FormControl(''),
     });
   }
 
@@ -2252,7 +2479,9 @@ export class InitiatorFormComponent {
     const criteria = this.linkedReferencesSearchForm.getRawValue();
 
     // Check if at least one criterion is filled
-    const hasAnyCriteria = Object.values(criteria).some(value => value && value.toString().trim() !== '');
+    const hasAnyCriteria = Object.values(criteria).some(
+      (value) => value && value.toString().trim() !== '',
+    );
 
     if (!hasAnyCriteria) {
       this.toastr.warning('Please fill at least one search criterion');
@@ -2263,10 +2492,13 @@ export class InitiatorFormComponent {
     this.userMgmtService.searchReferencesForLinking(criteria).subscribe({
       next: (results) => {
         // Filter out current reference and already linked references
-        const linkedRefIds = this.linkedReferencesData.data.map((ref: any) => ref.referenceId);
+        const linkedRefIds = this.linkedReferencesData.data.map(
+          (ref: any) => ref.referenceId,
+        );
         const filtered = results.filter(
-          (ref: any) => ref.referenceId !== this.refernceDetails.referenceId &&
-            !linkedRefIds.includes(ref.referenceId)
+          (ref: any) =>
+            ref.referenceId !== this.refernceDetails.referenceId &&
+            !linkedRefIds.includes(ref.referenceId),
         );
         this.searchResultsData.data = filtered;
         this.toastr.success(`Found ${filtered.length} reference(s)`);
@@ -2276,7 +2508,7 @@ export class InitiatorFormComponent {
         this.toastr.error('Failed to search references');
         console.error(err);
         this.ngxService.stop();
-      }
+      },
     });
   }
 
@@ -2296,42 +2528,50 @@ export class InitiatorFormComponent {
     this.ngxService.start();
 
     // Link each selected reference
-    const linkRequests = selectedRefs.map(ref => {
-      return this.userMgmtService.linkReferences({
-        primaryReferenceId: this.refernceDetails.referenceId,
-        linkedReferenceId: ref.referenceId,
-        linkType: 'RELATED'
-      }).toPromise();
+    const linkRequests = selectedRefs.map((ref) => {
+      return this.userMgmtService
+        .linkReferences({
+          primaryReferenceId: this.refernceDetails.referenceId,
+          linkedReferenceId: ref.referenceId,
+          linkType: 'RELATED',
+        })
+        .toPromise();
     });
 
-    Promise.all(linkRequests).then(() => {
-      this.toastr.success(`Successfully linked ${selectedRefs.length} reference(s)`);
-      this.searchResultsSelection.clear();
-      this.loadLinkedReferences();
-      // Remove linked items from search results
-      const linkedIds = selectedRefs.map(ref => ref.referenceId);
-      this.searchResultsData.data = this.searchResultsData.data.filter(
-        (ref: any) => !linkedIds.includes(ref.referenceId)
-      );
-      this.ngxService.stop();
-    }).catch(err => {
-      this.toastr.error('Failed to link some references');
-      console.error(err);
-      this.ngxService.stop();
-    });
+    Promise.all(linkRequests)
+      .then(() => {
+        this.toastr.success(
+          `Successfully linked ${selectedRefs.length} reference(s)`,
+        );
+        this.searchResultsSelection.clear();
+        this.loadLinkedReferences();
+        // Remove linked items from search results
+        const linkedIds = selectedRefs.map((ref) => ref.referenceId);
+        this.searchResultsData.data = this.searchResultsData.data.filter(
+          (ref: any) => !linkedIds.includes(ref.referenceId),
+        );
+        this.ngxService.stop();
+      })
+      .catch((err) => {
+        this.toastr.error('Failed to link some references');
+        console.error(err);
+        this.ngxService.stop();
+      });
   }
 
   loadLinkedReferences() {
     if (!this.refernceDetails.referenceId) return;
 
-    this.userMgmtService.getLinkedReferences(this.refernceDetails.referenceId).subscribe({
-      next: (linked) => {
-        this.linkedReferencesData.data = linked;
-      },
-      error: (err) => {
-        console.error('Failed to load linked references', err);
-      }
-    });
+    this.userMgmtService
+      .getLinkedReferences(this.refernceDetails.referenceId)
+      .subscribe({
+        next: (linked) => {
+          this.linkedReferencesData.data = linked;
+        },
+        error: (err) => {
+          console.error('Failed to load linked references', err);
+        },
+      });
   }
 
   delinkSelectedReferences() {
@@ -2345,20 +2585,24 @@ export class InitiatorFormComponent {
     this.ngxService.start();
 
     // Delink each selected reference
-    const delinkRequests = selectedRefs.map(ref => {
+    const delinkRequests = selectedRefs.map((ref) => {
       return this.userMgmtService.delinkReferences(ref.linkId).toPromise();
     });
 
-    Promise.all(delinkRequests).then(() => {
-      this.toastr.success(`Successfully delinked ${selectedRefs.length} reference(s)`);
-      this.linkedReferencesSelection.clear();
-      this.loadLinkedReferences();
-      this.ngxService.stop();
-    }).catch(err => {
-      this.toastr.error('Failed to delink some references');
-      console.error(err);
-      this.ngxService.stop();
-    });
+    Promise.all(delinkRequests)
+      .then(() => {
+        this.toastr.success(
+          `Successfully delinked ${selectedRefs.length} reference(s)`,
+        );
+        this.linkedReferencesSelection.clear();
+        this.loadLinkedReferences();
+        this.ngxService.stop();
+      })
+      .catch((err) => {
+        this.toastr.error('Failed to delink some references');
+        console.error(err);
+        this.ngxService.stop();
+      });
   }
 
   openSelectedReferences() {
@@ -2370,8 +2614,9 @@ export class InitiatorFormComponent {
     }
 
     // Open each reference in a new tab
-    selected.forEach(ref => {
-      const url = window.location.origin + `/dashboard/add-reference/${ref.referenceNo}`;
+    selected.forEach((ref) => {
+      const url =
+        window.location.origin + `/dashboard/add-reference/${ref.referenceNo}`;
       window.open(url, '_blank');
     });
   }
@@ -2389,7 +2634,7 @@ export class InitiatorFormComponent {
       state: new FormControl('', Validators.required),
       constituency: new FormControl(''),
       categoryOfSubject: new FormControl('', Validators.required),
-      subjectIssue: new FormControl('')
+      subjectIssue: new FormControl(''),
     });
   }
 
@@ -2416,12 +2661,14 @@ export class InitiatorFormComponent {
         this.knowledgeBaseResults = [];
         this.knowledgeBaseDataSource.data = [];
         this.ngxService.stop();
-      }
+      },
     });
   }
 
   toggleKBReference(reference: VipReference) {
-    const index = this.selectedKBReferences.findIndex(ref => ref.referenceNo === reference.referenceNo);
+    const index = this.selectedKBReferences.findIndex(
+      (ref) => ref.referenceNo === reference.referenceNo,
+    );
     if (index > -1) {
       this.selectedKBReferences.splice(index, 1);
     } else {
@@ -2430,7 +2677,9 @@ export class InitiatorFormComponent {
   }
 
   isKBReferenceSelected(reference: VipReference): boolean {
-    return this.selectedKBReferences.some(ref => ref.referenceNo === reference.referenceNo);
+    return this.selectedKBReferences.some(
+      (ref) => ref.referenceNo === reference.referenceNo,
+    );
   }
 
   toggleAllKBReferences(event: any) {
@@ -2442,13 +2691,17 @@ export class InitiatorFormComponent {
   }
 
   isAllKBSelected(): boolean {
-    return this.knowledgeBaseResults.length > 0 &&
-           this.selectedKBReferences.length === this.knowledgeBaseResults.length;
+    return (
+      this.knowledgeBaseResults.length > 0 &&
+      this.selectedKBReferences.length === this.knowledgeBaseResults.length
+    );
   }
 
   isSomeKBSelected(): boolean {
-    return this.selectedKBReferences.length > 0 &&
-           this.selectedKBReferences.length < this.knowledgeBaseResults.length;
+    return (
+      this.selectedKBReferences.length > 0 &&
+      this.selectedKBReferences.length < this.knowledgeBaseResults.length
+    );
   }
 
   openSelectedKBReferences() {
@@ -2458,12 +2711,15 @@ export class InitiatorFormComponent {
     }
 
     // Open each reference in a new tab
-    this.selectedKBReferences.forEach(ref => {
-      const url = window.location.origin + `/dashboard/add-reference/${ref.referenceNo}`;
+    this.selectedKBReferences.forEach((ref) => {
+      const url =
+        window.location.origin + `/dashboard/add-reference/${ref.referenceNo}`;
       window.open(url, '_blank');
     });
 
-    this.toastr.success(`Opening ${this.selectedKBReferences.length} reference(s) in new tabs`);
+    this.toastr.success(
+      `Opening ${this.selectedKBReferences.length} reference(s) in new tabs`,
+    );
   }
 
   clearSearchResults() {
@@ -2477,7 +2733,9 @@ export class InitiatorFormComponent {
     if (this.isAllSearchResultsSelected()) {
       this.searchResultsSelection.clear();
     } else {
-      this.searchResultsData.data.forEach(row => this.searchResultsSelection.select(row));
+      this.searchResultsData.data.forEach((row) =>
+        this.searchResultsSelection.select(row),
+      );
     }
   }
 
@@ -2493,7 +2751,9 @@ export class InitiatorFormComponent {
     if (this.isAllLinkedReferencesSelected()) {
       this.linkedReferencesSelection.clear();
     } else {
-      this.linkedReferencesData.data.forEach(row => this.linkedReferencesSelection.select(row));
+      this.linkedReferencesData.data.forEach((row) =>
+        this.linkedReferencesSelection.select(row),
+      );
     }
   }
 

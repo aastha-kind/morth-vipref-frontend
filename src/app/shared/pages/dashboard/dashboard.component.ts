@@ -1,4 +1,13 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, inject, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  inject,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { ChangeDetectorRef } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
@@ -10,7 +19,7 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ViewReferenceComponent } from '../view-reference/view-reference.component';
 import { UsermgmtService } from '../../service/usermgmt.service';
-import { NgxUiLoaderService } from "ngx-ui-loader";
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ToastrService } from 'ngx-toastr';
 import { PagedResponse } from '../../interface/paged-response.model';
 Chart.register(...registerables);
@@ -32,25 +41,23 @@ export interface VipReference {
   dateOfEntry?: Date;
 }
 
-
 @Component({
   selector: 'app-dashboard',
   standalone: false,
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent implements AfterViewInit {
-  userDetails!:User;
-  selectedMenu:string="User Dashboard";
+  userDetails!: User;
+  selectedMenu: string = 'User Dashboard';
   isMenuOpen = false;
-  @ViewChild('myChart') myChart: ElementRef | undefined;  // Access canvas via ViewChild
+  @ViewChild('myChart') myChart: ElementRef | undefined; // Access canvas via ViewChild
   chart: any;
-  private router=inject(Router);
-  private dialog=inject(MatDialog);
+  private router = inject(Router);
+  private dialog = inject(MatDialog);
   private userMgmtService = inject(UsermgmtService);
-  private ngxService= inject(NgxUiLoaderService);
-  private toastr= inject(ToastrService);
-
+  private ngxService = inject(NgxUiLoaderService);
+  private toastr = inject(ToastrService);
 
   public config: any;
   displayedColumns: string[] = [
@@ -60,7 +67,7 @@ export class DashboardComponent implements AfterViewInit {
     'priority',
     'currentQueue',
     // 'status',
-    'actions'
+    'actions',
   ];
   VipReferenceData = new MatTableDataSource<VipReference>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -85,14 +92,14 @@ export class DashboardComponent implements AfterViewInit {
     { value: 'all', label: 'All Time' },
     { value: 'current_week', label: 'Current Week' },
     { value: 'last_week', label: 'Last One Week' },
-    { value: 'last_month', label: 'Last One Month' }
+    { value: 'last_month', label: 'Last One Month' },
   ];
 
   queueFilterOptions = [
     { value: 'ALL', label: 'All Queues' },
     { value: 'VIP_Assigner', label: 'VIP Assigner Queue' },
     { value: 'VIP_final_reply', label: 'Final Reply Queue' },
-    { value: 'CLOSED', label: 'Closed' }
+    { value: 'CLOSED', label: 'Closed' },
   ];
 
   // Priority filter
@@ -100,7 +107,7 @@ export class DashboardComponent implements AfterViewInit {
   priorityFilterOptions = [
     { value: 'ALL', label: 'All Priorities' },
     { value: 'Priority', label: 'Priority' },
-    { value: 'Normal', label: 'Normal' }
+    { value: 'Normal', label: 'Normal' },
   ];
 
   ngOnInit() {
@@ -137,34 +144,40 @@ export class DashboardComponent implements AfterViewInit {
     }
   }
 
-  getUserDetails(){
-    const userData=sessionStorage.getItem("user");
-    if(userData){
-      this.userDetails=JSON.parse(userData);
+  getUserDetails() {
+    const userData = sessionStorage.getItem('user');
+    if (userData) {
+      this.userDetails = JSON.parse(userData);
     }
   }
 
   isAssignerOrAssignee(): boolean {
-    return this.userDetails?.roles?.some(role => {
-      const roleName = role.roleName?.toLowerCase() || '';
-      return roleName.includes('assigner') || roleName.includes('assignee');
-    }) || false;
+    return (
+      this.userDetails?.roles?.some((role) => {
+        const roleName = role.roleName?.toLowerCase() || '';
+        return roleName.includes('assigner') || roleName.includes('assignee');
+      }) || false
+    );
   }
 
   // Check if user is Assigner (has queue filter)
   isAssigner(): boolean {
-    return this.userDetails?.roles?.some(role => {
-      const roleName = role.roleName?.toLowerCase() || '';
-      return roleName.includes('assigner') && !roleName.includes('assignee');
-    }) || false;
+    return (
+      this.userDetails?.roles?.some((role) => {
+        const roleName = role.roleName?.toLowerCase() || '';
+        return roleName.includes('assigner') && !roleName.includes('assignee');
+      }) || false
+    );
   }
 
   // Check if user is Assignee (no queue filter)
   isAssignee(): boolean {
-    return this.userDetails?.roles?.some(role => {
-      const roleName = role.roleName?.toLowerCase() || '';
-      return roleName.includes('assignee');
-    }) || false;
+    return (
+      this.userDetails?.roles?.some((role) => {
+        const roleName = role.roleName?.toLowerCase() || '';
+        return roleName.includes('assignee');
+      }) || false
+    );
   }
 
   // Handle date filter change
@@ -186,7 +199,7 @@ export class DashboardComponent implements AfterViewInit {
   }
 
   // Calculate date range based on filter
-  getDateRange(): { startDate: string | null, endDate: string | null } {
+  getDateRange(): { startDate: string | null; endDate: string | null } {
     // If 'all' is selected, return null values immediately
     if (this.selectedDateFilter === 'all') {
       return { startDate: null, endDate: null };
@@ -229,25 +242,30 @@ export class DashboardComponent implements AfterViewInit {
 
     return {
       startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-      endDate: endDate ? endDate.toISOString().split('T')[0] : null
+      endDate: endDate ? endDate.toISOString().split('T')[0] : null,
     };
   }
 
-  getDashboardStats(){
+  getDashboardStats() {
     this.ngxService.start();
 
     // Use different API based on user role
     const dashboardApi = this.isAssignerOrAssignee()
       ? this.userMgmtService.getDashboardStats(this.userDetails.loginId)
-      : this.userMgmtService.getInitiatorDashboardStats(this.userDetails.loginId);
+      : this.userMgmtService.getInitiatorDashboardStats(
+          this.userDetails.loginId,
+        );
 
     dashboardApi.subscribe({
-      next:(res:any)=>{
-        const response=res;
+      next: (res: any) => {
+        const response = res;
         console.log('Dashboard stats response:', response);
 
         // Calculate dashboard total from chart data
-        this.dashboardTotal = response.chartData.data.reduce((sum: number, val: number) => sum + val, 0);
+        this.dashboardTotal = response.chartData.data.reduce(
+          (sum: number, val: number) => sum + val,
+          0,
+        );
 
         // Dynamic colors based on number of labels
         const colors = this.getChartColors(response.chartData.labels.length);
@@ -263,43 +281,43 @@ export class DashboardComponent implements AfterViewInit {
                 backgroundColor: colors.background,
                 borderColor: colors.border,
                 borderWidth: 1,
-              }
-            ]
+              },
+            ],
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
               legend: {
-                position: 'bottom'
-              }
-            }
-          }
+                position: 'bottom',
+              },
+            },
+          },
         };
         // Render chart after data is loaded
         this.renderChartAfterDataLoad();
         this.ngxService.stop();
       },
-      error:(err:any)=>{
-        this.toastr.error("No Dashboard Data found for this user");
+      error: (err: any) => {
+        this.toastr.error('No Dashboard Data found for this user');
         this.ngxService.stop();
-      }
-    })
+      },
+    });
   }
 
-  getChartColors(count: number): { background: string[], border: string[] } {
+  getChartColors(count: number): { background: string[]; border: string[] } {
     // Color palette for different categories
     // For Assigner: VIP Assigner Queue, Final Reply Queue, Closed, Other
     // For Initiator: Sent, In Progress
     const allColors = [
-      { bg: 'rgba(0,123,255,0.5)', border: 'rgba(0,123,255,1)' },      // Blue - VIP Assigner Queue / Sent
-      { bg: 'rgba(75,192,192,0.5)', border: 'rgba(75,192,192,1)' },    // Teal - Final Reply Queue / In Progress
-      { bg: 'rgba(153,102,255,0.5)', border: 'rgba(153,102,255,1)' },  // Purple - Closed
-      { bg: 'rgba(255,159,64,0.5)', border: 'rgba(255,159,64,1)' }     // Orange - Other
+      { bg: 'rgba(0,123,255,0.5)', border: 'rgba(0,123,255,1)' }, // Blue - VIP Assigner Queue / Sent
+      { bg: 'rgba(75,192,192,0.5)', border: 'rgba(75,192,192,1)' }, // Teal - Final Reply Queue / In Progress
+      { bg: 'rgba(153,102,255,0.5)', border: 'rgba(153,102,255,1)' }, // Purple - Closed
+      { bg: 'rgba(255,159,64,0.5)', border: 'rgba(255,159,64,1)' }, // Orange - Other
     ];
 
-    const background = allColors.slice(0, count).map(c => c.bg);
-    const border = allColors.slice(0, count).map(c => c.border);
+    const background = allColors.slice(0, count).map((c) => c.bg);
+    const border = allColors.slice(0, count).map((c) => c.border);
 
     return { background, border };
   }
@@ -317,7 +335,7 @@ export class DashboardComponent implements AfterViewInit {
     }, 100);
   }
 
-  getVipReferenceList(){
+  getVipReferenceList() {
     const dateRange = this.getDateRange();
     console.log('Dashboard - Fetching references with filters:', {
       sortColumn: this.sortColumn,
@@ -330,7 +348,7 @@ export class DashboardComponent implements AfterViewInit {
       queueFilter: this.selectedQueueFilter,
       priorityFilter: this.selectedPriorityFilter,
       dateRange: dateRange,
-      loginId: this.userDetails?.loginId
+      loginId: this.userDetails?.loginId,
     });
     this.ngxService.start();
 
@@ -345,7 +363,7 @@ export class DashboardComponent implements AfterViewInit {
         page: this.pageIndex,
         size: this.pageSize,
         sortBy: this.sortColumn,
-        sortDir: this.sortDirection
+        sortDir: this.sortDirection,
       };
 
       // Add date filters if selected
@@ -357,48 +375,55 @@ export class DashboardComponent implements AfterViewInit {
       }
 
       // Add priority filter if selected
-      if (this.selectedPriorityFilter && this.selectedPriorityFilter !== 'ALL') {
+      if (
+        this.selectedPriorityFilter &&
+        this.selectedPriorityFilter !== 'ALL'
+      ) {
         queueData.priority = this.selectedPriorityFilter;
       }
 
       console.log('Dashboard - Final queueData being sent:', queueData);
-      this.userMgmtService.getQueueReferencesListPaginated(queueData).subscribe({
-        next: (res: any) => {
-          console.log('Received assigner response:', res);
-          this.VipReferenceData.data = res.content;
-          this.totalElements = res.totalElements;
-          this.pageIndex = res.pageNumber || 0;
-          this.ngxService.stop();
-        },
-        error: (err) => {
-          console.error('Error fetching references:', err);
-          this.toastr.error("No references found for this user");
-          this.ngxService.stop();
-        }
-      });
+      this.userMgmtService
+        .getQueueReferencesListPaginated(queueData)
+        .subscribe({
+          next: (res: any) => {
+            console.log('Received assigner response:', res);
+            this.VipReferenceData.data = res.content;
+            this.totalElements = res.totalElements;
+            this.pageIndex = res.pageNumber || 0;
+            this.ngxService.stop();
+          },
+          error: (err) => {
+            console.error('Error fetching references:', err);
+            this.toastr.error('No references found for this user');
+            this.ngxService.stop();
+          },
+        });
     } else {
       // Initiator - fetch sent references (no filters)
-      this.userMgmtService.getVipReferenceListPaginated(
-        this.userDetails.loginId,
-        this.pageIndex,
-        this.pageSize,
-        this.searchTerm,
-        this.sortColumn,
-        this.sortDirection
-      ).subscribe({
-        next:(res: PagedResponse<VipReference>)=>{
-          console.log('Received initiator response:', res);
-          this.VipReferenceData.data = res.content;
-          this.totalElements = res.totalElements;
-          this.pageIndex = res.pageNumber;
-          this.ngxService.stop();
-        },
-        error:(err)=>{
-          console.error('Error fetching references:', err);
-          this.toastr.error("No references found for this user");
-          this.ngxService.stop();
-        }
-      });
+      this.userMgmtService
+        .getVipReferenceListPaginated(
+          this.userDetails.loginId,
+          this.pageIndex,
+          this.pageSize,
+          this.searchTerm,
+          this.sortColumn,
+          this.sortDirection,
+        )
+        .subscribe({
+          next: (res: PagedResponse<VipReference>) => {
+            console.log('Received initiator response:', res);
+            this.VipReferenceData.data = res.content;
+            this.totalElements = res.totalElements;
+            this.pageIndex = res.pageNumber;
+            this.ngxService.stop();
+          },
+          error: (err) => {
+            console.error('Error fetching references:', err);
+            this.toastr.error('No references found for this user');
+            this.ngxService.stop();
+          },
+        });
     }
   }
 
@@ -424,19 +449,21 @@ export class DashboardComponent implements AfterViewInit {
         const viewReferenceDialog = this.dialog.open(ViewReferenceComponent, {
           data: detailedRef,
           width: '900px',
-          maxHeight: '90vh'
+          maxHeight: '90vh',
         });
       },
       error: (err) => {
         this.ngxService.stop();
         // Fallback to basic data if API fails
-        this.toastr.warning("Could not fetch complete details, showing basic information");
+        this.toastr.warning(
+          'Could not fetch complete details, showing basic information',
+        );
         const viewReferenceDialog = this.dialog.open(ViewReferenceComponent, {
           data: ref,
           width: '900px',
-          maxHeight: '90vh'
+          maxHeight: '90vh',
         });
-      }
+      },
     });
   }
 
