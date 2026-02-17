@@ -1125,8 +1125,7 @@ export class InitiatorFormComponent {
       state: this.refernceDetails.state,
       constituency: this.refernceDetails.constituency,
       priority: this.refernceDetails.priority,
-      catgOfSubject: categoryId,
-      subCatgOfSubject: this.refernceDetails.subCategoryOfSubject,
+      catgOfSubject: categoryId?.toString(),
       subjectOrIssue: this.refernceDetails.subject,
     });
 
@@ -1343,7 +1342,7 @@ export class InitiatorFormComponent {
             }
           }
           this.addVipReferenceDetails.patchValue({
-            subCatgOfSubject: subCategoryId,
+            subCatgOfSubject: subCategoryId.toString(),
           });
         }
 
@@ -1695,6 +1694,26 @@ export class InitiatorFormComponent {
 
   updateVipReferenceDetails() {
     this.ngxService.start();
+
+    // Resolve category ID to name for backend
+    const categoryId = this.addVipReferenceDetails.get('catgOfSubject')?.value;
+    const matchedCategory = this.categoryList.find(
+      (cat: any) => cat.categoryId.toString() === categoryId?.toString(),
+    );
+    const categoryName = matchedCategory
+      ? matchedCategory.categoryDescription || matchedCategory.categoryName
+      : categoryId;
+
+    // Resolve sub-category ID to name for backend
+    const subCategoryId =
+      this.addVipReferenceDetails.get('subCatgOfSubject')?.value;
+    const matchedSubCategory = this.subCategoryList.find(
+      (subCat: any) => subCat.subCatId.toString() === subCategoryId?.toString(),
+    );
+    const subCategoryName = matchedSubCategory
+      ? matchedSubCategory.subCatName || matchedSubCategory.subCategoryName
+      : subCategoryId;
+
     const updatedData = {
       nameOfDignitary:
         this.addVipReferenceDetails.get('nameOfDiginitary')?.value,
@@ -1703,10 +1722,8 @@ export class InitiatorFormComponent {
       state: this.addVipReferenceDetails.get('state')?.value,
       constituency: this.addVipReferenceDetails.get('constituency')?.value,
       priority: this.addVipReferenceDetails.get('priority')?.value,
-      categoryOfSubject:
-        this.addVipReferenceDetails.get('catgOfSubject')?.value,
-      subCategoryOfSubject:
-        this.addVipReferenceDetails.get('subCatgOfSubject')?.value,
+      categoryOfSubject: categoryName,
+      subCategoryOfSubject: subCategoryName,
       subject: this.addVipReferenceDetails.get('subjectOrIssue')?.value,
       vipReferenceId: this.refernceDetails.referenceId,
       updatedBy: this.userDetails.name,
@@ -1716,7 +1733,15 @@ export class InitiatorFormComponent {
     this.userMgmtService.updateReference(updatedData).subscribe({
       next: (res) => {
         this.toastr.success('Reference updated successfully');
-        this.getReferenceDetails();
+        // Update local reference details with the new values
+        this.refernceDetails.categoryOfSubject = categoryName;
+        this.refernceDetails.subCategoryOfSubject = subCategoryName;
+        this.refernceDetails.nameOfDignitary =
+          this.addVipReferenceDetails.get('nameOfDiginitary')?.value;
+        this.refernceDetails.subject =
+          this.addVipReferenceDetails.get('subjectOrIssue')?.value;
+        this.refernceDetails.priority =
+          this.addVipReferenceDetails.get('priority')?.value;
         this.ngxService.stop();
       },
       error: (err) => {
