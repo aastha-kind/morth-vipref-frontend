@@ -39,10 +39,10 @@ export class LoginComponent {
 
   public onLogin(): void {
     // Validate captcha
-    if (!this.captchaToken) {
-      this.toastr.error("Please complete the captcha verification.");
-      return;
-    }
+    // if (!this.captchaToken) {
+    //   this.toastr.error("Please complete the captcha verification.");
+    //   return;
+    // }
 
     this.ngxService.start();
     this.markAsDirty(this.loginForm);

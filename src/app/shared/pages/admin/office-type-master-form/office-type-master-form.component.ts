@@ -46,14 +46,17 @@ export class OfficeTypeMasterFormComponent {
     this.adminService.getOfficeTypeMaster().subscribe({
       next: (res: OfficeType[]) => {
         this.officeTypes.data = res;
-        this.officeTypes.filterPredicate = (data: OfficeType, filter: string): boolean => {
+        this.officeTypes.filterPredicate = (data: any, filter: string): boolean => {
           const search = filter.trim().toLowerCase();
-          const name = data.officeTypeName?.toLowerCase() || '';
+          const name = data.typeName?.toLowerCase() || '';
           const code = data.officeTypeCode?.toLowerCase() || '';
           return name.includes(search) || code.includes(search);
         };
       },
-      error: (err:Error) => console.error(err),
+      error: (err: any) => {
+        console.error('Failed to load office types:', err);
+        this.toastService.error('Failed to load office types');
+      },
     });
   }
 
@@ -78,14 +81,17 @@ export class OfficeTypeMasterFormComponent {
             this.loadOfficeTypes();
             this.toastService.success('Office Type Added Successfully');
           },
-          error: () => this.toastService.error('Failed To Add Office Type'),
+          error: (err: any) => {
+            const message = err?.error?.message || 'Failed To Add Office Type';
+            this.toastService.error(message);
+          },
         });
       }
     });
   }
 
   /** Edit Office Type */
-  openEditDialog(type: OfficeType): void {
+  openEditDialog(type: any): void {
     const dialogRef = this.dialog.open(OfficeTypeMasterDialogComponent, {
       width: '400px',
       data: { mode: 'edit', officeType: { ...type } }
@@ -98,14 +104,17 @@ export class OfficeTypeMasterFormComponent {
             this.loadOfficeTypes();
             this.toastService.success('Office Type Updated Successfully');
           },
-          error: () => this.toastService.error('Failed To Update Office Type'),
+          error: (err: any) => {
+            const message = err?.error?.message || 'Failed To Update Office Type';
+            this.toastService.error(message);
+          },
         });
       }
     });
   }
 
   /** Delete Office Type */
-  openDeleteDialog(type: OfficeType): void {
+  openDeleteDialog(type: any): void {
     const dialogRef = this.dialog.open(OfficeTypeMasterDialogComponent, {
       width: '350px',
       data: { mode: 'delete', officeType: type }
@@ -118,7 +127,10 @@ export class OfficeTypeMasterFormComponent {
             this.loadOfficeTypes();
             this.toastService.success('Office Type Deleted Successfully');
           },
-          error: () => this.toastService.error('Failed To Delete Office Type'),
+          error: (err: any) => {
+            const message = err?.error?.message || 'Failed To Delete Office Type';
+            this.toastService.error(message);
+          },
         });
       }
     });

@@ -43,8 +43,9 @@ export class OrganizationMasterFormComponent {
                 this.toastService.success('Organization Added Successfully');
               }
             },
-            error: (err: Error) => {
-              this.toastService.error('Failed To Add Organization');
+            error: (err: any) => {
+              const message = err?.error?.message || 'Failed To Add Organization';
+              this.toastService.error(message);
             }
           })
         }

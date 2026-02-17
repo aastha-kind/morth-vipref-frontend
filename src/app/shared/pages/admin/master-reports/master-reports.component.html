@@ -479,7 +479,75 @@
           </div>
         </mat-tab>
 
-        <!-- Tab 5: State-Org Report -->
+        <!-- Tab 5: NHIDCL MIS Report -->
+        <mat-tab label="NHIDCL MIS Report">
+          <div class="p-3">
+            <div class="mb-3">
+              <button class="btn btn-primary me-2" (click)="loadNHIDCLMISReport()" [disabled]="loading">
+                <i class="bi bi-search me-1"></i>Generate Report
+              </button>
+            </div>
+
+            <div class="mb-3" *ngIf="nhidclMisData.length > 0">
+              <button class="btn btn-danger me-2" (click)="exportNHIDCLMISToPDF()">
+                <i class="bi bi-file-pdf me-1"></i>Export to PDF
+              </button>
+              <button class="btn btn-success me-2" (click)="exportNHIDCLMISToExcel()">
+                <i class="bi bi-file-excel me-1"></i>Export to Excel
+              </button>
+              <button class="btn btn-info" (click)="exportNHIDCLMISToCSV()">
+                <i class="bi bi-filetype-csv me-1"></i>Export to CSV
+              </button>
+            </div>
+
+            <div *ngIf="loading" class="text-center py-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2">Loading report data...</p>
+            </div>
+
+            <div *ngIf="!loading && nhidclMisData.length > 0" class="table-responsive">
+              <table class="table table-bordered table-hover table-sm">
+                <thead class="table-primary">
+                  <tr>
+                    <th>S.No.</th>
+                    <th style="cursor: pointer;" (click)="sortNHIDCLMISTable('state')">
+                      State
+                      <i class="bi" [ngClass]="nhidclMisSortColumn === 'state' ? (nhidclMisSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortNHIDCLMISTable('total')">
+                      Total
+                      <i class="bi" [ngClass]="nhidclMisSortColumn === 'total' ? (nhidclMisSortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th *ngFor="let key of nhidclMisData[0]?.designationWiseCount ? (nhidclMisData[0].designationWiseCount | keyvalue) : []">
+                      {{key.key}}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of nhidclMisData">
+                    <td>{{item.sNo}}</td>
+                    <td>{{item.state}}</td>
+                    <td>{{item.total}}</td>
+                    <td *ngFor="let key of item.designationWiseCount | keyvalue">
+                      {{key.value}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="mt-2">
+                <strong>Grand Total: {{nhidclMisResponse?.grandTotal || 0}}</strong>
+              </div>
+            </div>
+
+            <div *ngIf="!loading && nhidclMisData.length === 0 && nhidclMisResponse" class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>No NHIDCL records found.
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab 6: State-Org Report -->
         <mat-tab label="State-Org Report">
           <div class="p-3">
             <div class="card mb-3">
