@@ -45,6 +45,11 @@ export class ReportService {
     return this.http.get<any>(`${API_ENDPOINTS.reports}/mis/nhai/by-user`);
   }
 
+  // NHIDCL MIS Report
+  getNHIDCLMISReport(): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.reports}/mis/nhidcl/by-user`);
+  }
+
   // State-Org Report
   getStateOrgReport(filters: any): Observable<any> {
     let params = new HttpParams();

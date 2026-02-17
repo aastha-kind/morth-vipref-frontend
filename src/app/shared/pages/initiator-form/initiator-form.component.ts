@@ -1703,10 +1703,11 @@ export class InitiatorFormComponent {
       state: this.addVipReferenceDetails.get('state')?.value,
       constituency: this.addVipReferenceDetails.get('constituency')?.value,
       priority: this.addVipReferenceDetails.get('priority')?.value,
-      catgOfSubject: this.addVipReferenceDetails.get('catgOfSubject')?.value,
-      subCatgOfSubject:
+      categoryOfSubject:
+        this.addVipReferenceDetails.get('catgOfSubject')?.value,
+      subCategoryOfSubject:
         this.addVipReferenceDetails.get('subCatgOfSubject')?.value,
-      subjectOrIssue: this.addVipReferenceDetails.get('subjectOrIssue')?.value,
+      subject: this.addVipReferenceDetails.get('subjectOrIssue')?.value,
       vipReferenceId: this.refernceDetails.referenceId,
       updatedBy: this.userDetails.name,
       updatedAt: this.formatDateToIso(this.createdDate),
