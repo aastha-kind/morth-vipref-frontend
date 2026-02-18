@@ -192,6 +192,18 @@
   color: #1b5e20;
 }
 
+.queue-discarded .readonly-input {
+  background-color: #fbe9e7;
+  border-color: #ff5722;
+  color: #bf360c;
+}
+
+.queue-closed .readonly-input {
+  background-color: #f3e5f5;
+  border-color: #9c27b0;
+  color: #4a148c;
+}
+
 /* Documents Section */
 .documents-section {
   padding: 0;

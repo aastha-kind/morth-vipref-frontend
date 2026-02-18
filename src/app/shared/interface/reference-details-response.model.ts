@@ -31,4 +31,5 @@ export interface VipReferenceDocumentResponse {
     toLoginId?: string; // Assigned assigner's login ID (optional)
     documents: VipReferenceDocumentResponse[]; // List of documents
     initiatorOfficeType?: string; // MINISTRY or SECRETARY
+    referenceStatus?: string; // ACTIVE, DISCARDED, CLOSED
   }

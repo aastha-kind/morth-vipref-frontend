@@ -56,9 +56,10 @@ export class LoginComponent {
     this.userMgmtService.loginVipUser(loginData).subscribe({
       next: (res: any) => {
         if (res !== undefined && res !== null) {
-          // Add officeType to user object before storing
+          // Add officeType to user object before storing, strip sensitive fields
+          const { userPassword, hashedPassword, ...safeUser } = res.user;
           const userWithOfficeType = {
-            ...res.user,
+            ...safeUser,
             officeType: res.officeType,
             officeTypeName: res.officeTypeName
           };
