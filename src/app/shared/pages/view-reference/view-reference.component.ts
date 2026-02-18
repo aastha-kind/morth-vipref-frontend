@@ -236,8 +236,11 @@ private getFullStateName(stateCode: string): string {
   }
 
   private formatQueueName(queue: string): string {
+    const status = this.referenceDetails?.referenceStatus;
+    if (status === 'DISCARDED') return 'Discard References';
+    if (status === 'CLOSED') return 'Closed References';
     if (!queue) return 'N/A';
-    // Convert queue names like VIP_initiator to "VIP Initiator"
+    // Convert queue names like VIP_Assigner to "VIP Assigner"
     return queue.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
   }
 
@@ -268,6 +271,9 @@ private getFullStateName(stateCode: string): string {
   }
 
   getQueueStatusClass(queue: string): string {
+    const status = this.referenceDetails?.referenceStatus;
+    if (status === 'DISCARDED') return 'queue-discarded';
+    if (status === 'CLOSED') return 'queue-closed';
     if (!queue) return '';
     const lowerQueue = queue.toLowerCase();
     if (lowerQueue.includes('initiator')) return 'queue-initiator';
