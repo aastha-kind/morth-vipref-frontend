@@ -1,77 +1,228 @@
-
+/* ── Cards ───────────────────────────────────────────────── */
 .example-card {
-    width: 100% !important;
-    height: 100% !important;
+  width: 100%;
+  height: 100%;
 }
+
+/* ── Two-column grid (chart | table) ─────────────────────── */
 .grid-layout {
-    display: grid;
-    grid-template-columns: 2fr 5fr;
+  display: grid;
+  grid-template-columns: 2fr 5fr;
+  gap: 16px;
+  padding: 16px;
 }
+
+/* Grid items must declare min-width: 0 or they won't shrink below content size */
+.dashboard-card,
+.table-card {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── Chart ───────────────────────────────────────────────── */
+.canvas-chart {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Container drives the Chart.js size (responsive:true + maintainAspectRatio:false) */
 .canvas-chart-container {
-    width: 350px !important;
-    height: 350px !important;
-    margin: 30px 0px;
+  width: 300px;
+  height: 300px;
+  margin: 20px auto;
 }
 
 .mat-mdc-card-header {
-    padding-top: 40px;
-    justify-content: center;
-}
-
-.canvas-chart {
-    display: flex;
-    justify-content: center;
-}
-
-.p-4 {
-    padding: 20px;
+  padding-top: 30px;
+  justify-content: center;
 }
 
 .mat-card-footer {
-    margin-top: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .mat-card-footer p span {
-    color: red;
-    font-weight: 600;
+  color: #3e9393;
+  font-weight: bold;
 }
 
-::ng-deep .mat-mdc-header-row {
-    /* background: #3f51b5 !important; */
-    background: #3e9393 !important;
-    color: #ffff !important;
+/* ── Table section ───────────────────────────────────────── */
+.overflow-x-auto {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-::ng-deep .mat-sort-header-arrow svg {
-    fill: #ffff !important;
+.p-4 {
+  padding: 16px;
 }
 
-::ng-deep .mat-mdc-menu-panel {
-    min-width: 140px !important;
+/* Ensure the mat-table never shrinks below its natural width */
+/* table.mat-mdc-table {
+  min-width: 560px;
+} */
+
+/* ── Search field ────────────────────────────────────────── */
+.w-full {
+  width: 100%;
 }
 
-/* Filter Row Styles */
+/* ── Filters row ─────────────────────────────────────────── */
 .filters-row {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 
 .filter-field {
-    min-width: 180px;
-    flex: 1;
-    max-width: 250px;
+  min-width: 160px;
+  flex: 1;
+  max-width: 240px;
 }
 
-@media (max-width: 768px) {
-    .filters-row {
-        flex-direction: column;
-    }
-    .filter-field {
-        max-width: 100%;
-    }
+/* ── Material overrides ──────────────────────────────────── */
+::ng-deep .mat-mdc-header-row {
+  background: #3e9393 !important;
+  color: #fff !important;
+}
+
+::ng-deep .mat-sort-header-arrow svg {
+  fill: #fff !important;
+}
+
+::ng-deep .mat-mdc-menu-panel {
+  min-width: 140px !important;
+}
+
+/* ── Breakpoints ─────────────────────────────────────────── */
+
+/* Tablets landscape (768px – 991px) — stack chart below table */
+@media (min-width: 768px) and (max-width: 991px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .dashboard-card {
+    order: 2;
+  }
+
+  .table-card {
+    order: 1;
+  }
+
+  .canvas-chart-container {
+    width: 260px;
+    height: 260px;
+  }
+}
+
+/* Tablets portrait + large phones (576px – 767px) */
+@media (min-width: 576px) and (max-width: 767px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .dashboard-card { order: 2; }
+  .table-card     { order: 1; }
+
+  .canvas-chart-container {
+    width: 240px;
+    height: 240px;
+    margin: 16px auto;
+  }
+
+  /* 2-column filter grid so all 3 dropdowns fit without scrolling */
+  .filters-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    flex-wrap: unset;
+  }
+
+  .filter-field {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+/* Mobile phones (< 576px) */
+@media (max-width: 575px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .dashboard-card { order: 2; }
+  .table-card     { order: 1; }
+
+  .canvas-chart-container {
+    width: 200px;
+    height: 200px;
+    margin: 12px auto;
+  }
+
+  .mat-mdc-card-header { padding-top: 16px; }
+  .mat-card-footer     { margin-top: 16px; }
+
+  .p-4 { padding: 8px; }
+
+  /* ── Compact filters: 2-column grid on mobile ── */
+  .filters-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 6px;
+    flex-wrap: unset;
+  }
+
+  .filter-field {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Reduce Angular Material form-field internal padding + font */
+  ::ng-deep .filters-row .mat-mdc-text-field-wrapper {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  ::ng-deep .filters-row .mdc-floating-label,
+  ::ng-deep .filters-row .mat-mdc-select-value-text,
+  ::ng-deep .filters-row .mat-mdc-select-placeholder {
+    font-size: 11px !important;
+  }
+
+  ::ng-deep .filters-row .mat-mdc-form-field-infix {
+    padding-top: 10px !important;
+    padding-bottom: 6px !important;
+    min-height: unset !important;
+  }
+
+  /* Compact search box */
+  ::ng-deep .w-full .mat-mdc-text-field-wrapper {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  ::ng-deep .w-full .mdc-floating-label,
+  ::ng-deep .w-full input.mat-mdc-input-element {
+    font-size: 12px !important;
+  }
+
+  ::ng-deep .w-full .mat-mdc-form-field-infix {
+    padding-top: 10px !important;
+    padding-bottom: 6px !important;
+    min-height: unset !important;
+  }
 }

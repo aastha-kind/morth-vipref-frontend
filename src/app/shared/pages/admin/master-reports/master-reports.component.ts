@@ -5,6 +5,7 @@ import { UsermgmtService } from '../../../service/usermgmt.service';
 import { ToasterService } from '../../../utilities/toaster.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-master-reports',
@@ -353,11 +354,9 @@ export class MasterReportsComponent implements OnInit {
       return;
     }
 
-    // For Excel, we'll use CSV format with .xlsx extension
-    // For proper Excel support, you would need a library like xlsx or exceljs
     const headers = ['S.No.', 'Request Number', 'Letter Date', 'Receiving Date', 'Dignitary Name', 'Designation', 'State', 'Category', 'Sub Category', 'Subject', 'Priority', 'Pending With', 'Status'];
-    const csvData = this.vipCustomizeData.map((item, index) => [
-      (index + 1).toString(),
+    const rows = this.vipCustomizeData.map((item, index) => [
+      index + 1,
       item.requestNumber || '-',
       this.formatDate(item.letterDate) || '-',
       this.formatDate(item.receivingDate) || '-',
@@ -372,18 +371,10 @@ export class MasterReportsComponent implements OnInit {
       item.status || '-'
     ]);
 
-    let csv = headers.join('\t') + '\n';
-    csvData.forEach(row => {
-      csv += row.join('\t') + '\n';
-    });
-
-    const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'VIP_Common_Report.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'VIP Common Report');
+    XLSX.writeFile(wb, 'VIP_Common_Report.xlsx');
     this.toaster.success('Report exported to Excel');
   }
 
@@ -539,8 +530,8 @@ export class MasterReportsComponent implements OnInit {
     }
 
     const headers = ['S.No.', 'Reference No', 'Dignitary Name', 'Subject', 'State', 'Assignee Name', 'Login ID', 'Designation', 'Organisation', 'Office', 'Pending Days', 'Status'];
-    const csvData = this.vipPendencyData.map((item) => [
-      item.sNo?.toString() || '-',
+    const rows = this.vipPendencyData.map((item) => [
+      item.sNo ?? '-',
       item.referenceNo || '-',
       item.dignitaryName || '-',
       item.subject || '-',
@@ -550,22 +541,14 @@ export class MasterReportsComponent implements OnInit {
       item.designation || '-',
       item.organisation || '-',
       item.office || '-',
-      item.pendingDays?.toString() || '0',
+      item.pendingDays ?? 0,
       item.status || '-'
     ]);
 
-    let csv = headers.join('\t') + '\n';
-    csvData.forEach(row => {
-      csv += row.join('\t') + '\n';
-    });
-
-    const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'VIP_Pendency_Report.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'VIP Pendency Report');
+    XLSX.writeFile(wb, 'VIP_Pendency_Report.xlsx');
     this.toaster.success('Report exported to Excel');
   }
 
@@ -688,25 +671,17 @@ export class MasterReportsComponent implements OnInit {
 
     const designations = Object.keys(this.misData[0].designationWiseCount || {});
     const headers = ['S.No.', 'State', 'Total', ...designations];
-    const csvData = this.misData.map((item) => [
-      item.sNo?.toString() || '-',
+    const rows = this.misData.map((item) => [
+      item.sNo ?? '-',
       item.state || '-',
-      item.total?.toString() || '0',
-      ...designations.map(d => item.designationWiseCount[d]?.toString() || '0')
+      item.total ?? 0,
+      ...designations.map(d => item.designationWiseCount[d] ?? 0)
     ]);
 
-    let csv = headers.join('\t') + '\n';
-    csvData.forEach(row => {
-      csv += row.join('\t') + '\n';
-    });
-
-    const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'VIP_MIS_MoRTH_Report.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'MIS MoRTH Report');
+    XLSX.writeFile(wb, 'VIP_MIS_MoRTH_Report.xlsx');
     this.toaster.success('Report exported to Excel');
   }
 
@@ -832,25 +807,17 @@ export class MasterReportsComponent implements OnInit {
 
     const designations = Object.keys(this.nhaiMisData[0].designationWiseCount || {});
     const headers = ['S.No.', 'State', 'Total', ...designations];
-    const csvData = this.nhaiMisData.map((item) => [
-      item.sNo?.toString() || '-',
+    const rows = this.nhaiMisData.map((item) => [
+      item.sNo ?? '-',
       item.state || '-',
-      item.total?.toString() || '0',
-      ...designations.map(d => item.designationWiseCount[d]?.toString() || '0')
+      item.total ?? 0,
+      ...designations.map(d => item.designationWiseCount[d] ?? 0)
     ]);
 
-    let csv = headers.join('\t') + '\n';
-    csvData.forEach(row => {
-      csv += row.join('\t') + '\n';
-    });
-
-    const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'VIP_MIS_NHAI_Report.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'MIS NHAI Report');
+    XLSX.writeFile(wb, 'VIP_MIS_NHAI_Report.xlsx');
     this.toaster.success('Report exported to Excel');
   }
 
@@ -965,23 +932,17 @@ export class MasterReportsComponent implements OnInit {
     }
     const designations = Object.keys(this.nhidclMisData[0].designationWiseCount || {});
     const headers = ['S.No.', 'State', 'Total', ...designations];
-    const csvData = this.nhidclMisData.map((item) => [
-      item.sNo?.toString() || '-',
+    const rows = this.nhidclMisData.map((item) => [
+      item.sNo ?? '-',
       item.state || '-',
-      item.total?.toString() || '0',
-      ...designations.map(d => item.designationWiseCount[d]?.toString() || '0')
+      item.total ?? 0,
+      ...designations.map(d => item.designationWiseCount[d] ?? 0)
     ]);
-    let csv = headers.join('\t') + '\n';
-    csvData.forEach(row => {
-      csv += row.join('\t') + '\n';
-    });
-    const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'VIP_MIS_NHIDCL_Report.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
+
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'MIS NHIDCL Report');
+    XLSX.writeFile(wb, 'VIP_MIS_NHIDCL_Report.xlsx');
     this.toaster.success('Report exported to Excel');
   }
 
@@ -1151,29 +1112,21 @@ export class MasterReportsComponent implements OnInit {
     }
 
     const headers = ['S.No.', 'State', 'Organisation', 'Total Reference', 'To Be Assigned', 'In Progress', 'Closed', 'Discarded'];
-    const csvData = this.stateOrgData.map((item) => [
-      item.sNo?.toString() || '-',
+    const rows = this.stateOrgData.map((item) => [
+      item.sNo ?? '-',
       item.state || '-',
       item.organisation || '-',
-      item.totalReference?.toString() || '0',
-      item.toBeAssigned?.toString() || '0',
-      item.inProgress?.toString() || '0',
-      item.closed?.toString() || '0',
-      item.discard?.toString() || '0'
+      item.totalReference ?? 0,
+      item.toBeAssigned ?? 0,
+      item.inProgress ?? 0,
+      item.closed ?? 0,
+      item.discard ?? 0
     ]);
 
-    let csv = headers.join('\t') + '\n';
-    csvData.forEach(row => {
-      csv += row.join('\t') + '\n';
-    });
-
-    const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'VIP_State_Org_Report.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'State Org Report');
+    XLSX.writeFile(wb, 'VIP_State_Org_Report.xlsx');
     this.toaster.success('Report exported to Excel');
   }
 
@@ -1310,26 +1263,18 @@ export class MasterReportsComponent implements OnInit {
     }
 
     const headers = ['S.No.', 'Office', 'Designation', 'Employee Name', 'Total'];
-    const csvData = this.officerWiseData.map((item) => [
-      item.sNo?.toString() || '-',
+    const rows = this.officerWiseData.map((item) => [
+      item.sNo ?? '-',
       item.office || '-',
       item.designation || '-',
       item.employeeName || '-',
-      item.total?.toString() || '0'
+      item.total ?? 0
     ]);
 
-    let csv = headers.join('\t') + '\n';
-    csvData.forEach(row => {
-      csv += row.join('\t') + '\n';
-    });
-
-    const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'VIP_Officer_Wise_Report.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Officer Wise Report');
+    XLSX.writeFile(wb, 'VIP_Officer_Wise_Report.xlsx');
     this.toaster.success('Report exported to Excel');
   }
 
@@ -1468,8 +1413,8 @@ export class MasterReportsComponent implements OnInit {
     }
 
     const headers = ['S.No.', 'Organisation', 'Office', 'Designation', 'Name', 'Login ID', 'Contact Number', 'Email ID', 'Has Login Before', 'Last Login Time', 'User Locked', 'Failure Attempt Count'];
-    const csvData = this.userLoginData.map((item) => [
-      item.sNo?.toString() || '-',
+    const rows = this.userLoginData.map((item) => [
+      item.sNo ?? '-',
       item.organisation || '-',
       item.office || '-',
       item.designation || '-',
@@ -1480,21 +1425,13 @@ export class MasterReportsComponent implements OnInit {
       item.hasLoginBefore || 'N',
       this.formatDate(item.lastLoginTime) || '-',
       item.userLocked || 'N',
-      item.failureAttemptCount?.toString() || '0'
+      item.failureAttemptCount ?? 0
     ]);
 
-    let csv = headers.join('\t') + '\n';
-    csvData.forEach(row => {
-      csv += row.join('\t') + '\n';
-    });
-
-    const blob = new Blob([csv], { type: 'application/vnd.ms-excel' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'VIP_User_Login_Report.xlsx';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'User Login Report');
+    XLSX.writeFile(wb, 'VIP_User_Login_Report.xlsx');
     this.toaster.success('Report exported to Excel');
   }
 
