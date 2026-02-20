@@ -1,65 +1,55 @@
-<app-navbar></app-navbar>
+<div class="login-page-wrapper">
+  <app-navbar></app-navbar>
 
-<div class="banner-area">
-  <div class="login-form">
-    <form novalidate [formGroup]="loginForm">
-      <div id="login-container" class="mat-elevation-z8">
+  <div class="banner-area">
+    <div class="login-form">
+      <form novalidate [formGroup]="loginForm">
+        <div id="login-container" class="mat-elevation-z8">
 
-        <div class="d-grid">
-          <h3 class="text-lg font-bold text-gray-900 m-0 text-center">Welcome To</h3>
-          <span class="font-bold text-blue-900 text-center text-2xl mb-3">VIP Reference Management</span>
-        </div>
-
-        <!-- Username Field -->
-        <label class="input-label mt-2" for="username">Username</label>
-        <mat-form-field class="login-form-field" appearance="outline">
-          <input matInput id="username" placeholder="Enter your username" formControlName="username" required />
-          <mat-error *ngIf="loginForm.controls['username'].hasError('required')">
-            Please enter username
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Password Field -->
-        <label class="input-label" for="password">Password</label>
-        <mat-form-field class="login-form-field" appearance="outline">
-          <input matInput id="password" placeholder="Enter your password" [type]="hide ? 'password' : 'text'"
-            formControlName="password" required />
-          <button type="button" mat-icon-button matSuffix (click)="hide = !hide"
-            [attr.aria-label]="'Toggle password visibility'" [attr.aria-pressed]="!hide">
-            <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
-          </button>
-          <mat-error *ngIf="loginForm.controls['password'].hasError('required')">
-            Please enter password
-          </mat-error>
-        </mat-form-field>
-
-        <!-- Google reCAPTCHA -->
-        <!-- <div class="recaptcha-container mb-3">
-          <re-captcha
-            [siteKey]="siteKey"
-            (resolved)="onCaptchaResolved($event)">
-          </re-captcha>
-        </div> -->
-
-        <div class="login-btn-group">
-          <div>
-            <a href="assets/usermanual/VIP_Reference_Management_User_Manual.pdf" target="_blank">Visit Reference User Manual</a>
-            <br>
-            <!-- <a href="">Visit Reference SOP</a> -->
+          <div class="d-grid">
+            <h3 class="text-lg font-bold text-gray-900 m-0 text-center">Welcome To</h3>
+            <span class="font-bold text-blue-900 text-center text-2xl mb-3">VIP Reference Management</span>
           </div>
-          <button mat-raised-button type="submit" color="primary" class="Login-btn" (click)="onLogin()">Login</button>
+
+          <!-- Username Field -->
+          <label class="input-label mt-2" for="username">Username</label>
+          <mat-form-field class="login-form-field" appearance="outline">
+            <input matInput id="username" placeholder="Enter your username" formControlName="username" required />
+            <mat-error *ngIf="loginForm.controls['username'].hasError('required')">
+              Please enter username
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Password Field -->
+          <label class="input-label" for="password">Password</label>
+          <mat-form-field class="login-form-field" appearance="outline">
+            <input matInput id="password" placeholder="Enter your password" [type]="hide ? 'password' : 'text'"
+              formControlName="password" required />
+            <button type="button" mat-icon-button matSuffix (click)="hide = !hide"
+              [attr.aria-label]="'Toggle password visibility'" [attr.aria-pressed]="!hide">
+              <mat-icon>{{ hide ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+            <mat-error *ngIf="loginForm.controls['password'].hasError('required')">
+              Please enter password
+            </mat-error>
+          </mat-form-field>
+
+          <div class="login-btn-group">
+            <div class="manual-link">
+              <a href="assets/usermanual/VIP_Reference_Management_User_Manual.pdf" target="_blank">Visit Reference User Manual</a>
+            </div>
+            <button mat-raised-button type="submit" color="primary" class="Login-btn" (click)="onLogin()">Login</button>
+          </div>
+
+          <div class="footer-sec">
+            <br>
+            <hr>
+            <a routerLink="/forget-password" class="primary">Forgot Password?</a>
+            <br>
+          </div>
+
         </div>
-
-        <div class="footer-sec">
-          <br>
-          <br>
-          <hr>
-          <a routerLink="/forget-password" class="primary">Forgot Password?</a>
-          <br>
-        </div>
-
-      </div>
-    </form>
-
+      </form>
+    </div>
   </div>
 </div>
