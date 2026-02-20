@@ -203,7 +203,7 @@ export class UsermgmtService {
     return this.http.post<any>(`${API_ENDPOINTS.authenticate}/forgot-password`, data);
   }
 
-  resetPassword(data: { loginId: string, temporaryPassword: string, newPassword: string, confirmPassword: string }): Observable<any> {
+  resetPassword(data: { loginId: string, newPassword: string, confirmPassword: string }): Observable<any> {
     return this.http.post<any>(`${API_ENDPOINTS.authenticate}/reset-password`, data);
   }
 

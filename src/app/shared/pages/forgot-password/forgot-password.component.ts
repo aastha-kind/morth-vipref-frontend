@@ -16,10 +16,9 @@ export class ForgotPasswordComponent implements OnInit {
   forgotPasswordForm!: FormGroup;
   resetPasswordForm!: FormGroup;
 
-  currentStep: number = 1; // 1 = forgot password, 2 = reset password
+  currentStep: number = 1; // 1 = verify identity, 2 = set new password
   savedLoginId: string = '';
 
-  hideTempPassword: boolean = true;
   hideNewPassword: boolean = true;
   hideConfirmPassword: boolean = true;
 
@@ -40,7 +39,6 @@ export class ForgotPasswordComponent implements OnInit {
     });
 
     this.resetPasswordForm = this.fb.group({
-      temporaryPassword: ['', [Validators.required]],
       newPassword: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
@@ -73,14 +71,14 @@ export class ForgotPasswordComponent implements OnInit {
         if (res.success) {
           this.savedLoginId = requestData.loginId;
           this.currentStep = 2;
-          this.toastr.success(res.message, 'Success');
+          this.toastr.success('Identity verified. Please set your new password.', 'Success');
         } else {
           this.toastr.error(res.message, 'Error');
         }
       },
       error: (err) => {
         this.ngxService.stop();
-        const errorMessage = err.error?.message || 'Failed to process forgot password request';
+        const errorMessage = err.error?.message || 'Verification failed. Please check your Login ID and Email ID.';
         this.toastr.error(errorMessage, 'Error');
       }
     });
@@ -96,14 +94,15 @@ export class ForgotPasswordComponent implements OnInit {
     this.ngxService.start();
     const requestData = {
       loginId: this.savedLoginId,
-      ...this.resetPasswordForm.value
+      newPassword: this.resetPasswordForm.value.newPassword,
+      confirmPassword: this.resetPasswordForm.value.confirmPassword
     };
 
     this.userMgmtService.resetPassword(requestData).subscribe({
       next: (res: any) => {
         this.ngxService.stop();
         if (res.success) {
-          this.toastr.success(res.message, 'Success');
+          this.toastr.success('Password reset successfully. Please login with your new password.', 'Success');
           setTimeout(() => {
             this.router.navigate(['/login']);
           }, 2000);
