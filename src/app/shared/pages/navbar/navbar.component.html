@@ -1,23 +1,19 @@
 <!-- Top Navbar -->
 <mat-toolbar class="navbar-top" color="primary">
   <!-- Left: Flag + GOVT -->
-  <div class="d-flex align-items-center gap-3 cursor-pointer" (click)="navigateHome()">
+  <div class="d-flex align-items-center gap-2 cursor-pointer" (click)="navigateHome()">
     <img src="assets/img/Flag_of_India.png" alt="India Flag" class="h-6" />
-    <div>
-      <p class="mb-0 text-white text-sm font-normal">GOVERNMENT OF INDIA</p>
-    </div>
+    <p class="mb-0 text-white text-sm font-normal d-none d-sm-block">GOVERNMENT OF INDIA</p>
   </div>
 
   <!-- Spacer -->
   <span class="ms-auto"></span>
 
-  <div class="d-flex align-items-center gap-4">
-
-
-    <div style="width: 1px; height: 20px; background-color: white;"></div>
+  <div class="d-flex align-items-center gap-2 gap-sm-4">
+    <div class="vertical-divider d-none d-sm-block"></div>
 
     <!-- Accessibility Controls -->
-    <div class="access-type d-flex align-items-center gap-2 text-white">
+    <div class="access-type d-flex align-items-center gap-1 gap-sm-2 text-white">
       <a href="javascript:void(0)" class="changer" title="Decrease Text" (click)="reduceFontSize()">
         <sup>-</sup>A
       </a>
@@ -31,39 +27,28 @@
   </div>
 </mat-toolbar>
 
+<!-- Menu Navbar -->
 <mat-toolbar class="navbar-menu">
-  <div class="d-flex align-items-center gap-2">
-    <img src="assets/img/Emblem_of_India.svg" alt="India Emblem" style="height: 40px;" />
-    <div style="width: 1px; height: 40px; background-color: #000;"></div>
-    <div class="d-grid">
-      <span class="text-lg font-bold text-blue-900" style="margin-bottom: -8px;">VIP Reference Management</span>
-      <p class="mb-0 text-sm text-gray-800 font-normal">Ministry of Road Transport and Highways, Government of India</p>
+  <div class="d-flex align-items-center gap-2 navbar-brand-section">
+    <img src="assets/img/Emblem_of_India.svg" alt="India Emblem" class="navbar-emblem" />
+    <div class="brand-divider d-none d-sm-block"></div>
+    <div class="d-grid navbar-title-section">
+      <span class="font-bold text-blue-900 navbar-title">VIP Reference Management</span>
+      <p class="mb-0 text-sm text-gray-800 font-normal navbar-subtitle d-none d-md-block">Ministry of Road Transport and Highways, Government of India</p>
     </div>
   </div>
 
   <span class="ms-auto"></span>
 
-  <div class="d-flex align-items-center gap-3">
-    <!-- Add Grievance -->
-    <!-- <button mat-raised-button color="warn" class="greviance-button" *ngIf="isGrevianceButton"
-      (click)="publicGreviance()">
-      <mat-icon>book</mat-icon>&nbsp;Add Grievance
-    </button> -->
-
-    <!-- Divider -->
-    <!-- <div *ngIf="isGrevianceButton" style="width: 3px; height: 25px; background-color: black;"></div> -->
-
+  <div class="d-flex align-items-center gap-2">
     <!-- Login -->
     <button mat-raised-button color="primary" class="login-button" *ngIf="isLoginedButton" (click)="userLogin()">
-      <mat-icon>person</mat-icon>&nbsp;Login
+      <mat-icon>person</mat-icon><span class="btn-label d-none d-sm-inline">&nbsp;Login</span>
     </button>
 
     <!-- Home -->
     <button mat-raised-button color="accent" class="login-button text-white" *ngIf="isHomeButton" [routerLink]="['/']">
-      <mat-icon>home</mat-icon>&nbsp;Home
+      <mat-icon>home</mat-icon><span class="btn-label d-none d-sm-inline">&nbsp;Home</span>
     </button>
-
-    <!-- Logo -->
-    <!-- <img src="assets/img/Road_Safety_Committee_Logo.png" alt="Road Safety Logo" style="height: 40px; transform: scale(1.25);" /> -->
   </div>
 </mat-toolbar>
