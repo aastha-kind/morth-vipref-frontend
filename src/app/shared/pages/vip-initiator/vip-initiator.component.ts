@@ -94,10 +94,8 @@ export class VipInitiatorComponent implements AfterViewInit {
       sortBy: this.sortColumn,
       sortDir: this.sortDirection
     }
-    console.log('VIP Initiator - Fetching with sort:', queueData);
     this.userMgmtService.getQueueReferencesListPaginated(queueData).subscribe({
       next:(res)=>{
-        console.log('VIP Initiator - Received response:', res);
         let data = res.content;
 
         // Apply client-side office type filter if set
@@ -185,10 +183,8 @@ export class VipInitiatorComponent implements AfterViewInit {
       console.warn('User details not available yet for fetching drafts');
       return;
     }
-    console.log('Fetching drafts for user:', this.userDetails.loginId);
     this.userMgmtService.getDraftReferences(this.userDetails.loginId).subscribe({
       next: (res) => {
-        console.log('Draft references received:', res);
         this.draftReferences = res || [];
       },
       error: (err) => {
@@ -212,6 +208,5 @@ export class VipInitiatorComponent implements AfterViewInit {
 
   deleteDraft(draft: VipReference) {
     // TODO: Implement delete draft functionality if needed
-    console.log('Delete draft:', draft);
   }
 }

@@ -102,7 +102,6 @@ export class VipAssignerComponent implements AfterViewInit {
         }
 
         this.queueReferencesData.data = data;
-        console.log(res)
         this.ngxService.stop();
       },
       error: (err) => {

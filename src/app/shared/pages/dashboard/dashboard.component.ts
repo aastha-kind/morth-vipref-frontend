@@ -241,9 +241,16 @@ export class DashboardComponent implements AfterViewInit {
     }
 
     return {
-      startDate: startDate ? startDate.toISOString().split('T')[0] : null,
-      endDate: endDate ? endDate.toISOString().split('T')[0] : null,
+      startDate: startDate ? this.formatLocalDate(startDate) : null,
+      endDate: endDate ? this.formatLocalDate(endDate) : null,
     };
+  }
+
+  private formatLocalDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   getDashboardStats() {
@@ -268,7 +275,6 @@ export class DashboardComponent implements AfterViewInit {
     dashboardApi.subscribe({
       next: (res: any) => {
         const response = res;
-        console.log('Dashboard stats response:', response);
 
         // Calculate dashboard total from chart data
         this.dashboardTotal = response.chartData.data.reduce(
@@ -346,34 +352,26 @@ export class DashboardComponent implements AfterViewInit {
 
   getVipReferenceList() {
     const dateRange = this.getDateRange();
-    console.log('Dashboard - Fetching references with filters:', {
-      sortColumn: this.sortColumn,
-      sortDirection: this.sortDirection,
-      page: this.pageIndex,
-      size: this.pageSize,
-      isAssignerOrAssignee: this.isAssignerOrAssignee(),
-      isAssigner: this.isAssigner(),
-      dateFilter: this.selectedDateFilter,
-      queueFilter: this.selectedQueueFilter,
-      priorityFilter: this.selectedPriorityFilter,
-      dateRange: dateRange,
-      loginId: this.userDetails?.loginId,
-    });
     this.ngxService.start();
 
-    // Dashboard uses reference-list API for all roles to show all references for tracking
-    this.userMgmtService
-      .getVipReferenceListPaginated(
-        this.userDetails.loginId,
-        this.pageIndex,
-        this.pageSize,
-        this.searchTerm,
-        this.sortColumn,
-        this.sortDirection,
-      )
-      .subscribe({
-        next: (res: PagedResponse<VipReference>) => {
-          console.log('Received reference list response:', res);
+    if (this.isAssignerOrAssignee()) {
+      // For Assigner/Assignee: use filtered queue endpoint that supports date, queue, priority filters
+      const filterRequest = {
+        loginId: this.userDetails.loginId,
+        queue: this.selectedQueueFilter,
+        status: 'SENT',
+        search: this.searchTerm || null,
+        page: this.pageIndex,
+        size: this.pageSize,
+        sortBy: this.sortColumn,
+        sortDir: this.sortDirection,
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        priority: this.selectedPriorityFilter,
+      };
+
+      this.userMgmtService.getQueueReferencesListPaginated(filterRequest).subscribe({
+        next: (res: any) => {
           this.VipReferenceData.data = res.content;
           this.totalElements = res.totalElements;
           this.pageIndex = res.pageNumber;
@@ -385,6 +383,31 @@ export class DashboardComponent implements AfterViewInit {
           this.ngxService.stop();
         },
       });
+    } else {
+      // For Initiator: use simple paginated list (no filters shown)
+      this.userMgmtService
+        .getVipReferenceListPaginated(
+          this.userDetails.loginId,
+          this.pageIndex,
+          this.pageSize,
+          this.searchTerm,
+          this.sortColumn,
+          this.sortDirection,
+        )
+        .subscribe({
+          next: (res: PagedResponse<VipReference>) => {
+            this.VipReferenceData.data = res.content;
+            this.totalElements = res.totalElements;
+            this.pageIndex = res.pageNumber;
+            this.ngxService.stop();
+          },
+          error: (err) => {
+            console.error('Error fetching references:', err);
+            this.toastr.error('No references found for this user');
+            this.ngxService.stop();
+          },
+        });
+    }
   }
 
   onPageChange(event: PageEvent) {

@@ -895,12 +895,14 @@
                     (change)="selectedOffice($event)"
                   >
                     <option value="" disabled selected>Select Office</option>
-                    <option
-                      *ngFor="let office of officeTypeList"
-                      [value]="office.officeName"
-                    >
-                      {{ office.officeName }}
-                    </option>
+                    <ng-container *ngFor="let office of officeTypeList">
+                      <option
+                        *ngIf="office.officeName !== 'Office of Secretary'"
+                        [value]="office.officeName"
+                      >
+                        {{ office.officeName }}
+                      </option>
+                    </ng-container>
                   </select>
                   <mat-error
                     class="mat-error"

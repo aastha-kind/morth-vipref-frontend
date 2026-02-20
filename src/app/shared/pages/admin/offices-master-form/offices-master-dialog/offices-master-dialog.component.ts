@@ -49,7 +49,6 @@ export class OfficesMasterDialogComponent {
     this.adminService.getOfficeTypeMaster().subscribe({
       next: (res: any) => {
         this.officeType = res;
-        console.log(this.officeType)
       },
       error: (err: Error) => console.error('Failed to load organizations', err),
     });
