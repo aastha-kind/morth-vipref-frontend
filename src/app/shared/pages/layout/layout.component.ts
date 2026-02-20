@@ -1,5 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { BreakpointObserver } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-layout',
@@ -7,11 +8,26 @@ import { Router } from '@angular/router';
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.css'
 })
-export class LayoutComponent {
-  selectedMenu:string="User Dashboard";
-  private router=inject(Router);
+export class LayoutComponent implements OnInit {
+  selectedMenu: string = "User Dashboard";
+  private router = inject(Router);
+  private breakpointObserver = inject(BreakpointObserver);
+
   isMenuOpen = false;
   opened = false;
+
+  // Responsive sidenav state
+  sidenavMode: 'side' | 'over' = 'side';
+  sidenavOpened = true;
+
+  ngOnInit(): void {
+    this.breakpointObserver
+      .observe(['(max-width: 991px)'])
+      .subscribe(result => {
+        this.sidenavMode = result.matches ? 'over' : 'side';
+        this.sidenavOpened = !result.matches;
+      });
+  }
 
   toggle(): void {
     this.opened = !this.opened;
@@ -51,15 +67,12 @@ export class LayoutComponent {
     },
   ];
 
-
   switchMenu(option: string): void {
     this.selectedMenu = option;
-    if(this.selectedMenu == "User Desktop"){
+    if (this.selectedMenu == "User Desktop") {
       this.router.navigate(['/dashboard/desktop']);
-    }
-    else{
+    } else {
       this.router.navigate(['/dashboard']);
     }
   }
-
 }

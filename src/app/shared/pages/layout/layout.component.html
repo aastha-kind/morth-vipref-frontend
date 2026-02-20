@@ -4,7 +4,7 @@
 <div class="layout-container">
   <mat-sidenav-container class="sidenav-container">
     <!-- Sidebar -->
-    <mat-sidenav #drawer class="sidenav" mode="side" opened>
+    <mat-sidenav #drawer class="sidenav" [mode]="sidenavMode" [opened]="sidenavOpened">
       <app-side-nav></app-side-nav>
     </mat-sidenav>
 

@@ -1,110 +1,107 @@
 .mat-expansion-panel {
-    box-shadow: none !important;
-    background: transparent;
-  }
-  
-  .mat-expansion-panel-header {
-    padding: 0 16px;
-  }
-  
-  .mat-expansion-panel-header-title,
-  .mat-expansion-panel-header-description {
-    align-items: center;
-  }
-  
-  .mat-list-icon {
-    padding: 4px;
-  }
-  
-  ::ng-deep .mat-list-item {
-    cursor: pointer !important;
-    border-left: 4px solid transparent;
-    transition: 0.2s all;
-    box-sizing: border-box;
-  }
-  
-  ::ng-deep .mat-list-item:hover {
-    background: rgba(0, 0, 0, 0.04);
-  }
-  
-  .mat-list-base {
-    padding-top: 0;
-  }
-  
-  .mat-list-base .mat-list-item {
-    height: 50px;
-  }
-  
-  .list-item {
-    font-size: 16px;
-    padding-left: 16px;
-  }
-  
-  .mat-line {
-    white-space: normal !important;
-  }
-  
-  .active {
-    background: #94a5ff33 !important;
-    border-left: 4px solid #3f51b5;
-  }
-  
-  
-  :host {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-  ::ng-deep .mat-mdc-list-item-unscoped-content{
-    display: flex;
-  }
-  
-  mat-drawer {
-    min-width: 200px;
-    max-width: 400px;
-  }
-  
-  .margin-left {
-    margin-left: 300px;
-  }
-  
-  mat-drawer-container {
-    min-height: calc(100vh - 64px);
-  }
-  
-  ::ng-deep .mat-drawer-inner-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background: #ecececc2;
-  }
-  
-  
-  .center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 80vh;
-  }
-  
-  
-  .date-hour-content {
-    background: #3f51b538;
-    text-align: center;
-    padding: 10px 0;
-  }
+  box-shadow: none !important;
+  background: transparent;
+}
 
-  .mat-card-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.mat-expansion-panel-header {
+  padding: 0 16px;
+}
+
+.mat-expansion-panel-header-title,
+.mat-expansion-panel-header-description {
+  align-items: center;
+}
+
+.mat-list-icon {
+  padding: 4px;
+}
+
+::ng-deep .mat-list-item {
+  cursor: pointer !important;
+  border-left: 4px solid transparent;
+  transition: 0.2s all;
+  box-sizing: border-box;
+}
+
+::ng-deep .mat-list-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.mat-list-base {
+  padding-top: 0;
+}
+
+.mat-list-base .mat-list-item {
+  height: 50px;
+}
+
+.list-item {
+  font-size: 16px;
+  padding-left: 16px;
+}
+
+.mat-line {
+  white-space: normal !important;
+}
+
+.active {
+  background: #94a5ff33 !important;
+  border-left: 4px solid #3f51b5;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+::ng-deep .mat-mdc-list-item-unscoped-content {
+  display: flex;
+}
+
+mat-drawer {
+  min-width: 200px;
+  max-width: 400px;
+}
+
+.margin-left {
+  margin-left: 300px;
+}
+
+mat-drawer-container {
+  min-height: calc(100vh - 64px);
+}
+
+::ng-deep .mat-drawer-inner-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #ecececc2;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+}
+
+.date-hour-content {
+  background: #3f51b538;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.mat-card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .menu-button-content {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    /* space between text and icon */
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 ::ng-deep .mat-mdc-card-content:first-child {
@@ -114,13 +111,12 @@
 ::ng-deep .mat-mdc-card-content:last-child {
   padding-bottom: 0px !important;
 }
+
 .button-content {
   font-size: 14px;
   font-weight: 500;
   font-family: Roboto, sans-serif;
 }
-
-
 
 .main-header {
   position: fixed;
@@ -142,7 +138,6 @@
   height: calc(100vh - 64px);
   margin-top: 64px;
   overflow: hidden;
-  /* Prevent page scroll */
 }
 
 .sidenav-container {
@@ -157,17 +152,13 @@
   color: #fff;
   padding-top: 10px;
   position: fixed;
-  /* Make it fixed */
   top: 55px;
-  /* Below the header */
   left: 0;
   bottom: 0;
   z-index: 1100;
   transition: transform 0.3s ease, opacity 0.3s ease;
   overflow-y: auto;
-  /* Scroll if sidebar content grows */
 }
-
 
 /* ===== MAIN CONTENT ===== */
 .main-content {
@@ -180,12 +171,35 @@
   width: 100%;
 }
 
-ffffff
 .main-content::-webkit-scrollbar {
   display: none;
 }
 
-/* When sidenav is closed */
 .main-content.sidenav-closed {
   margin-left: 0;
+}
+
+/* ===== Responsive ===== */
+
+/* Tablets portrait + mobile (< 992px) — sidenav switches to 'over' mode via TS */
+@media (max-width: 991px) {
+  .layout-container {
+    margin-top: 64px;
+  }
+
+  /* In 'over' mode Angular Material removes the pushed margin automatically */
+  .sidenav {
+    top: 64px;
+  }
+}
+
+@media (max-width: 575px) {
+  .layout-container {
+    margin-top: 56px;
+  }
+
+  .sidenav {
+    top: 56px;
+    width: 200px;
+  }
 }
