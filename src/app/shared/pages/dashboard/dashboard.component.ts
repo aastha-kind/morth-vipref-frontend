@@ -268,7 +268,6 @@ export class DashboardComponent implements AfterViewInit {
     dashboardApi.subscribe({
       next: (res: any) => {
         const response = res;
-        console.log('Dashboard stats response:', response);
 
         // Calculate dashboard total from chart data
         this.dashboardTotal = response.chartData.data.reduce(
@@ -346,19 +345,6 @@ export class DashboardComponent implements AfterViewInit {
 
   getVipReferenceList() {
     const dateRange = this.getDateRange();
-    console.log('Dashboard - Fetching references with filters:', {
-      sortColumn: this.sortColumn,
-      sortDirection: this.sortDirection,
-      page: this.pageIndex,
-      size: this.pageSize,
-      isAssignerOrAssignee: this.isAssignerOrAssignee(),
-      isAssigner: this.isAssigner(),
-      dateFilter: this.selectedDateFilter,
-      queueFilter: this.selectedQueueFilter,
-      priorityFilter: this.selectedPriorityFilter,
-      dateRange: dateRange,
-      loginId: this.userDetails?.loginId,
-    });
     this.ngxService.start();
 
     // Dashboard uses reference-list API for all roles to show all references for tracking
@@ -373,7 +359,6 @@ export class DashboardComponent implements AfterViewInit {
       )
       .subscribe({
         next: (res: PagedResponse<VipReference>) => {
-          console.log('Received reference list response:', res);
           this.VipReferenceData.data = res.content;
           this.totalElements = res.totalElements;
           this.pageIndex = res.pageNumber;

@@ -179,7 +179,6 @@ export class InitiatorFormComponent {
     // Capture the previous route from navigation state or query params
     // Use history.state since getCurrentNavigation() is null after navigation completes
     const state = history.state;
-    console.log('Navigation state:', state);
 
     if (state && state['previousRoute']) {
       this.previousRoute = state['previousRoute'];
@@ -189,7 +188,6 @@ export class InitiatorFormComponent {
 
     // Check if editing a draft from navigation state
     if (state && state['isDraft'] && state['draftReferenceId']) {
-      console.log('Loading draft with ID:', state['draftReferenceId']);
       this.draftReferenceId = state['draftReferenceId'];
       // Load draft data into form
       this.loadDraftData(state['draftReferenceId']);
@@ -206,13 +204,11 @@ export class InitiatorFormComponent {
   loadDraftData(draftReferenceId: number) {
     this.ngxService.start();
     const apiUrl = `${API_ENDPOINTS.reference}/reference-details-by-id/${draftReferenceId}`;
-    console.log('Fetching draft data from:', apiUrl);
 
     // Fetch draft details from API using reference ID
     this.http.get<any>(apiUrl).subscribe({
       next: (res) => {
         this.ngxService.stop();
-        console.log('Draft data received:', res);
         if (res) {
           // Populate form with draft data
           const formValues = {
@@ -229,7 +225,6 @@ export class InitiatorFormComponent {
             subCatgOfSubject: res.subCategoryOfSubject || '',
             subjectOrIssue: res.subject || '',
           };
-          console.log('Patching form with values:', formValues);
           this.addVipReferenceDetails.patchValue(formValues);
 
           // Update minDateOfReceiving if dateOfLetter exists
@@ -245,7 +240,6 @@ export class InitiatorFormComponent {
           // Load documents if available
           if (res.documents && res.documents.length > 0) {
             this.documentList = res.documents;
-            console.log('Draft documents loaded:', this.documentList);
             // Select the first document by default
             if (this.documentList.length > 0) {
               this.selectedDocument = this.documentList[0].fileName;
@@ -353,7 +347,6 @@ export class InitiatorFormComponent {
             next: (res: any | null) => {
               if (res !== null && res !== undefined) {
                 this.selectedReferenceDetails = res;
-                console.log(this.selectedReferenceDetails);
                 this.getReferenceDetails();
                 this.getActionAllowed(this.userDetails);
                 this.getActionHistory(this.userDetails);
@@ -406,7 +399,6 @@ export class InitiatorFormComponent {
     this.userMgmtService.getActionHistory(userData).subscribe({
       next: (res) => {
         this.actionHistoryData.data = res?.history ? res?.history : [];
-        console.log(res);
         this.ngxService.stop();
       },
       error: (err: Error) => {
@@ -628,7 +620,6 @@ export class InitiatorFormComponent {
       // Use DMS download endpoint (POST)
       const apiUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document-by-id`;
       const body = { documentId: selectedDoc.id, userId: 0 };
-      console.log('Loading from DMS:', apiUrl, body);
       this.http
         .post(apiUrl, body, { responseType: 'blob', headers: headers })
         .subscribe({
@@ -636,7 +627,6 @@ export class InitiatorFormComponent {
             if (blob && blob.size > 0) {
               this.pdfSrc = blob;
               this.selectedDocument = selectedDoc.fileName;
-              console.log('Document loaded from DMS:', selectedDoc.fileName);
             } else {
               this.pdfSrc = undefined;
               this.selectedDocumentDetails = null;
@@ -657,7 +647,6 @@ export class InitiatorFormComponent {
 
     // Fallback: Use local file path endpoint (GET)
     const apiUrl = `${API_ENDPOINTS.referenceWorkFlow}/download-document?filePath=${encodeURIComponent(selectedDoc.filePath)}`;
-    console.log('Loading from local:', apiUrl);
     // Fetch the document as a Blob with explicit headers
     this.http
       .get(apiUrl, { responseType: 'blob', headers: headers })
@@ -666,7 +655,6 @@ export class InitiatorFormComponent {
           if (blob && blob.size > 0) {
             this.pdfSrc = blob;
             this.selectedDocument = selectedDoc.fileName;
-            console.log('Document loaded from backend:', selectedDoc.fileName);
           } else {
             this.pdfSrc = undefined;
             this.selectedDocumentDetails = null;
@@ -1052,8 +1040,6 @@ export class InitiatorFormComponent {
         next: (res: VipReferenceDetailsResponse) => {
           this.refernceDetails = res;
           this.documentList = res.documents ? res.documents : [];
-          console.log('Document list received:', this.documentList);
-          console.log('Total documents:', this.documentList.length);
           this.setReferenceDetails();
           this.loadFirstDocument();
           this.ngxService.stop();
@@ -1070,12 +1056,8 @@ export class InitiatorFormComponent {
     this.userMgmtService.getReferenceDetails(referenceNo).subscribe({
       next: (res: VipReferenceDetailsResponse) => {
         this.refernceDetails = res;
-        console.log(res);
         this.selectedReferenceDetails = res; //{ referenceNo: referenceNo };
         this.documentList = res.documents ? res.documents : [];
-        console.log('Document list loaded:', this.documentList);
-        console.log('Total documents:', this.documentList.length);
-
         // Populate selectedAssigner if toLoginId is available
         if (res.toLoginId && this.activeAssignersList.length > 0) {
           this.selectedAssigner = this.activeAssignersList.find(
@@ -1214,7 +1196,6 @@ export class InitiatorFormComponent {
     // If only one assigner, auto-select it
     if (this.activeAssignersList.length === 1) {
       this.selectedAssigner = this.activeAssignersList[0];
-      console.log('Auto-selected single assigner:', this.selectedAssigner);
       return;
     }
 
@@ -1226,10 +1207,6 @@ export class InitiatorFormComponent {
 
       if (matchingAssigner) {
         this.selectedAssigner = matchingAssigner;
-        console.log(
-          'Auto-selected assigner by office type:',
-          this.selectedAssigner,
-        );
         return;
       }
     }
@@ -1242,10 +1219,6 @@ export class InitiatorFormComponent {
     );
     if (uniqueOfficeTypes.size <= 1) {
       this.selectedAssigner = this.activeAssignersList[0];
-      console.log(
-        'Auto-selected first assigner (all same office type):',
-        this.selectedAssigner,
-      );
     }
   }
 
@@ -1476,7 +1449,6 @@ export class InitiatorFormComponent {
   }
 
   getAllDraftReply(referenceId: number) {
-    console.log(referenceId);
     this.ngxService.start();
     this.userMgmtService.getAllDraftReply(referenceId).subscribe({
       next: (res: any) => {
@@ -1539,10 +1511,6 @@ export class InitiatorFormComponent {
           (office, index, self) =>
             index === self.findIndex((o) => o.officeName === office.officeName),
         );
-        console.log(
-          `Before: ${response.length} → After dedupe: ${uniqueOffices.length}`,
-        );
-
         this.officeTypeList = uniqueOffices;
         this.ngxService.stop();
       },
@@ -2095,7 +2063,6 @@ export class InitiatorFormComponent {
       return;
     }
     const forwardReferenceDetails = this.forwardReferenceForm.getRawValue();
-    console.log(forwardReferenceDetails);
     const forwardReferenceData = {
       referenceId: this.refernceDetails.referenceId,
       loginId: this.userDetails.loginId,
@@ -2432,7 +2399,6 @@ export class InitiatorFormComponent {
     // Case: Final Draft Reply → only final reply button
     if (actionType === 'Final Draft Reply') {
       this.showFinalReplyBtn = true;
-      console.log('showFinalReplyBtn', this.showFinalReplyBtn);
       return;
     }
 

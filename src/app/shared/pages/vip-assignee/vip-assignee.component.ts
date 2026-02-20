@@ -91,7 +91,6 @@ export class VipAssigneeComponent implements AfterViewInit {
     }
     this.userMgmtService.getQueueReferencesListPaginated(queueData).subscribe({
       next: (res) => {
-        console.log(res)
         let data = res.content;
 
         // Apply client-side office type filter if set

@@ -37,7 +37,6 @@ export class AdminService {
   }
 
   updateOffice(officeId: number, officeData: any): Observable<any> {
-    console.log(officeData);
     return this.http.put<any>(`${API_ENDPOINTS.referencemaster}/office/${officeId}`, officeData)
   }
 

@@ -37,7 +37,6 @@ export class ViewReferenceComponent {
     private userMgmtService: UsermgmtService,
     private toaster: ToasterService,
   ) {
-    console.log(data);
     this.referenceDetails = data;
     this.documents = data.documents || [];
   }
