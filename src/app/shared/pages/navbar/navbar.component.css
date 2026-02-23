@@ -1,3 +1,10 @@
+.marquee-banner {
+  background-color: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  padding: 4px 0;
+  font-size: 0.85rem;
+}
+
 .navbar-top {
   background: linear-gradient(to right, #4CAF50, #2196F3) !important;
   font-size: 0.875rem;
