@@ -254,4 +254,8 @@ export class UsermgmtService {
   getDraftReferences(loginId: string): Observable<any> {
     return this.http.get<any>(`${API_ENDPOINTS.reference}/drafts/${loginId}`);
   }
+
+  getUserProfile(loginId: string): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.users}?search=${loginId}&page=0&size=5`);
+  }
 }

@@ -58,6 +58,7 @@ import { ViewEditorComponent } from './pages/view-editor/view-editor.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { ClosedReferencesComponent } from './pages/closed-references/closed-references.component';
 import { DiscardReferencesComponent } from './pages/discard-references/discard-references.component';
+import { UserProfileComponent } from './pages/user-profile/user-profile.component';
 
 @NgModule({
   declarations: [
@@ -108,6 +109,7 @@ import { DiscardReferencesComponent } from './pages/discard-references/discard-r
     ForgotPasswordComponent,
     ClosedReferencesComponent,
     DiscardReferencesComponent,
+    UserProfileComponent,
   ],
   imports: [
     CommonModule,
