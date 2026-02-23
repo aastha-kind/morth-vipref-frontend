@@ -1,0 +1,119 @@
+<div class="profile-wrapper">
+  <div class="profile-card mat-elevation-z3">
+
+    <!-- Card Header -->
+    <div class="profile-header">
+      <div class="avatar-circle">
+        <span class="avatar-initials">{{ getInitials() }}</span>
+      </div>
+      <div class="profile-meta">
+        <h2 class="profile-name">{{ profileData?.name || userDetails.name }}</h2>
+        <div class="login-id-row">
+          <mat-icon class="meta-icon">badge</mat-icon>
+          <span>{{ profileData?.loginId || userDetails.loginId }}</span>
+        </div>
+        <div class="role-chips">
+          <span class="role-chip" *ngFor="let role of (profileData?.roles || userDetails.roles)">
+            {{ role.roleName }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Details Grid -->
+    <div class="profile-body">
+      <h3 class="section-heading">
+        <mat-icon>person</mat-icon> Profile Details
+      </h3>
+
+      <div class="detail-grid">
+
+        <div class="detail-card">
+          <div class="detail-icon-wrap">
+            <mat-icon>email</mat-icon>
+          </div>
+          <div class="detail-text">
+            <span class="detail-label">Email Address</span>
+            <span class="detail-value">{{ profileData?.emailId || userDetails.emailId || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-icon-wrap">
+            <mat-icon>phone</mat-icon>
+          </div>
+          <div class="detail-text">
+            <span class="detail-label">Contact Number</span>
+            <span class="detail-value">{{ profileData?.contactNumber || userDetails.contactNumber || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-icon-wrap">
+            <mat-icon>business</mat-icon>
+          </div>
+          <div class="detail-text">
+            <span class="detail-label">Organization</span>
+            <span class="detail-value">{{ profileData?.organizationName || userDetails.organization || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-icon-wrap">
+            <mat-icon>location_city</mat-icon>
+          </div>
+          <div class="detail-text">
+            <span class="detail-label">Office</span>
+            <span class="detail-value">{{ profileData?.officeName || userDetails.office || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-icon-wrap">
+            <mat-icon>work</mat-icon>
+          </div>
+          <div class="detail-text">
+            <span class="detail-label">Designation</span>
+            <span class="detail-value">{{ profileData?.designationName || userDetails.designation || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <div class="detail-icon-wrap">
+            <mat-icon>calendar_today</mat-icon>
+          </div>
+          <div class="detail-text">
+            <span class="detail-label">Account Created</span>
+            <span class="detail-value">
+              {{ (profileData?.createdDateTime || userDetails.createdAt) | date: 'dd MMM yyyy' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-card" *ngIf="profileData?.lastLoginTime">
+          <div class="detail-icon-wrap">
+            <mat-icon>login</mat-icon>
+          </div>
+          <div class="detail-text">
+            <span class="detail-label">Last Login</span>
+            <span class="detail-value">{{ profileData?.lastLoginTime | date: 'dd MMM yyyy, hh:mm a' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card" *ngIf="profileData?.officeTypeName || userDetails.officeTypeName">
+          <div class="detail-icon-wrap">
+            <mat-icon>apartment</mat-icon>
+          </div>
+          <div class="detail-text">
+            <span class="detail-label">Office Type</span>
+            <span class="detail-value">{{ profileData?.officeTypeName || userDetails.officeTypeName }}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

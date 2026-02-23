@@ -27,6 +27,7 @@ import { VipFinalReplyComponent } from './pages/vip-final-reply/vip-final-reply.
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { ClosedReferencesComponent } from './pages/closed-references/closed-references.component';
 import { DiscardReferencesComponent } from './pages/discard-references/discard-references.component';
+import { UserProfileComponent } from './pages/user-profile/user-profile.component';
 
 const routes: Routes = [
   {
@@ -57,7 +58,8 @@ const routes: Routes = [
       {path:'vip-assignee', component:VipAssigneeComponent},
       {path:'vip-final-reply',component:VipFinalReplyComponent},
       {path:'vip-closed-references',component:ClosedReferencesComponent},
-      {path:'vip-discard-references',component:DiscardReferencesComponent}
+      {path:'vip-discard-references',component:DiscardReferencesComponent},
+      {path:'profile',component:UserProfileComponent}
     ]
   },
   {
@@ -80,7 +82,8 @@ const routes: Routes = [
         ],
       },
       { path: 'master-report', component: MasterReportsComponent },
-      { path: 'settings', component: SettingsComponent }
+      { path: 'settings', component: SettingsComponent },
+      { path: 'profile', component: UserProfileComponent }
     ]
   }
 ];

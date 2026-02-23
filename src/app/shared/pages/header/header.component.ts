@@ -18,6 +18,15 @@ export class HeaderComponent {
 
   constructor(private router: Router) { }
 
+  viewProfile(): void {
+    const currentUrl = this.router.url;
+    if (currentUrl.startsWith('/administrator')) {
+      this.router.navigate(['/administrator/profile']);
+    } else {
+      this.router.navigate(['/dashboard/profile']);
+    }
+  }
+
   logout(): void {
     this.router.navigate(['/']);
     this.userMgmtService.clearReferenceDetails();
