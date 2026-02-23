@@ -207,6 +207,6 @@ export class VipInitiatorComponent implements AfterViewInit {
   }
 
   deleteDraft(draft: VipReference) {
-    // TODO: Implement delete draft functionality if needed
+    // Delete draft functionality is not required in the current workflow.
   }
 }

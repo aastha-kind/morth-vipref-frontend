@@ -440,6 +440,8 @@ export class InitiatorFormComponent {
                 route: 'vip-final-reply',
               });
               break;
+            default:
+              break;
           }
         });
         this.disabledReferenceField();

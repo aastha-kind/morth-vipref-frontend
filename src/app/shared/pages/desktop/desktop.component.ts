@@ -65,6 +65,8 @@ export class DesktopComponent {
             case "VIP_Final_Reply":
               this.queuesList.push({ name: "VIP_Final_Reply", icon: 'task_alt' });
               break;
+            default:
+              break;
           }
         });
   
