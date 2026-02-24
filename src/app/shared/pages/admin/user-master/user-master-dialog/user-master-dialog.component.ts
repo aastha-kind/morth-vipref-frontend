@@ -33,7 +33,8 @@ export class UserMasterDialogComponent {
         designation: '',
         name: '',
         contactNumber: '',
-        emailId: ''
+        emailId: '',
+        loginId: ''
       };
     }
   }
@@ -60,7 +61,8 @@ export class UserMasterDialogComponent {
           '',
           [Validators.required, Validators.pattern(/^[0-9]{10}$/)]
         ],
-        emailId: ['', [Validators.required, Validators.email]]
+        emailId: ['', [Validators.required, Validators.email]],
+        loginId: ['', Validators.required]
       });
     }
     else{
@@ -74,7 +76,8 @@ export class UserMasterDialogComponent {
           this.data.user.contactNumber,
           [Validators.required, Validators.pattern(/^[0-9]{10}$/)]
         ],
-        emailId: [this.data.user.emailId, [Validators.required, Validators.email]]
+        emailId: [this.data.user.emailId, [Validators.required, Validators.email]],
+        loginId: [this.data.user.loginId, Validators.required]
       });
     }
 
