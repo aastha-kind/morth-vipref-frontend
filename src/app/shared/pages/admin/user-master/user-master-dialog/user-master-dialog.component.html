@@ -5,133 +5,184 @@
 
 <!-- Add/Edit Form -->
 <mat-dialog-content *ngIf="data.mode !== 'delete'" class="dialog-content">
-    <form [formGroup]="userForm">
-        <div class="row">
-            <div class="col-md-6">
+  <form [formGroup]="userForm">
 
-                <!-- Organization Dropdown -->
-                <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Select Organization</mat-label>
-                    <mat-select formControlName="organization">
-                        <mat-option *ngFor="let org of organizations" [value]="org.organizationId">
-                            {{ org.organizationName }} ({{ org.organizationCode }})
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
+    <!-- Row 1: Organization | Office Type -->
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Organization <span style="color:red">*</span></mat-label>
+          <mat-select formControlName="organization"
+            (selectionChange)="onOrganizationChange($event.value)">
+            <mat-option value="" disabled>Select Organization</mat-option>
+            <mat-option *ngFor="let org of organizations" [value]="org.organizationId">
+              {{ org.organizationName }} ({{ org.organizationCode }})
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="userForm.get('organization')?.hasError('required')">
+            Organization is required
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-            <div class="col-md-6">
-                <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Select Office</mat-label>
-                    <mat-select formControlName="office">
-                        <mat-option *ngFor="let off of offices" [value]="off.officeId">
-                            {{ off.officeName }} 
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-        </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Office Type <span style="color:red">*</span></mat-label>
+          <mat-select formControlName="officeType"
+            (selectionChange)="onOfficeTypeChange($event.value)">
+            <mat-option value="" disabled>Select Office Type</mat-option>
+            <mat-option *ngFor="let ot of officeTypes" [value]="ot.officeTypeId ?? ot.typeId">
+              {{ ot.typeName }} ({{ ot.officeTypeCode }})
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="userForm.get('officeType')?.hasError('required')">
+            Office Type is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-6">
-                <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Designation</mat-label>
-                    <mat-select formControlName="designation">
-                        <mat-option *ngFor="let designation of designations" [value]="designation.designationId">
-                            {{ designation.designationDescription }} 
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="userForm.get('designation')?.hasError('required')">
-                        Designation is required
-                    </mat-error>
-                </mat-form-field>
-            </div>
+    <!-- Row 2: Office | Division -->
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Office <span style="color:red">*</span></mat-label>
+          <mat-select formControlName="office"
+            (selectionChange)="onOfficeChange($event.value)">
+            <mat-option value="" disabled>Select Office</mat-option>
+            <mat-option *ngFor="let off of offices" [value]="off.officeId">
+              {{ off.officeName }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="userForm.get('office')?.hasError('required')">
+            Office is required
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-            <div class="col-md-6">
-                <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Roles</mat-label>
-                    <mat-select formControlName="role">
-                        <mat-option *ngFor="let role of roles" [value]="role.roleId">
-                            {{ role.roleName }} 
-                        </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="userForm.get('role')?.hasError('required')">
-                        Role is required
-                    </mat-error>
-                </mat-form-field>
-            </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Division <span style="color:red">*</span></mat-label>
+          <mat-select formControlName="division"
+            (selectionChange)="onDivisionChange($event.value)">
+            <mat-option value="" disabled>Select Division</mat-option>
+            <mat-option *ngFor="let div of divisions" [value]="div.divisionId">
+              {{ div.divisionName }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="userForm.get('division')?.hasError('required')">
+            Division is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
 
+    <!-- Row 3: Designation | Role -->
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Designation <span style="color:red">*</span></mat-label>
+          <mat-select formControlName="designation">
+            <mat-option value="" disabled>Select Designation</mat-option>
+            <mat-option *ngFor="let d of designations" [value]="d.designationId">
+              {{ d.designationDescription || d.designationCode }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="userForm.get('designation')?.hasError('required')">
+            Designation is required
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-        </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Role <span style="color:red">*</span></mat-label>
+          <mat-select formControlName="role">
+            <mat-option value="" disabled>Select Role</mat-option>
+            <mat-option *ngFor="let role of roles" [value]="role.roleId">
+              {{ role.roleName }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="userForm.get('role')?.hasError('required')">
+            Role is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
 
-        <div class="row">
-            <div class="col-md-6">
-                <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Name</mat-label>
-                    <input matInput formControlName="name" required />
-                    <mat-error *ngIf="userForm.get('name')?.hasError('required')">
-                        Name is required
-                    </mat-error>
-                </mat-form-field>
-            </div>
-            <div class="col-md-6">
-                <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Contact Number</mat-label>
-                    <input matInput formControlName="contactNumber" maxlength="10" required />
-                    <mat-error *ngIf="userForm.get('contactNumber')?.hasError('required')">
-                        Contact Number is required
-                    </mat-error>
-                </mat-form-field>
-            </div>
-            
-        </div>
-        <div class="row">
-            <div class="col-md-6">
-                <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Email ID</mat-label>
-                    <input matInput formControlName="emailId" type="email" required />
-                    <mat-error *ngIf="userForm.get('emailId')?.hasError('required')">
-                        Email ID is required
-                    </mat-error>
-                    <mat-error *ngIf="userForm.get('emailId')?.hasError('email')">
-                        Enter a valid email address
-                    </mat-error>
-                </mat-form-field>
-            </div>
-            <div class="col-md-6">
-                <mat-form-field appearance="outline" class="w-100">
-                    <mat-label>Login ID</mat-label>
-                    <input matInput formControlName="loginId" required />
-                    <mat-error *ngIf="userForm.get('loginId')?.hasError('required')">
-                        Login ID is required
-                    </mat-error>
-                </mat-form-field>
-            </div>
-        </div>
+    <!-- Row 4: Name | Contact Number -->
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Name <span style="color:red">*</span></mat-label>
+          <input matInput formControlName="name" placeholder="Enter full name" />
+          <mat-error *ngIf="userForm.get('name')?.hasError('required')">
+            Name is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Contact Number <span style="color:red">*</span></mat-label>
+          <input matInput formControlName="contactNumber" maxlength="10" placeholder="10-digit number" />
+          <mat-error *ngIf="userForm.get('contactNumber')?.hasError('required')">
+            Contact Number is required
+          </mat-error>
+          <mat-error *ngIf="userForm.get('contactNumber')?.hasError('pattern')">
+            Enter a valid 10-digit number
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
 
-    </form>
+    <!-- Row 5: Email | Login ID -->
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Email ID <span style="color:red">*</span></mat-label>
+          <input matInput formControlName="emailId" type="email" placeholder="user@example.com" />
+          <mat-error *ngIf="userForm.get('emailId')?.hasError('required')">
+            Email ID is required
+          </mat-error>
+          <mat-error *ngIf="userForm.get('emailId')?.hasError('email')">
+            Enter a valid email address
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-label>Login ID <span style="color:red">*</span></mat-label>
+          <input matInput formControlName="loginId" placeholder="Unique login ID" />
+          <mat-error *ngIf="userForm.get('loginId')?.hasError('required')">
+            Login ID is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+  </form>
 </mat-dialog-content>
 
 <!-- Delete Confirmation -->
 <mat-dialog-content *ngIf="data.mode === 'delete'">
-    <p>Are you sure you want to delete <strong>{{ data.user?.name }}</strong>?</p>
+  <p>Are you sure you want to delete <strong>{{ data.user?.name }}</strong>?</p>
 </mat-dialog-content>
 
 <!-- Footer Buttons -->
 <mat-dialog-actions align="end" class="dialog-actions">
-    <button mat-button (click)="closeDialog()">Cancel</button>
+  <button mat-button (click)="closeDialog()">Cancel</button>
 
-    <button *ngIf="data.mode === 'add'" mat-raised-button color="primary" (click)="saveUser()"
-        [disabled]="userForm.invalid">
-        Save
-    </button>
+  <button *ngIf="data.mode === 'add'" mat-raised-button color="primary"
+    (click)="saveUser()" [disabled]="userForm?.invalid">
+    Save
+  </button>
 
-    <button *ngIf="data.mode === 'edit'" mat-raised-button color="primary" (click)="updateUser()"
-        [disabled]="userForm.invalid">
-        Update
-    </button>
+  <button *ngIf="data.mode === 'edit'" mat-raised-button color="primary"
+    (click)="updateUser()" [disabled]="userForm?.invalid">
+    Update
+  </button>
 
-    <button *ngIf="data.mode === 'delete'" mat-raised-button color="warn" (click)="deleteUser()">
-        Delete
-    </button>
+  <button *ngIf="data.mode === 'delete'" mat-raised-button color="warn" (click)="deleteUser()">
+    Delete
+  </button>
 </mat-dialog-actions>

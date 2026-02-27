@@ -4,6 +4,16 @@
     <h2><b>User Master</b></h2>
 
     <div class="d-flex align-items-center gap-3">
+      <!-- Status Filter -->
+      <mat-form-field appearance="outline" style="width: 160px; margin-top: 18px;">
+        <mat-label>Status</mat-label>
+        <mat-select [(value)]="statusFilter" (selectionChange)="onStatusFilterChange($event.value)">
+          <mat-option value="all">All Users</mat-option>
+          <mat-option value="active">Active</mat-option>
+          <mat-option value="inactive">Inactive</mat-option>
+        </mat-select>
+      </mat-form-field>
+
       <!-- 🔍 Search Input -->
       <mat-form-field appearance="outline" class="me-3" style="width: 250px; margin-top: 18px;">
         <input matInput (keyup)="applyFilter($event)" placeholder="Search by Name, Designation, or Organization" />
@@ -23,7 +33,7 @@
     <ng-container matColumnDef="srNo">
       <th mat-header-cell *matHeaderCellDef class="text-center">Sr. No.</th>
       <td mat-cell *matCellDef="let element; let i = index" class="text-center">
-        {{ i + 1 }}
+        {{ (paginator?.pageIndex ?? 0) * (paginator?.pageSize ?? pageSize) + i + 1 }}
       </td>
     </ng-container>
 
@@ -94,13 +104,20 @@
     <ng-container matColumnDef="status">
       <th mat-header-cell *matHeaderCellDef class="text-center">Status</th>
       <td mat-cell *matCellDef="let element" class="text-center">
-        <span *ngIf="element.userLocked" class="badge bg-danger text-white px-2 py-1" style="border-radius: 4px;">
+        <span *ngIf="element.officeId != null && !element.userLocked"
+          class="badge bg-success text-white px-2 py-1" style="border-radius: 4px;">
+          <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">check_circle</mat-icon>
+          Active
+        </span>
+        <span *ngIf="element.officeId != null && element.userLocked"
+          class="badge bg-warning text-dark px-2 py-1" style="border-radius: 4px;">
           <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">lock</mat-icon>
           Locked
         </span>
-        <span *ngIf="!element.userLocked" class="badge bg-success text-white px-2 py-1" style="border-radius: 4px;">
-          <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">check_circle</mat-icon>
-          Active
+        <span *ngIf="element.officeId == null"
+          class="badge bg-secondary text-white px-2 py-1" style="border-radius: 4px;">
+          <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">person_off</mat-icon>
+          Inactive
         </span>
       </td>
     </ng-container>
@@ -130,7 +147,7 @@
   </table>
 
   <!-- ✅ Paginator -->
-  <mat-paginator [length]="totalUsers" class="table-paginator" [pageSize]="pageSize" [pageIndex]="pageIndex"
+  <mat-paginator class="table-paginator" [pageSize]="pageSize"
     [pageSizeOptions]="[5, 10, 25, 50]" showFirstLastButtons>
   </mat-paginator>
 </div>

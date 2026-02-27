@@ -159,6 +159,23 @@ export class UsermgmtService {
     return this.http.get<any>(`${API_ENDPOINTS.referencemaster}/get-active-assigners`);
   }
 
+  // Cascade dropdown APIs (all use integer IDs): Org → OfficeType → Office → Division → Designation → User
+  getOfficeTypesByOrg(orgId: number): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.referencemaster}/get-office-types-by-org/${orgId}`);
+  }
+
+  getOfficesByOfficeType(officeTypeId: number): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.referencemaster}/get-offices-by-type/${officeTypeId}`);
+  }
+
+  getDivisionsByOffice(officeId: number): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.referencemaster}/get-divisions-by-office/${officeId}`);
+  }
+
+  getDesignationsByDivision(divisionId: number): Observable<any> {
+    return this.http.get<any>(`${API_ENDPOINTS.referencemaster}/get-designations-by-division/${divisionId}`);
+  }
+
   // get action history
   getActionHistory(referenceData: any): Observable<any> {
     return this.http.post<any>(`${API_ENDPOINTS.referenceWorkFlow}/action-history/get`, referenceData);

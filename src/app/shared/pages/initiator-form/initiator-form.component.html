@@ -829,11 +829,11 @@
                 </div>
               </div>
 
-              <div class="form-field">
+              <!-- Step 1: Organization -->
+              <div class="form-field"
+                *ngIf="forwardReferenceForm.get('actionType')?.value !== 'Final Draft Reply'">
                 <div class="label-field">
-                  <label
-                    >Organization <span class="text-red-500">*</span></label
-                  >
+                  <label>Organization <span class="text-red-500">*</span></label>
                 </div>
                 <div class="input-container">
                   <select
@@ -841,24 +841,19 @@
                     formControlName="assigneeOrganization"
                     (change)="selectedOrganization($event)"
                   >
-                    <option value="" disabled selected>
-                      Select Organization
-                    </option>
+                    <option value="" disabled selected>Select Organization</option>
                     <option
                       *ngFor="let org of organizationsList"
-                      [value]="org.organizationCode"
+                      [value]="org.organizationId"
                     >
-                      {{ org.organizationCode }}
+                      {{ org.organizationName || org.organizationCode }}
                     </option>
                   </select>
                   <mat-error
                     class="mat-error"
                     *ngIf="
-                      forwardReferenceForm.controls[
-                        'assigneeOrganization'
-                      ].hasError('required') &&
-                      forwardReferenceForm.controls['assigneeOrganization']
-                        .touched
+                      forwardReferenceForm.controls['assigneeOrganization'].hasError('required') &&
+                      forwardReferenceForm.controls['assigneeOrganization'].touched
                     "
                   >
                     Please select organization
@@ -866,24 +861,39 @@
                 </div>
               </div>
 
-              <!-- <div class="form-field">
+              <!-- Step 2: Office Type -->
+              <div class="form-field"
+                *ngIf="forwardReferenceForm.get('actionType')?.value !== 'Final Draft Reply'">
                 <div class="label-field">
-                  <label>Office Type</label>
+                  <label>Office Type <span class="text-red-500">*</span></label>
                 </div>
                 <div class="input-container">
-                  <select matNativeControl formControlName="officeType">
+                  <select
+                    matNativeControl
+                    formControlName="assigneeOfficeType"
+                    (change)="selectedOfficeType($event)"
+                  >
                     <option value="" disabled selected>Select Office Type</option>
-                    <option value="MoRTH">MoRTH</option>
-                    <option value="NHAI">NHAI</option>
-                    <option value="NHIDCL">NHIDCL</option>
+                    <option
+                      *ngFor="let ot of officeTypeOptions"
+                      [value]="ot.officeTypeId"
+                    >
+                      {{ ot.typeName }} ({{ ot.officeTypeCode }})
+                    </option>
                   </select>
-                  <mat-error class="mat-error"
-                    *ngIf="forwardReferenceForm.controls['officeType'].hasError('required') && forwardReferenceForm.controls['officeType'].touched">
+                  <mat-error
+                    class="mat-error"
+                    *ngIf="
+                      forwardReferenceForm.controls['assigneeOfficeType'].hasError('required') &&
+                      forwardReferenceForm.controls['assigneeOfficeType'].touched
+                    "
+                  >
                     Please select office type
                   </mat-error>
                 </div>
-              </div> -->
+              </div>
 
+              <!-- Step 3: Office -->
               <div class="form-field">
                 <div class="label-field">
                   <label>Office <span class="text-red-500">*</span></label>
@@ -895,21 +905,17 @@
                     (change)="selectedOffice($event)"
                   >
                     <option value="" disabled selected>Select Office</option>
-                    <ng-container *ngFor="let office of officeTypeList">
-                      <option
-                        *ngIf="office.officeName !== 'Office of Secretary'"
-                        [value]="office.officeName"
-                      >
-                        {{ office.officeName }}
-                      </option>
-                    </ng-container>
+                    <option
+                      *ngFor="let office of officeTypeList"
+                      [value]="office.officeId"
+                    >
+                      {{ office.officeName }}
+                    </option>
                   </select>
                   <mat-error
                     class="mat-error"
                     *ngIf="
-                      forwardReferenceForm.controls['assigneeOffice'].hasError(
-                        'required'
-                      ) &&
+                      forwardReferenceForm.controls['assigneeOffice'].hasError('required') &&
                       forwardReferenceForm.controls['assigneeOffice'].touched
                     "
                   >
@@ -918,6 +924,39 @@
                 </div>
               </div>
 
+              <!-- Step 4: Division -->
+              <div class="form-field"
+                *ngIf="forwardReferenceForm.get('actionType')?.value !== 'Final Draft Reply'">
+                <div class="label-field">
+                  <label>Division <span class="text-red-500">*</span></label>
+                </div>
+                <div class="input-container">
+                  <select
+                    matNativeControl
+                    formControlName="assigneeDivision"
+                    (change)="selectedDivision($event)"
+                  >
+                    <option value="" disabled selected>Select Division</option>
+                    <option
+                      *ngFor="let division of divisionList"
+                      [value]="division.divisionId"
+                    >
+                      {{ division.divisionName }}
+                    </option>
+                  </select>
+                  <mat-error
+                    class="mat-error"
+                    *ngIf="
+                      forwardReferenceForm.controls['assigneeDivision'].hasError('required') &&
+                      forwardReferenceForm.controls['assigneeDivision'].touched
+                    "
+                  >
+                    Please select division
+                  </mat-error>
+                </div>
+              </div>
+
+              <!-- Step 5: Designation -->
               <div class="form-field">
                 <div class="label-field">
                   <label>Designation <span class="text-red-500">*</span></label>
@@ -928,27 +967,19 @@
                     formControlName="assigneeDesignation"
                     (change)="selectedDesignation($event)"
                   >
-                    <option value="" disabled selected>
-                      Select Designation
-                    </option>
+                    <option value="" disabled selected>Select Designation</option>
                     <option
                       *ngFor="let designation of designationList"
-                      [value]="designation.designationCode"
+                      [value]="designation.designationId"
                     >
-                      {{
-                        designation.designationDescription ||
-                          designation.designationCode
-                      }}
+                      {{ designation.designationDescription || designation.designationCode }}
                     </option>
                   </select>
                   <mat-error
                     class="mat-error"
                     *ngIf="
-                      forwardReferenceForm.controls[
-                        'assigneeDesignation'
-                      ].hasError('required') &&
-                      forwardReferenceForm.controls['assigneeDesignation']
-                        .touched
+                      forwardReferenceForm.controls['assigneeDesignation'].hasError('required') &&
+                      forwardReferenceForm.controls['assigneeDesignation'].touched
                     "
                   >
                     Please select designation
@@ -956,6 +987,7 @@
                 </div>
               </div>
 
+              <!-- Step 6: User -->
               <div class="form-field">
                 <div class="label-field">
                   <label>User <span class="text-red-500">*</span></label>
@@ -974,9 +1006,8 @@
                   <mat-error
                     class="mat-error"
                     *ngIf="
-                      forwardReferenceForm.controls['assigneeName'].hasError(
-                        'required'
-                      ) && forwardReferenceForm.controls['assigneeName'].touched
+                      forwardReferenceForm.controls['assigneeName'].hasError('required') &&
+                      forwardReferenceForm.controls['assigneeName'].touched
                     "
                   >
                     Please select user

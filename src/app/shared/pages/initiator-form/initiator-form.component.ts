@@ -23,6 +23,8 @@ import { EditorComponent } from '@tinymce/tinymce-angular';
 import { ReplyEditorComponent } from '../reply-editor/reply-editor.component';
 import { OrganizationList } from '../../interface/organization-list.model';
 import { OfficeList } from '../../interface/offices-list.model';
+import { OfficeTypeList } from '../../interface/office-type-list.model';
+import { DivisionList } from '../../interface/division-list.model';
 import { DesignationList } from '../../interface/designation-list.model';
 import { UserList } from '../../interface/user-list.model';
 import { VipDesignationList } from '../../interface/vip-designation-list.model';
@@ -69,7 +71,9 @@ export class InitiatorFormComponent {
     {} as VipReferenceDetailsResponse;
   draftReferenceId: number | null = null; // Track draft reference ID
   organizationsList: OrganizationList[] = [];
+  officeTypeOptions: OfficeTypeList[] = [];
   officeTypeList: OfficeList[] = [];
+  divisionList: DivisionList[] = [];
   designationList: DesignationList[] = [];
   userLists: UserList[] = [];
   vipDesignationList: VipDesignationList[] = [];
@@ -522,7 +526,15 @@ export class InitiatorFormComponent {
         { value: '', disabled: true },
         Validators.required,
       ),
+      assigneeOfficeType: new FormControl(
+        { value: '', disabled: true },
+        Validators.required,
+      ),
       assigneeOffice: new FormControl(
+        { value: '', disabled: true },
+        Validators.required,
+      ),
+      assigneeDivision: new FormControl(
         { value: '', disabled: true },
         Validators.required,
       ),
@@ -1396,6 +1408,10 @@ export class InitiatorFormComponent {
       this.actionOptions.length > 0
     ) {
       this.resetForwardReferencForm('finalDraftReply');
+      // Org, Office Type and Division are hidden/disabled for Final Draft Reply
+      this.forwardReferenceForm.get('assigneeOrganization')?.disable();
+      this.forwardReferenceForm.get('assigneeOfficeType')?.disable();
+      this.forwardReferenceForm.get('assigneeDivision')?.disable();
       this.ReferenceAction('finalReply');
       this.getAllDraftReply(referenceId);
     } else if (
@@ -1404,10 +1420,12 @@ export class InitiatorFormComponent {
     ) {
       this.resetForwardReferencForm('forwardForReply');
       this.forwardReferenceForm.get('action')?.enable();
+      this.forwardReferenceForm.get('assigneeOrganization')?.enable();
       this.getAllDraftReply(referenceId);
     } else {
       this.resetForwardReferencForm('forwardForReply');
       this.forwardReferenceForm.get('action')?.enable();
+      this.forwardReferenceForm.get('assigneeOrganization')?.enable();
     }
 
     this.updateButtonsVisibility();
@@ -1470,45 +1488,129 @@ export class InitiatorFormComponent {
     this.selectedDraftRecord = row;
   }
 
+  // Step 1: Organization selected → load Office Types
+  // Step 1: Organization selected → load Office Types by orgId
   selectedOrganization(event: any) {
-    const selectedOrganization = event.target.value;
-    if (selectedOrganization !== null && selectedOrganization !== undefined) {
-      this.forwardReferenceForm.get('assigneeOffice')?.enable();
+    const orgId: number = +event.target.value;
+    if (orgId) {
+      this.forwardReferenceForm.get('assigneeOfficeType')?.enable();
+      this.forwardReferenceForm.get('assigneeOfficeType')?.setValue('');
       this.forwardReferenceForm.get('assigneeOffice')?.setValue('');
+      this.forwardReferenceForm.get('assigneeOffice')?.disable();
+      this.forwardReferenceForm.get('assigneeDivision')?.setValue('');
+      this.forwardReferenceForm.get('assigneeDivision')?.disable();
       this.forwardReferenceForm.get('assigneeDesignation')?.setValue('');
       this.forwardReferenceForm.get('assigneeDesignation')?.disable();
       this.forwardReferenceForm.get('assigneeName')?.setValue('');
       this.forwardReferenceForm.get('assigneeName')?.disable();
+      this.officeTypeOptions = [];
+      this.officeTypeList = [];
+      this.divisionList = [];
       this.designationList = [];
       this.userLists = [];
-      this.getOfficeList(selectedOrganization);
+      this.loadOfficeTypesByOrg(orgId);
     }
-
-    // to turn on the head of department only
-    // if (this.userDetails.roles[0].roleName == 'Assigner') {
-    //   const organization = this.organizationsList.find((res) => res.organizationCode == selectedOrganization);
-    //   this.getHeadOfOrganizationList(organization?.organizationId);
-    // }
   }
 
-  // getOfficeList(selectedOrganization: string) {
-  //   this.ngxService.start();
-  //   this.userMgmtService.getOfficeList(selectedOrganization).subscribe({
-  //     next: (response) => {
-  //       this.officeTypeList = response;
-  //       this.ngxService.stop()
-  //     },
-  //     error: (err) => {
-  //       this.ngxService.stop();
-  //     }
-  //   })
-  // }
+  loadOfficeTypesByOrg(orgId: number) {
+    this.ngxService.start();
+    this.userMgmtService.getOfficeTypesByOrg(orgId).subscribe({
+      next: (response: OfficeTypeList[]) => {
+        this.officeTypeOptions = response;
+        this.ngxService.stop();
+      },
+      error: () => { this.ngxService.stop(); },
+    });
+  }
+
+  // Step 2: Office Type selected → load Offices by officeTypeId only
+  selectedOfficeType(event: any) {
+    const officeTypeId: number = +event.target.value;
+    if (officeTypeId) {
+      this.forwardReferenceForm.get('assigneeOffice')?.enable();
+      this.forwardReferenceForm.get('assigneeOffice')?.setValue('');
+      this.forwardReferenceForm.get('assigneeDivision')?.setValue('');
+      this.forwardReferenceForm.get('assigneeDivision')?.disable();
+      this.forwardReferenceForm.get('assigneeDesignation')?.setValue('');
+      this.forwardReferenceForm.get('assigneeDesignation')?.disable();
+      this.forwardReferenceForm.get('assigneeName')?.setValue('');
+      this.forwardReferenceForm.get('assigneeName')?.disable();
+      this.officeTypeList = [];
+      this.divisionList = [];
+      this.designationList = [];
+      this.userLists = [];
+      this.loadOfficesByType(officeTypeId);
+    }
+  }
+
+  loadOfficesByType(officeTypeId: number) {
+    this.ngxService.start();
+    this.userMgmtService.getOfficesByOfficeType(officeTypeId).subscribe({
+      next: (response: OfficeList[]) => {
+        this.officeTypeList = response;
+        this.ngxService.stop();
+      },
+      error: () => { this.ngxService.stop(); },
+    });
+  }
+
+  // Step 3: Office selected → load Divisions by officeId
+  selectedOffice(event: any) {
+    const officeId: number = +event.target.value;
+    if (officeId) {
+      this.forwardReferenceForm.get('assigneeDivision')?.enable();
+      this.forwardReferenceForm.get('assigneeDivision')?.setValue('');
+      this.forwardReferenceForm.get('assigneeDesignation')?.setValue('');
+      this.forwardReferenceForm.get('assigneeDesignation')?.disable();
+      this.forwardReferenceForm.get('assigneeName')?.setValue('');
+      this.forwardReferenceForm.get('assigneeName')?.disable();
+      this.divisionList = [];
+      this.designationList = [];
+      this.userLists = [];
+      this.loadDivisionsByOffice(officeId);
+    }
+  }
+
+  loadDivisionsByOffice(officeId: number) {
+    this.ngxService.start();
+    this.userMgmtService.getDivisionsByOffice(officeId).subscribe({
+      next: (response: DivisionList[]) => {
+        this.divisionList = response;
+        this.ngxService.stop();
+      },
+      error: () => { this.ngxService.stop(); },
+    });
+  }
+
+  // Step 4: Division selected → load Designations by divisionId
+  selectedDivision(event: any) {
+    const divisionId: number = +event.target.value;
+    if (divisionId) {
+      this.forwardReferenceForm.get('assigneeDesignation')?.enable();
+      this.forwardReferenceForm.get('assigneeDesignation')?.setValue('');
+      this.forwardReferenceForm.get('assigneeName')?.setValue('');
+      this.forwardReferenceForm.get('assigneeName')?.disable();
+      this.designationList = [];
+      this.userLists = [];
+      this.loadDesignationsByDivision(divisionId);
+    }
+  }
+
+  loadDesignationsByDivision(divisionId: number) {
+    this.ngxService.start();
+    this.userMgmtService.getDesignationsByDivision(divisionId).subscribe({
+      next: (response: DesignationList[]) => {
+        this.designationList = response;
+        this.ngxService.stop();
+      },
+      error: () => { this.ngxService.stop(); },
+    });
+  }
 
   getOfficeList(selectedOrganization: string) {
     this.ngxService.start();
     this.userMgmtService.getOfficeList(selectedOrganization).subscribe({
       next: (response: OfficeList[]) => {
-        // Remove duplicates based on officeName (or officeId if you have it)
         const uniqueOffices = response.filter(
           (office, index, self) =>
             index === self.findIndex((o) => o.officeName === office.officeName),
@@ -1517,36 +1619,6 @@ export class InitiatorFormComponent {
         this.ngxService.stop();
       },
     });
-  }
-
-  selectedOffice(event: any) {
-    const selectedOffice = event.target.value;
-    if (selectedOffice !== null && selectedOffice !== undefined) {
-      this.forwardReferenceForm.get('assigneeDesignation')?.enable();
-      this.forwardReferenceForm.get('assigneeDesignation')?.setValue('');
-      this.forwardReferenceForm.get('assigneeName')?.setValue('');
-      this.forwardReferenceForm.get('assigneeName')?.disable();
-      this.userLists = [];
-      this.getDesignationList();
-    }
-  }
-
-  getDesignationList() {
-    this.ngxService.start();
-    const selectedOfficeName =
-      this.forwardReferenceForm.get('assigneeOffice')?.value;
-
-    this.userMgmtService
-      .getDesignationListByOfficeName(selectedOfficeName)
-      .subscribe({
-        next: (response) => {
-          this.designationList = response;
-          this.ngxService.stop();
-        },
-        error: (err) => {
-          this.ngxService.stop();
-        },
-      });
   }
 
   getFinalReplyDesignation(officeName: string) {
@@ -1589,21 +1661,14 @@ export class InitiatorFormComponent {
 
   getUserList() {
     this.ngxService.start();
-    const organizationCode = this.forwardReferenceForm.get(
-      'assigneeOrganization',
-    )?.value;
-    const organization = this.organizationsList.find(
-      (res) => res.organizationCode == organizationCode,
-    );
-    const officeName = this.forwardReferenceForm.get('assigneeOffice')?.value;
-    const designationCode = this.forwardReferenceForm.get(
-      'assigneeDesignation',
-    )?.value;
+    const orgId: number = +this.forwardReferenceForm.get('assigneeOrganization')?.value;
+    const officeId: number = +this.forwardReferenceForm.get('assigneeOffice')?.value;
+    const designationId: number = +this.forwardReferenceForm.get('assigneeDesignation')?.value;
 
     const userInfo = {
-      organization: organization?.organizationId,
-      officeName: officeName,
-      designationCode: designationCode,
+      organization: orgId,
+      office: officeId,
+      designation: designationId,
     };
 
     this.userMgmtService.getUserList(userInfo).subscribe({
@@ -2336,14 +2401,26 @@ export class InitiatorFormComponent {
   }
 
   resetForwardReferencForm(actionName: string) {
+    const cascadeFields = [
+      'assigneeOfficeType',
+      'assigneeOffice',
+      'assigneeDivision',
+      'assigneeDesignation',
+      'assigneeName',
+    ];
+    // Reset cascade lists
+    this.officeTypeOptions = [];
+    this.officeTypeList = [];
+    this.divisionList = [];
+    this.designationList = [];
+    this.userLists = [];
+
     if (actionName == 'forwardForReply') {
       const fieldsToResetAndDisable = [
         'action',
         'replyType',
         'assigneeOrganization',
-        'assigneeOffice',
-        'assigneeDesignation',
-        'assigneeName',
+        ...cascadeFields,
         'assignerComment',
       ];
 
@@ -2357,9 +2434,7 @@ export class InitiatorFormComponent {
       const fieldsToResetAndDisable = [
         'replyType',
         'assigneeOrganization',
-        'assigneeOffice',
-        'assigneeDesignation',
-        'assigneeName',
+        ...cascadeFields,
         'assignerComment',
       ];
 
@@ -2373,9 +2448,7 @@ export class InitiatorFormComponent {
       const fieldsToResetAndDisable = [
         'action',
         'assigneeOrganization',
-        'assigneeOffice',
-        'assigneeDesignation',
-        'assigneeName',
+        ...cascadeFields,
         'assignerComment',
       ];
 

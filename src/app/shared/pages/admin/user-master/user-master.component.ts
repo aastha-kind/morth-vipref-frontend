@@ -34,6 +34,8 @@ export class UserMasterComponent {
   totalUsers = 0;
   pageSize = 10;
   pageIndex = 0;
+  statusFilter = 'all';
+  allUsers: any[] = [];
 
   private adminService = inject(AdminService);
   private toastService = inject(ToasterService);
@@ -47,21 +49,14 @@ export class UserMasterComponent {
   }
 
   ngAfterViewInit(): void {
-    // Listen to paginator events
-    if (this.paginator) {
-      this.paginator.page.subscribe(() => {
-        this.pageIndex = this.paginator.pageIndex;
-        this.pageSize = this.paginator.pageSize;
-        this.loadUsers();
-      });
-    }
+    this.users.paginator = this.paginator;
   }
 
   private loadUsers(): void {
-    this.adminService.getAllUsers(this.pageIndex, this.pageSize, this.filterValue).subscribe({
+    this.adminService.getAllUsers(0, 10000, '').subscribe({
       next: (res: any) => {
-        this.users.data = res.content;
-        this.totalUsers = res.totalElements;
+        this.allUsers = res.content;
+        this.applyStatusFilter();
       },
       error: () => this.toastService.error('Failed To Load Users')
     });
@@ -69,26 +64,50 @@ export class UserMasterComponent {
 
   applyFilter(event: Event): void {
     const filter = (event.target as HTMLInputElement).value;
-    this.filterValue = filter.trim();
-    this.pageIndex = 0; // Reset to first page on search
-    if (this.paginator) {
-      this.paginator.pageIndex = 0;
+    this.filterValue = filter.trim().toLowerCase();
+    this.applyStatusFilter();
+  }
+
+  onStatusFilterChange(value: string): void {
+    this.statusFilter = value;
+    this.applyStatusFilter();
+  }
+
+  private applyStatusFilter(): void {
+    let filtered = [...this.allUsers];
+
+    if (this.statusFilter === 'active') {
+      filtered = filtered.filter(u => u.officeId != null);
+    } else if (this.statusFilter === 'inactive') {
+      filtered = filtered.filter(u => u.officeId == null);
     }
-    this.loadUsers();
+
+    if (this.filterValue) {
+      filtered = filtered.filter(u =>
+        u.name?.toLowerCase().includes(this.filterValue) ||
+        u.organizationName?.toLowerCase().includes(this.filterValue) ||
+        u.designationName?.toLowerCase().includes(this.filterValue) ||
+        u.loginId?.toLowerCase().includes(this.filterValue)
+      );
+    }
+
+    this.users.data = filtered;
+    this.totalUsers = filtered.length;
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
   }
 
   openAddDialog(): void {
     const dialogRef = this.dialog.open(UserMasterDialogComponent, {
-      width: '700px',
+      width: '800px',
       data: { mode: 'add', user: {} }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result?.action === 'add' && result.user) {
-        const addUserData={
-          ...result.user,
-          roleIds:[result.user?.role]
-        }
+        const { officeType, division, role, ...rest } = result.user;
+        const addUserData = { ...rest, roleIds: [role] };
         this.adminService.addUser(addUserData).subscribe({
           next: () => {
             this.loadUsers();
@@ -102,16 +121,14 @@ export class UserMasterComponent {
 
   openEditDialog(user: User): void {
     const dialogRef = this.dialog.open(UserMasterDialogComponent, {
-      width: '700px',
+      width: '800px',
       data: { mode: 'edit', user: { ...user } }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result?.action === 'edit' && user.id) {
-        const editUserData={
-          ...result.user,
-          roleIds:[result.user?.role]
-        }
+        const { officeType, division, role, ...rest } = result.user;
+        const editUserData = { ...rest, roleIds: [role] };
         this.adminService.updateUser(user.id, editUserData).subscribe({
           next: () => {
             this.loadUsers();
