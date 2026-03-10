@@ -147,12 +147,13 @@ export class AdminService {
   }
 
   addUser(user: User): Observable<any> {
-    return this.http.post(`${API_ENDPOINTS.users}`, user);
+    return this.http.put(`${API_ENDPOINTS.users}/0/create`, user);
   }
 
   updateUser(id: number, user: User): Observable<any> {
-    return this.http.put(`${API_ENDPOINTS.users}/${id}`, user);
+    return this.http.put(`${API_ENDPOINTS.users}/${id}/update`, user);
   }
+
 
   getUserListByRoleId(roleId:string){
     return this.http.get(`${API_ENDPOINTS.userMgmt}/user-list/${roleId}`);

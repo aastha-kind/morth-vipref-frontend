@@ -323,7 +323,6 @@ export class InitiatorFormComponent {
         this.addVipReferenceDetails.get('referenceNo')?.disable();
         this.addVipReferenceDetails.get('dateOfLetter')?.disable();
         this.addVipReferenceDetails.get('dateOfReceiving')?.disable();
-        this.addVipReferenceDetails.get('state')?.disable();
       } else if (this.selectedReferenceDetails.currentQueue == 'VIP_Assignee') {
         this.initiateforwardReferenceForm();
         this.showReferencNo = true;
