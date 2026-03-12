@@ -645,8 +645,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of stateOrgData">
-                    <td>{{item.sNo}}</td>
+                  <tr *ngFor="let item of stateOrgData; let i = index">
+                    <td>{{i + 1}}</td>
                     <td>{{item.state}}</td>
                     <td>{{item.organisation}}</td>
                     <td>{{item.totalReference}}</td>

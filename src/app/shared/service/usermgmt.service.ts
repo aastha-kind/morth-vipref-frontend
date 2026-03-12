@@ -86,6 +86,9 @@ export class UsermgmtService {
   getQueueReferencesListPaginated(queueData: any): Observable<any> {
     return this.http.post<any>(`${API_ENDPOINTS.reference}/user/queue/references/paginated`, queueData)
   }
+  getAssignerAllReferencesPaginated(queueData: any): Observable<any> {
+    return this.http.post<any>(`${API_ENDPOINTS.reference}/user/queue/references/assigner-paginated`, queueData)
+  }
 
   getReferenceListByQueueAndStatus(userData: any): Observable<any> {
     return this.http.get<any>(`${API_ENDPOINTS.reference}/reference-list/${userData.loginId}/${userData.status}`)

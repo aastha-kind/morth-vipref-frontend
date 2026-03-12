@@ -354,12 +354,40 @@ export class DashboardComponent implements AfterViewInit {
     const dateRange = this.getDateRange();
     this.ngxService.start();
 
-    if (this.isAssignerOrAssignee()) {
-      // For Assigner/Assignee: use filtered queue endpoint that supports date, queue, priority filters
+    if (this.isAssigner()) {
+      // Assigner: dedicated endpoint that returns ALL references (INBOX + SENT) without status filter
       const filterRequest = {
         loginId: this.userDetails.loginId,
         queue: this.selectedQueueFilter,
-        status: 'SENT',
+        search: this.searchTerm || null,
+        page: this.pageIndex,
+        size: this.pageSize,
+        sortBy: this.sortColumn,
+        sortDir: this.sortDirection,
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        priority: this.selectedPriorityFilter,
+      };
+
+      this.userMgmtService.getAssignerAllReferencesPaginated(filterRequest).subscribe({
+        next: (res: any) => {
+          this.VipReferenceData.data = res.content;
+          this.totalElements = res.totalElements;
+          this.pageIndex = res.pageNumber;
+          this.ngxService.stop();
+        },
+        error: (err) => {
+          console.error('Error fetching assigner references:', err);
+          this.toastr.error('No references found for this user');
+          this.ngxService.stop();
+        },
+      });
+    } else if (this.isAssignee()) {
+      // Assignee: INBOX status (references pending their action)
+      const filterRequest = {
+        loginId: this.userDetails.loginId,
+        queue: this.selectedQueueFilter,
+        status: 'INBOX',
         search: this.searchTerm || null,
         page: this.pageIndex,
         size: this.pageSize,
@@ -378,7 +406,7 @@ export class DashboardComponent implements AfterViewInit {
           this.ngxService.stop();
         },
         error: (err) => {
-          console.error('Error fetching references:', err);
+          console.error('Error fetching assignee references:', err);
           this.toastr.error('No references found for this user');
           this.ngxService.stop();
         },
