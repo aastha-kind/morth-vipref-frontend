@@ -271,9 +271,21 @@
                       Subject
                       <i class="bi" [ngClass]="vipPendencySortColumn === 'subject' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
                     </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('letterDate')">
+                      Letter Date
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'letterDate' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('receivingDate')">
+                      Receiving Date
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'receivingDate' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
                     <th style="cursor: pointer;" (click)="sortVipPendencyTable('state')">
                       State
                       <i class="bi" [ngClass]="vipPendencySortColumn === 'state' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
+                    </th>
+                    <th style="cursor: pointer;" (click)="sortVipPendencyTable('category')">
+                      Category
+                      <i class="bi" [ngClass]="vipPendencySortColumn === 'category' ? (vipPendencySortDirection === 'asc' ? 'bi-arrow-up' : 'bi-arrow-down') : 'bi-arrow-down-up'"></i>
                     </th>
                     <th style="cursor: pointer;" (click)="sortVipPendencyTable('assigneeName')">
                       Assignee Name
@@ -315,7 +327,10 @@
                     </td>
                     <td>{{item.dignitaryName || '-'}}</td>
                     <td>{{item.subject || '-'}}</td>
-                    <td>{{item.state || '-'}}</td>
+                    <td>{{item.letterDate ? (item.letterDate | date:'dd/MM/yyyy') : '-'}}</td>
+                    <td>{{item.receivingDate ? (item.receivingDate | date:'dd/MM/yyyy') : '-'}}</td>
+                    <td>{{getStateFullName(item.state)}}</td>
+                    <td>{{item.category || '-'}}</td>
                     <td>{{item.assigneeName || '-'}}</td>
                     <td><code>{{item.assigneeLoginId || '-'}}</code></td>
                     <td>{{item.designation || '-'}}</td>

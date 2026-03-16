@@ -3,6 +3,7 @@ import { ReportService } from '../../../service/report.service';
 import { AdminService } from '../../../service/admin.service';
 import { UsermgmtService } from '../../../service/usermgmt.service';
 import { ToasterService } from '../../../utilities/toaster.service';
+import { getStateFullName } from '../../../utilities/state-codes';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -424,7 +425,7 @@ export class MasterReportsComponent implements OnInit {
       if (column === 'pendingDays' || column === 'sNo') {
         aVal = aVal !== null && aVal !== undefined ? parseInt(aVal) : 0;
         bVal = bVal !== null && bVal !== undefined ? parseInt(bVal) : 0;
-      } else if (column === 'assignedAt') {
+      } else if (column === 'assignedAt' || column === 'letterDate' || column === 'receivingDate') {
         aVal = aVal ? new Date(aVal).getTime() : 0;
         bVal = bVal ? new Date(bVal).getTime() : 0;
       } else {
@@ -458,13 +459,16 @@ export class MasterReportsComponent implements OnInit {
     doc.text(`Pendency Type: ${this.vipPendencyResponse?.criteriaPendencyType || ''}`, 14, 27);
     doc.text(`Total Records: ${this.vipPendencyResponse?.totalRecords || 0}`, 14, 32);
 
-    const headers = [['S.No.', 'Reference No', 'Dignitary Name', 'Subject', 'State', 'Assignee Name', 'Login ID', 'Designation', 'Organisation', 'Office', 'Pending Days', 'Status']];
+    const headers = [['S.No.', 'Reference No', 'Dignitary Name', 'Subject', 'Letter Date', 'Receiving Date', 'State', 'Category', 'Assignee Name', 'Login ID', 'Designation', 'Organisation', 'Office', 'Pending Days', 'Status']];
     const data = this.vipPendencyData.map((item) => [
       item.sNo?.toString() || '-',
       item.referenceNo || '-',
       item.dignitaryName || '-',
       item.subject || '-',
-      item.state || '-',
+      this.formatDate(item.letterDate) || '-',
+      this.formatDate(item.receivingDate) || '-',
+      this.getStateFullName(item.state),
+      item.category || '-',
       item.assigneeName || '-',
       item.assigneeLoginId || '-',
       item.designation || '-',
@@ -478,7 +482,7 @@ export class MasterReportsComponent implements OnInit {
       head: headers,
       body: data,
       startY: 37,
-      styles: { fontSize: 7 },
+      styles: { fontSize: 6 },
       headStyles: { fillColor: [76, 175, 80] }
     });
 
@@ -492,13 +496,16 @@ export class MasterReportsComponent implements OnInit {
       return;
     }
 
-    const headers = ['S.No.', 'Reference No', 'Dignitary Name', 'Subject', 'State', 'Assignee Name', 'Login ID', 'Designation', 'Organisation', 'Office', 'Pending Days', 'Status'];
+    const headers = ['S.No.', 'Reference No', 'Dignitary Name', 'Subject', 'Letter Date', 'Receiving Date', 'State', 'Category', 'Assignee Name', 'Login ID', 'Designation', 'Organisation', 'Office', 'Pending Days', 'Status'];
     const csvData = this.vipPendencyData.map((item) => [
       item.sNo?.toString() || '-',
       item.referenceNo || '-',
       item.dignitaryName || '-',
       item.subject || '-',
-      item.state || '-',
+      this.formatDate(item.letterDate) || '-',
+      this.formatDate(item.receivingDate) || '-',
+      this.getStateFullName(item.state),
+      item.category || '-',
       item.assigneeName || '-',
       item.assigneeLoginId || '-',
       item.designation || '-',
@@ -529,13 +536,16 @@ export class MasterReportsComponent implements OnInit {
       return;
     }
 
-    const headers = ['S.No.', 'Reference No', 'Dignitary Name', 'Subject', 'State', 'Assignee Name', 'Login ID', 'Designation', 'Organisation', 'Office', 'Pending Days', 'Status'];
+    const headers = ['S.No.', 'Reference No', 'Dignitary Name', 'Subject', 'Letter Date', 'Receiving Date', 'State', 'Category', 'Assignee Name', 'Login ID', 'Designation', 'Organisation', 'Office', 'Pending Days', 'Status'];
     const rows = this.vipPendencyData.map((item) => [
       item.sNo ?? '-',
       item.referenceNo || '-',
       item.dignitaryName || '-',
       item.subject || '-',
-      item.state || '-',
+      this.formatDate(item.letterDate) || '-',
+      this.formatDate(item.receivingDate) || '-',
+      this.getStateFullName(item.state),
+      item.category || '-',
       item.assigneeName || '-',
       item.assigneeLoginId || '-',
       item.designation || '-',
@@ -1439,6 +1449,10 @@ export class MasterReportsComponent implements OnInit {
     if (!date) return '';
     const d = new Date(date);
     return d.toLocaleDateString('en-GB');
+  }
+
+  getStateFullName(code: string): string {
+    return getStateFullName(code);
   }
 
   onTabChange(index: number): void {
