@@ -118,6 +118,10 @@ export class UsermgmtService {
       { responseType: 'text', headers: {} })
   }
 
+  reopenReference(referenceData: { referenceId: number; loginId: string; comments?: string }): Observable<any> {
+    return this.http.post(`${API_ENDPOINTS.referenceWorkFlow}/action/reopen-reference`, referenceData);
+  }
+
 
 
   // master data api

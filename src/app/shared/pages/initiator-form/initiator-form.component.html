@@ -1167,9 +1167,7 @@
                     color="primary"
                     (click)="finalReplyQueue()"
                     *ngIf="showFinalReplyBtn"
-                    [disabled]="
-                      !selectedDraftRecord || forwardReferenceForm.invalid
-                    "
+                    [disabled]="!selectedDraftRecord"
                   >
                     Move To Final Reply
                   </button>

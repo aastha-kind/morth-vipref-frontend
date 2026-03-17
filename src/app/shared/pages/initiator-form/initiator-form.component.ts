@@ -1407,10 +1407,11 @@ export class InitiatorFormComponent {
       this.actionOptions.length > 0
     ) {
       this.resetForwardReferencForm('finalDraftReply');
-      // Org, Office Type and Division are hidden/disabled for Final Draft Reply
-      this.forwardReferenceForm.get('assigneeOrganization')?.disable();
-      this.forwardReferenceForm.get('assigneeOfficeType')?.disable();
-      this.forwardReferenceForm.get('assigneeDivision')?.disable();
+      // Disable all non-required fields immediately so form is valid for Final Draft Reply
+      ['action', 'assigneeOrganization', 'assigneeOfficeType', 'assigneeDivision',
+       'assigneeOffice', 'assigneeDesignation', 'assigneeName', 'assignerComment'].forEach(f => {
+        this.forwardReferenceForm.get(f)?.disable();
+      });
       this.ReferenceAction('finalReply');
       this.getAllDraftReply(referenceId);
     } else if (

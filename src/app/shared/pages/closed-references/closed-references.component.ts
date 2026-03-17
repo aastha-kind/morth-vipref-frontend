@@ -24,6 +24,11 @@ export class ClosedReferencesComponent implements AfterViewInit {
   searchTerm: string = '';
   officeTypeFilter: string | null = null;
 
+  reopenConfirmVisible = false;
+  reopenRemarks = '';
+  reopenTargetRef: VipReference | null = null;
+  reopenLoading = false;
+
   // Pagination variables
   pageIndex: number = 0;
   pageSize: number = 10;
@@ -158,6 +163,42 @@ export class ClosedReferencesComponent implements AfterViewInit {
     this.userMgmtService.setReferenceDetails(ref);
     this.router.navigate([`/dashboard/add-reference`], {
       state: { previousRoute: '/dashboard/vip-final-reply' }
+    });
+  }
+
+  showReopenConfirm(ref: VipReference) {
+    this.reopenTargetRef = ref;
+    this.reopenRemarks = '';
+    this.reopenConfirmVisible = true;
+  }
+
+  cancelReopen() {
+    this.reopenConfirmVisible = false;
+    this.reopenTargetRef = null;
+    this.reopenRemarks = '';
+  }
+
+  confirmReopen() {
+    if (!this.reopenTargetRef) return;
+    this.reopenLoading = true;
+    this.userMgmtService.reopenReference({
+      referenceId: this.reopenTargetRef.referenceId!,
+      loginId: this.userDetails.loginId,
+      comments: this.reopenRemarks || undefined
+    }).subscribe({
+      next: () => {
+        this.reopenLoading = false;
+        this.reopenConfirmVisible = false;
+        this.reopenTargetRef = null;
+        this.reopenRemarks = '';
+        this.toasterService.success('Reference re-opened and moved to your Assigner queue');
+        this.getQueueReferences();
+      },
+      error: (err) => {
+        this.reopenLoading = false;
+        const msg = err?.error?.message || 'Failed to re-open reference';
+        this.toasterService.error(msg);
+      }
     });
   }
 }
