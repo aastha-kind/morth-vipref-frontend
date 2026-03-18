@@ -28,6 +28,7 @@ import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password
 import { ClosedReferencesComponent } from './pages/closed-references/closed-references.component';
 import { DiscardReferencesComponent } from './pages/discard-references/discard-references.component';
 import { UserProfileComponent } from './pages/user-profile/user-profile.component';
+import { UserReportsComponent } from './pages/user-reports/user-reports.component';
 
 const routes: Routes = [
   {
@@ -59,6 +60,7 @@ const routes: Routes = [
       {path:'vip-final-reply',component:VipFinalReplyComponent},
       {path:'vip-closed-references',component:ClosedReferencesComponent},
       {path:'vip-discard-references',component:DiscardReferencesComponent},
+      {path:'vip-reports',component:UserReportsComponent},
       {path:'profile',component:UserProfileComponent}
     ]
   },

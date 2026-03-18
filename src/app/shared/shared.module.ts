@@ -59,6 +59,7 @@ import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password
 import { ClosedReferencesComponent } from './pages/closed-references/closed-references.component';
 import { DiscardReferencesComponent } from './pages/discard-references/discard-references.component';
 import { UserProfileComponent } from './pages/user-profile/user-profile.component';
+import { UserReportsComponent } from './pages/user-reports/user-reports.component';
 
 @NgModule({
   declarations: [
@@ -110,6 +111,7 @@ import { UserProfileComponent } from './pages/user-profile/user-profile.componen
     ClosedReferencesComponent,
     DiscardReferencesComponent,
     UserProfileComponent,
+    UserReportsComponent,
   ],
   imports: [
     CommonModule,

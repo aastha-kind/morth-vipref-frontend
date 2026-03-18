@@ -22,6 +22,10 @@ import { UsermgmtService } from '../../service/usermgmt.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { ToastrService } from 'ngx-toastr';
 import { PagedResponse } from '../../interface/paged-response.model';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import { getStateFullName } from '../../utilities/state-codes';
 Chart.register(...registerables);
 
 export interface VipReference {
@@ -39,6 +43,9 @@ export interface VipReference {
   categoryOfSubject?: string;
   assignedAt?: Date;
   dateOfEntry?: Date;
+  assigneeName?: string;
+  office?: string;
+  organization?: string;
 }
 
 @Component({
@@ -60,15 +67,7 @@ export class DashboardComponent implements AfterViewInit {
   private toastr = inject(ToastrService);
 
   public config: any;
-  displayedColumns: string[] = [
-    'referenceNo',
-    'subject',
-    'assignedAt',
-    'priority',
-    'currentQueue',
-    // 'status',
-    'actions',
-  ];
+  displayedColumns: string[] = [];
   VipReferenceData = new MatTableDataSource<VipReference>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -111,9 +110,25 @@ export class DashboardComponent implements AfterViewInit {
   ];
 
   ngOnInit() {
-    this.getUserDetails();
+    this.getUserDetails(); // also calls setDisplayedColumns() internally
     this.getDashboardStats();
     this.getVipReferenceList();
+  }
+
+  setDisplayedColumns() {
+    if (this.isAssignerOrAssignee()) {
+      this.displayedColumns = [
+        'referenceNo', 'nameOfDignitary', 'state', 'subject',
+        'assignedAt', 'priority', 'currentQueue',
+        'assigneeName', 'office', 'organization', 'actions',
+      ];
+    } else {
+      // Initiator: hide Assignee Name, Office, Organization
+      this.displayedColumns = [
+        'referenceNo', 'nameOfDignitary', 'state', 'subject',
+        'assignedAt', 'priority', 'currentQueue', 'actions',
+      ];
+    }
   }
   ngAfterViewInit() {
     // Chart rendering is now handled after data loads in getDashboardStats
@@ -148,36 +163,25 @@ export class DashboardComponent implements AfterViewInit {
     const userData = sessionStorage.getItem('user');
     if (userData) {
       this.userDetails = JSON.parse(userData);
+      this.setDisplayedColumns();
     }
   }
 
   isAssignerOrAssignee(): boolean {
-    return (
-      this.userDetails?.roles?.some((role) => {
-        const roleName = role.roleName?.toLowerCase() || '';
-        return roleName.includes('assigner') || roleName.includes('assignee');
-      }) || false
-    );
+    const roleName = this.userDetails?.roles?.[0]?.roleName?.toLowerCase() || '';
+    return roleName.includes('assigner') || roleName.includes('assignee');
   }
 
   // Check if user is Assigner (has queue filter)
   isAssigner(): boolean {
-    return (
-      this.userDetails?.roles?.some((role) => {
-        const roleName = role.roleName?.toLowerCase() || '';
-        return roleName.includes('assigner') && !roleName.includes('assignee');
-      }) || false
-    );
+    const roleName = this.userDetails?.roles?.[0]?.roleName?.toLowerCase() || '';
+    return roleName.includes('assigner') && !roleName.includes('assignee');
   }
 
   // Check if user is Assignee (no queue filter)
   isAssignee(): boolean {
-    return (
-      this.userDetails?.roles?.some((role) => {
-        const roleName = role.roleName?.toLowerCase() || '';
-        return roleName.includes('assignee');
-      }) || false
-    );
+    const roleName = this.userDetails?.roles?.[0]?.roleName?.toLowerCase() || '';
+    return roleName.includes('assignee');
   }
 
   // Handle date filter change
@@ -475,6 +479,143 @@ export class DashboardComponent implements AfterViewInit {
           maxHeight: '90vh',
         });
       },
+    });
+  }
+
+  formatDate(date: any): string {
+    if (!date) return '-';
+    return new Date(date).toLocaleDateString('en-GB');
+  }
+
+  getStateFullName(code: string): string {
+    return getStateFullName(code);
+  }
+
+  private loadAllDataForExport(onSuccess: (data: any[]) => void): void {
+    const dateRange = this.getDateRange();
+    const handleResponse = (res: any) => onSuccess((res && res.content) ? res.content : []);
+    const handleError = () => {
+      this.ngxService.stop();
+      this.toastr.error('Failed to fetch data for export');
+    };
+
+    if (this.isAssigner()) {
+      this.userMgmtService.getAssignerAllReferencesPaginated({
+        loginId: this.userDetails.loginId,
+        queue: this.selectedQueueFilter,
+        search: this.searchTerm || null,
+        page: 0,
+        size: 10000,
+        sortBy: this.sortColumn,
+        sortDir: this.sortDirection,
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        priority: this.selectedPriorityFilter,
+      }).subscribe({ next: handleResponse, error: handleError });
+    } else if (this.isAssignee()) {
+      this.userMgmtService.getQueueReferencesListPaginated({
+        loginId: this.userDetails.loginId,
+        queue: this.selectedQueueFilter,
+        status: 'INBOX',
+        search: this.searchTerm || null,
+        page: 0,
+        size: 10000,
+        sortBy: this.sortColumn,
+        sortDir: this.sortDirection,
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        priority: this.selectedPriorityFilter,
+      }).subscribe({ next: handleResponse, error: handleError });
+    } else {
+      this.userMgmtService.getVipReferenceListPaginated(
+        this.userDetails.loginId, 0, 10000,
+        this.searchTerm, this.sortColumn, this.sortDirection
+      ).subscribe({ next: handleResponse, error: handleError });
+    }
+  }
+
+  exportToPDF(): void {
+    if (this.totalElements === 0) {
+      this.toastr.warning('No data to export');
+      return;
+    }
+    this.ngxService.start();
+    this.loadAllDataForExport((data) => {
+      this.ngxService.stop();
+      if (!data.length) { this.toastr.warning('No data to export'); return; }
+
+      const doc = new jsPDF('l', 'mm', 'a4');
+      doc.setFontSize(14);
+      doc.text('VIP Reference List', 14, 15);
+      doc.setFontSize(9);
+      doc.text(`Generated: ${new Date().toLocaleString('en-GB')}`, 14, 21);
+      doc.text(`User: ${this.userDetails?.name || this.userDetails?.loginId || ''}`, 14, 26);
+
+      const showExtra = this.isAssignerOrAssignee();
+      const headers = showExtra
+        ? [['S.No.', 'Reference No', "Dignitary's Name", 'State', 'Subject', 'Received Date', 'Priority', 'Current Queue', 'Assignee Name', 'Office', 'Organization']]
+        : [['S.No.', 'Reference No', "Dignitary's Name", 'State', 'Subject', 'Received Date', 'Priority', 'Current Queue']];
+
+      const rows = data.map((item: any, i: number) => {
+        const row: string[] = [
+          (i + 1).toString(),
+          item.referenceNo || '-',
+          item.nameOfDignitary || '-',
+          this.getStateFullName(item.state),
+          item.subject || '-',
+          this.formatDate(item.assignedAt),
+          item.priority || '-',
+          item.currentQueue || '-',
+        ];
+        if (showExtra) {
+          row.push(item.assigneeName || '-', item.office || '-', item.organization || '-');
+        }
+        return row;
+      });
+
+      autoTable(doc, { head: headers, body: rows, startY: 30, styles: { fontSize: 7 }, headStyles: { fillColor: [62, 147, 147] } });
+      doc.save('VIP_Reference_List.pdf');
+      this.toastr.success(`Exported ${data.length} records to PDF`);
+    });
+  }
+
+  exportToExcel(): void {
+    if (this.totalElements === 0) {
+      this.toastr.warning('No data to export');
+      return;
+    }
+    this.ngxService.start();
+    this.loadAllDataForExport((data) => {
+      this.ngxService.stop();
+      if (!data.length) { this.toastr.warning('No data to export'); return; }
+
+      const showExtra = this.isAssignerOrAssignee();
+      const headers = showExtra
+        ? ['S.No.', 'Reference No', "Dignitary's Name", 'State', 'Subject', 'Received Date', 'Priority', 'Current Queue', 'Assignee Name', 'Office', 'Organization']
+        : ['S.No.', 'Reference No', "Dignitary's Name", 'State', 'Subject', 'Received Date', 'Priority', 'Current Queue'];
+
+      const rows = data.map((item: any, i: number) => {
+        const row: any[] = [
+          i + 1,
+          item.referenceNo || '-',
+          item.nameOfDignitary || '-',
+          this.getStateFullName(item.state),
+          item.subject || '-',
+          this.formatDate(item.assignedAt),
+          item.priority || '-',
+          item.currentQueue || '-',
+        ];
+        if (showExtra) {
+          row.push(item.assigneeName || '-', item.office || '-', item.organization || '-');
+        }
+        return row;
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'VIP Reference List');
+      XLSX.writeFile(wb, 'VIP_Reference_List.xlsx');
+      this.toastr.success(`Exported ${data.length} records to Excel`);
     });
   }
 

@@ -73,4 +73,10 @@ export class SideNavComponent {
       this.userDetails = JSON.parse(userData);
     }
   }
+
+  isAssigner(): boolean {
+    return this.userDetails?.roles?.some(
+      (r) => r.roleName?.toLowerCase() === 'assigner'
+    ) ?? false;
+  }
 }

@@ -21,10 +21,10 @@
     </div>
   </div>
 
-  <!-- <a mat-list-item [routerLink]="['/administrator/master-report']">
-    <mat-icon style="font-size: 1.15rem;height: auto;">assignment</mat-icon>
+  <a mat-list-item [routerLink]="['/dashboard/vip-reports']" *ngIf="!isAssigner()">
+    <mat-icon style="font-size: 1.15rem;height: auto;">assessment</mat-icon>
     <span class="ms-1">Reports</span>
-  </a> -->
+  </a>
 
   <!-- <a mat-list-item [routerLink]="['/administrator/settings']">
     <mat-icon style="font-size: 1.15rem;height: auto;">settings</mat-icon>
