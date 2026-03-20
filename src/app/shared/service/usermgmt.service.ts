@@ -280,6 +280,6 @@ export class UsermgmtService {
   }
 
   getUserProfile(loginId: string): Observable<any> {
-    return this.http.get<any>(`${API_ENDPOINTS.users}?search=${loginId}&page=0&size=5`);
+    return this.http.get<any>(`${API_ENDPOINTS.users}/profile/${loginId}`);
   }
 }

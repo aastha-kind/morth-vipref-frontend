@@ -29,8 +29,8 @@ export class UserProfileComponent implements OnInit {
     this.ngxService.start();
     this.usermgmtService.getUserProfile(this.userDetails.loginId).subscribe({
       next: (res) => {
-        if (res && res.content && res.content.length > 0) {
-          this.profileData = res.content[0];
+        if (res) {
+          this.profileData = res;
         }
         this.ngxService.stop();
       },
